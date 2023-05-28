@@ -1,0 +1,23 @@
+body {
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: bold;
+    width: 100vw !important;
+}
+
+.collapsed-menu {
+    padding-left: 65px !important;
+    transition: .3s ease;
+}
+
+.not-collapsed-menu {
+    padding-left: 290px !important;
+    transition: .3s ease;
+}
+
+.v-sidebar-menu .vsm--title {
+    color: black !important;
+}
+
+.v-sidebar-menu .vsm--toggle-btn_default::before {
+    display: none !important;
+}
