@@ -1,8 +1,23 @@
 <template>
     <div>
-        <div class="row d-flex align-items-center mb-3 mt-5">
+        <div class="row d-flex align-items-center mt-5">
             <div class="col-4">
                 <h3 class="fw-bold">Vowels/Consonants</h3>
+            </div>
+        </div>
+        <div class="row d-flex align-items-center mb-3 mt-3">
+            <div class="col-4">
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" v-model="alphabetFlag" :value="0" id="btnradio1"
+                        autocomplete="off" :checked="alphabetFlag == 0">
+                    <label class="btn btn-outline-dark fw-bold rounded-0"
+                        :class="alphabetFlag == 0 ? 'text-white' : 'text-black'" for="btnradio1">Vowels</label>
+
+                    <input type="radio" class="btn-check" v-model="alphabetFlag" :value="1" id="btnradio2"
+                        autocomplete="off" :checked="alphabetFlag == 1">
+                    <label class="btn btn-outline-dark fw-bold rounded-0"
+                        :class="alphabetFlag == 1 ? 'text-white' : 'text-black'" for="btnradio2">Consonants</label>
+                </div>
             </div>
             <div class="col-8">
                 <button data-bs-toggle="modal" data-bs-target="#addAlphabetModal" class="btn btn-success rounded-0 fw-bold">
@@ -10,24 +25,16 @@
                 </button>
             </div>
         </div>
-        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-            <input type="radio" class="btn-check" v-model="alphabetFlag" :value="0" id="btnradio1" autocomplete="off"
-                :checked="alphabetFlag == 0">
-            <label class="btn btn-outline-dark fw-bold rounded-0" :class="alphabetFlag == 0 ? 'text-white' : 'text-black'"
-                for="btnradio1">Vowels</label>
 
-            <input type="radio" class="btn-check" v-model="alphabetFlag" :value="1" id="btnradio2" autocomplete="off"
-                :checked="alphabetFlag == 1">
-            <label class="btn btn-outline-dark fw-bold rounded-0" :class="alphabetFlag == 1 ? 'text-white' : 'text-black'"
-                for="btnradio2">Consonants</label>
-        </div>
         <div class="d-flex justify-content-center mt-3">
             <table class="table table-bordered table-responsive table-striped">
                 <thead>
                     <tr class="bg-secondary">
                         <th class="text-white" style="font-size: 20px" scope="col">Letter</th>
+                        <th class="text-white" style="font-size: 20px">Object</th>
                         <th class="text-white" style="font-size: 20px">Image Path</th>
                         <th class="text-white" style="font-size: 20px">Video Path</th>
+                        <th class="text-white" style="font-size: 20px">Action</th>
                     </tr>
                 </thead>
                 <tbody v-if="vowelConsonants.length == 0">
@@ -38,6 +45,7 @@
                 <tbody v-else>
                     <tr v-for="item in data" :key="item.id">
                         <td class="fw-bold">{{ item.letter.toString().toUpperCase() }}</td>
+                        <td class="fw-bold">{{ item.object }}</td>
                         <td>
                             <div class="row">
                                 <div class="col-6">
@@ -67,6 +75,11 @@
                                     </button>
                                 </div>
                             </div>
+                        </td>
+                        <td class="d-flex justify-content-center">
+                            <button class="btn-danger btn rounded-0 btn-sm">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>
@@ -116,20 +129,19 @@
                                 <label for="letter" class="form-label fw-bold">Alphabet</label>
                                 <input v-model="alphabetContent.letter" type="text" class="form-control" id="letter"
                                     aria-describedby="letter">
-                                <small class="text-danger fw-bold" v-if="errors && errors.letter">{{
-                                    errors.letter[0] }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="objectName" class="form-label fw-bold">Object Name</label>
+                                <input v-model="alphabetContent.objectName" type="text" class="form-control" id="objectName"
+                                    aria-describedby="objectName">
                             </div>
                             <div class="mb-3">
                                 <label for="image" class="form-label fw-bold">Image File</label>
                                 <input type="file" class="form-control" id="image">
-                                <small class="text-danger fw-bold" v-if="errors && errors.image">{{
-                                    errors.image[0] }}</small>
                             </div>
                             <div class="mb-3">
                                 <label for="video" class="form-label fw-bold">Video File</label>
                                 <input type="file" class="form-control" id="video">
-                                <small class="text-danger fw-bold" v-if="errors && errors.video">{{
-                                    errors.video[0] }}</small>
                             </div>
                         </form>
                     </div>
@@ -153,6 +165,7 @@ export default {
             video: null,
             alphabetContent: {
                 letter: '',
+                objectName: null,
                 image: null,
                 video: null
             },

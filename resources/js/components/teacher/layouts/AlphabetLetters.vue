@@ -14,7 +14,8 @@
             <table class="table table-bordered table-responsive table-striped">
                 <thead>
                     <tr class="bg-secondary">
-                        <th class="text-white" style="font-size: 20px" scope="col">Letter</th>
+                        <th class="text-white" style="font-size: 20px">Letter</th>
+                        <th class="text-white" style="font-size: 20px">Object</th>
                         <th class="text-white" style="font-size: 20px">Image Path</th>
                         <th class="text-white" style="font-size: 20px">Video Path</th>
                     </tr>
@@ -27,6 +28,7 @@
                 <tbody v-else>
                     <tr v-for="item in data" :key="item.id">
                         <td class="fw-bold">{{ item.letter.toString().toUpperCase() }}</td>
+                        <td class="fw-bold">{{ item.object }}</td>
                         <td>
                             <div class="row">
                                 <div class="col-6">
@@ -62,10 +64,10 @@
             </table>
         </div>
         <div v-if="alphabetLetters.length !== 0" class="d-flex justify-content-around">
-            <button @click="prev()" class="btn btn-secondary rounded-0">
+            <button :disabled="flag == 0" @click="prev()" class="btn btn-secondary rounded-0">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <button @click="next()" class="btn btn-secondary rounded-0">
+            <button :disabled="flag == (alphabetLetters.length-1)" @click="next()" class="btn btn-secondary rounded-0">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -105,20 +107,19 @@
                                 <label for="letter" class="form-label fw-bold">Alphabet</label>
                                 <input v-model="alphabetContent.letter" type="text" class="form-control" id="letter"
                                     aria-describedby="letter">
-                                <small class="text-danger fw-bold" v-if="errors && errors.letter">{{
-                                    errors.letter[0] }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="objectName" class="form-label fw-bold">Object Name</label>
+                                <input v-model="alphabetContent.objectName" type="text" class="form-control" id="objectName"
+                                    aria-describedby="objectName">
                             </div>
                             <div class="mb-3">
                                 <label for="image" class="form-label fw-bold">Image File</label>
                                 <input type="file" class="form-control" id="image">
-                                <small class="text-danger fw-bold" v-if="errors && errors.image">{{
-                                    errors.image[0] }}</small>
                             </div>
                             <div class="mb-3">
                                 <label for="video" class="form-label fw-bold">Video File</label>
                                 <input type="file" class="form-control" id="video">
-                                <small class="text-danger fw-bold" v-if="errors && errors.video">{{
-                                    errors.video[0] }}</small>
                             </div>
                         </form>
                     </div>
@@ -140,6 +141,7 @@ export default {
             video: null,
             alphabetContent: {
                 letter: '',
+                objectName: null,
                 image: null,
                 video: null
             },
