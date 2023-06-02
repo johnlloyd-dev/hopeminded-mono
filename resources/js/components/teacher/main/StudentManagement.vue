@@ -18,7 +18,12 @@
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
-                        <tbody v-if="students.length !== 0">
+                        <tbody v-if="isLoading">
+                            <tr>
+                                <th colspan="6" class="text-center">Loading...</th>
+                            </tr>
+                        </tbody>
+                        <tbody v-else-if="!isLoading && students.length !== 0">
                             <tr v-for="student in students" :key="student.id">
                                 <th scope="row">{{ student.access_id }}</th>
                                 <td>{{ student.first_name }}</td>
@@ -30,23 +35,23 @@
                                 </td>
                                 <td class="d-flex justify-content-center">
                                     <button @click="viewReport(student.id)" class="btn btn-success rounded-0">
-                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Student Report </span><i class="fas fa-external-link-alt"></i>
                                     </button>
                                 </td>
                             </tr>
                         </tbody>
-                        <tbody v-else>
+                        <tbody v-else-if="!isLoading && students.length === 0">
                             <tr>
-                                <th colspan="5" class="text-center">No records found</th>
+                                <th colspan="6" class="text-center">No records found</th>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div v-if="students.length !== 0" class="d-flex justify-content-around">
-                    <button class="btn btn-secondary rounded-0">
+                    <button :disabled="students.length <= 10" class="btn btn-secondary rounded-0">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button class="btn btn-secondary rounded-0">
+                    <button :disabled="students.length <= 10" class="btn btn-secondary rounded-0">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -116,6 +121,7 @@
 <script>
 import Loading from '../../loading/Loading.vue'
 import swal from 'sweetalert2'
+import { Tooltip } from 'bootstrap'
 export default {
     data() {
         return {
@@ -136,6 +142,9 @@ export default {
     },
     mounted() {
         this.getStudents()
+        new Tooltip(document.body, {
+            selector: "[data-bs-toggle='tooltip']",
+        })
     },
     methods: {
         onCollapse(isCollapsed) {
@@ -146,12 +155,15 @@ export default {
             }
         },
         async getStudents() {
+            this.isLoading = true
             await axios.get('/api/users/students/get')
                 .then(response => {
                     this.students = response.data
                 })
                 .catch(error => {
                     console.log(error)
+                }) .finally(() => {
+                    this.isLoading = false
                 })
 
         },
@@ -206,6 +218,7 @@ export default {
     padding: 0;
     margin: 0;
     height: 100vh;
+    overflow-x: hidden;
 }
 
 .card {

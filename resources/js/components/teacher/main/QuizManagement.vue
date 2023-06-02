@@ -3,8 +3,31 @@
         <div class="d-flex">
             <teacher-sidebar-component @collapse="onCollapse" />
             <div :class="collapsed ? 'collapsed-menu' : 'not-collapsed-menu'" class="main-content mx-5 w-100 h-100">
-                <div class="d-flex justify-content-center py-3">
-                    <p>This is quiz management</p>
+                <div class="d-flex justify-content-center">
+                    <div class="card rounded-0 py-5 px-5" style="width: 100%;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="card-title">Quiz Answer Keys </h4>
+                        </div>
+                        <div class="main-content mt-3">
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                    <input type="radio" class="btn-check" v-model="keyFlag" :value="0" id="btnradio1"
+                                        autocomplete="off" :checked="keyFlag == 0">
+                                    <label class="btn btn-outline-dark fw-bold rounded-0"
+                                        :class="keyFlag == 0 ? 'text-white' : 'text-black'"
+                                        for="btnradio1">Hand Signs</label>
+
+                                    <input type="radio" class="btn-check" v-model="keyFlag" :value="1" id="btnradio2"
+                                        autocomplete="off" :checked="keyFlag == 1">
+                                    <label class="btn btn-outline-dark fw-bold rounded-0"
+                                        :class="keyFlag == 1 ? 'text-white' : 'text-black'"
+                                        for="btnradio2">Objects</label>
+                                </div>
+                            </div>
+                            <hand-sign-component v-if="keyFlag == 0"></hand-sign-component>
+                            <object-component v-if="keyFlag == 1"></object-component>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -15,7 +38,8 @@
 export default {
     data() {
         return {
-            collapsed: false
+            collapsed: false,
+            keyFlag: 0,
         }
     },
     methods: {
@@ -34,12 +58,13 @@ export default {
 .body {
     background-image: url("/images/background.jpg");
     background-size: cover;
-    background-repeat: no-repeat;
+    background-repeat: repeat;
     background-attachment: fixed;
     color: #333;
     padding: 0;
     margin: 0;
     height: 100vh;
+    overflow-x: hidden;
 }
 
 .card {

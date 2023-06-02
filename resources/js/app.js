@@ -31,6 +31,12 @@ app.component('alphabet-words-component', AlphabetWords);
 import VowelConsonants from './components/teacher/layouts/VowelConsonants.vue';
 app.component('vowel-consonants-component', VowelConsonants);
 
+import HandSign from './components/teacher/layouts/HandSign.vue';
+app.component('hand-sign-component', HandSign);
+
+import Object from './components/teacher/layouts/Objects.vue';
+app.component('object-component', Object);
+
 import VueSidebarMenu from 'vue-sidebar-menu'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 

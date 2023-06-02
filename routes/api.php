@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CheckAccessIdController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\QuizReportController;
@@ -48,6 +49,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('quiz/reports/get', [GameController::class, 'getQuizReports']);
 
     Route::get('quiz-reports/get', [GameController::class, 'allGameRecords']);
+
+    Route::get('/certificates/student/{studentId}/game-id/{gameFlag}', [CertificateController::class, 'getCertificates']);
+    Route::post('/certificate/upload', [CertificateController::class, 'uploadFile']);
+    Route::post('/certificate/delete', [CertificateController::class, 'deleteCertificate']);
 
     Route::get('quiz-report/student/{studentId}', [QuizReportController::class, 'getStudentQuizReport']);
 
