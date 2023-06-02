@@ -13,21 +13,86 @@
                             <div class="row mt-5">
                                 <div class="col-4">
                                     <button @click="$router.push({ name: 'quiz-report', params: { gameId: 3 } })"
-                                        type="button" class="btn btn-warning fw-bold">
+                                        type="button" class="btn btn-warning fw-bold rounded-0">
                                         Memory Game
                                     </button>
                                 </div>
                                 <div class="col-4">
                                     <button @click="$router.push({ name: 'quiz-report', params: { gameId: 2 } })"
-                                        type="button" class="btn btn-success fw-bold">
+                                        type="button" class="btn btn-success fw-bold rounded-0">
                                         Typing Balloon
                                     </button>
                                 </div>
                                 <div class="col-4">
                                     <button @click="$router.push({ name: 'quiz-report', params: { gameId: 1 } })"
-                                        type="button" class="btn btn-primary fw-bold">
+                                        type="button" class="btn btn-primary fw-bold rounded-0">
                                         Hangman Game
                                     </button>
+                                </div>
+                            </div>
+                            <div class="certificates mt-5">
+                                <div class="card rounded-0">
+                                    <div class="card-body">
+                                        <h5 class="fw-bold fst-italic">Certificates</h5>
+                                        <p>These are certicates given by your teacher once you completed each of the textbook
+                                            lessons and able to pass each of the quizzes.</p>
+                                        <div class="accordion" id="accordionExample">
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="headingOne">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                        data-bs-target="#collapseOne" aria-expanded="false"
+                                                        aria-controls="collapseOne">
+                                                        Alphabet-Letters/Memory Game
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseOne" class="accordion-collapse collapse"
+                                                    aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                                    <div class="accordion-body">
+                                                        <span v-if="certificates.memory.length === 0">No certificate/s found</span>
+                                                        <ul v-else v-for="item in certificates.memory" :key="item.id" class="list-group">
+                                                            <li class="list-group-item"><a :href="item.file_url" download>{{ item.file }}</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="headingTwo">
+                                                    <button class="accordion-button collapsed" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseTwo"
+                                                        aria-expanded="false" aria-controls="collapseTwo">
+                                                        Vowels-Consonants/Typing Balloon
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseTwo" class="accordion-collapse collapse"
+                                                    aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                                                    <div class="accordion-body">
+                                                        <span v-if="certificates.typing.length === 0">No certificate/s found</span>
+                                                        <ul v-else v-for="item in certificates.typing" :key="item.id" class="list-group">
+                                                            <li class="list-group-item"><a :href="item.file_url" download>{{ item.file }}</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="headingThree">
+                                                    <button class="accordion-button collapsed" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseThree"
+                                                        aria-expanded="false" aria-controls="collapseThree">
+                                                        Alphabet-Words/Hangman Game
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseThree" class="accordion-collapse collapse"
+                                                    aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                                                    <div class="accordion-body">
+                                                        <span v-if="certificates.hangman.length === 0">No certificate/s found</span>
+                                                        <ul v-else v-for="item in certificates.hangman" :key="item.id" class="list-group">
+                                                            <li class="list-group-item"><a :href="item.file_url" download>{{ item.file }}</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +112,12 @@ export default {
             collapsed: false,
             isMemoryGameNotAllowed: false,
             isTypingBalloonNotAllowed: false,
-            isHangmanGameNotAllowed: false
+            isHangmanGameNotAllowed: false,
+            certificates: {
+                hangman: [],
+                memory: [],
+                typing: []
+            }
         }
     },
     methods: {
@@ -75,20 +145,36 @@ export default {
             this.isHangmanGameNotAllowed = Object.values(attributes).some(value => value.length === 0);
             this.isProcessing = false
         },
+        async getCertificates() {
+            this.isLoading = true
+            try {
+                const response = await axios.get(`/api/student-certificates/all`)
+                this.certificates.hangman = response.data.filter(data => {
+                    return data.game_flag == 'hangman-game'
+                })
+                this.certificates.memory = response.data.filter(data => {
+                    return data.game_flag == 'memory-game'
+                })
+                this.certificates.typing = response.data.filter(data => {
+                    return data.game_flag == 'typing-balloon'
+                })
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.isLoading = false
+            }
+        },
     },
     mounted() {
         this.getAlLeFlags()
         this.getVoCoFlags()
         this.getAlWoFlags()
-        new Tooltip(document.body, {
-            selector: "[data-bs-toggle='tooltip']",
-        })
+        this.getCertificates()
     }
 }
 </script>
 
-<style scoped>
-.body {
+<style scoped>.body {
     background-image: url("/images/background.jpg");
     background-size: cover;
     background-repeat: no-repeat;
@@ -97,10 +183,10 @@ export default {
     padding: 0;
     margin: 0;
     height: 100vh;
+    overflow-x: hidden;
 }
 
 .card {
     background-color: rgba(255, 255, 255, 0.5);
     border: none;
-}
-</style>
+}</style>

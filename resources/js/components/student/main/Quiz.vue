@@ -133,6 +133,7 @@ export default {
     padding: 0;
     margin: 0;
     height: 100vh;
+    overflow-x: hidden;
 }
 
 .card {

@@ -1,5 +1,8 @@
 <template>
-    <div class="body" :class="isConsonant ? 'night-background' : 'day-background'">
+    <div class="body position-relative" :class="isConsonant ? 'night-background' : 'day-background'">
+        <button type="button" @click="navigate" class="btn btn-secondary mt-5 mx-5 rounded-0 position-absolute top-0 start-0">
+            Back
+        </button>
         <div class="p-5">
             <h3 class="text-center title-header" :class="isConsonant ? 'text-white' : 'text-black'">Vowels/Consonants</h3>
             <div class="row w-100">
@@ -111,6 +114,9 @@ export default {
         ...mapActions({
             getFlags: 'setVowelConsonants'
         }),
+        navigate() {
+            this.$router.push('/student-textbook')
+        },
         setVideo(index, item) {
             this.video = item.video
             $('#alphabetsModal').modal('show')

@@ -1,5 +1,8 @@
 <template>
-    <div class="body">
+    <div class="body position-relative">
+        <button type="button" @click="navigate" class="btn btn-secondary mt-5 mx-5 rounded-0 position-absolute top-0 start-0">
+            Back
+        </button>
         <div class="p-5">
             <div v-if="isProcessing" class="position-absolute top-50 start-50 translate-middle">
                 Processing...
@@ -87,6 +90,9 @@ export default {
         ...mapActions({
             getFlags: 'setAlphabetWords'
         }),
+        navigate() {
+            this.$router.push('/student-textbook')
+        },
         setVideo(video, item, newItem, index) {
             this.video = video
             $('#alphabetsModal').modal('show')

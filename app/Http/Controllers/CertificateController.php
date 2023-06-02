@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Certificate;
 use App\Models\Game;
+use App\Models\Student;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\File;
 
@@ -14,6 +17,16 @@ class CertificateController extends Controller
         $gameFlag = Game::where('id', $gameId)->first()->flag;
         return Certificate::where('student_id', $studentId)
             ->where('game_flag', $gameFlag)
+            ->get()
+            ->map(function($certificate){
+                $certificate->file_url = Storage::url($certificate->file);
+                return $certificate;
+            })->toArray();
+    }
+
+    public function getStudentCertificates() {
+        $studentId = Student::where('user_id', Auth::user()->id)->first()->id;
+        return Certificate::where('student_id', $studentId)
             ->get()
             ->map(function($certificate){
                 $certificate->file_url = Storage::url($certificate->file);

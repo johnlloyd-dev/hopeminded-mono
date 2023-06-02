@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/certificates/student/{studentId}/game-id/{gameFlag}', [CertificateController::class, 'getCertificates']);
     Route::post('/certificate/upload', [CertificateController::class, 'uploadFile']);
     Route::post('/certificate/delete', [CertificateController::class, 'deleteCertificate']);
+    Route::get('/student-certificates/all', [CertificateController::class, 'getStudentCertificates']);
 
     Route::get('quiz-report/student/{studentId}', [QuizReportController::class, 'getStudentQuizReport']);
 

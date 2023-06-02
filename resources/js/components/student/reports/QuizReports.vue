@@ -2,7 +2,7 @@
     <div class="body">
         <div class="d-flex">
             <div class="main-content mx-5 w-100 h-100">
-                <button type="button" @click="navigate" class="btn btn-secondary mt-5">
+                <button type="button" @click="navigate" class="btn btn-secondary mt-5 rounded-0">
                     Back
                 </button>
                 <div class="reports mt-5">
@@ -97,5 +97,6 @@ export default {
     padding: 0;
     margin: 0;
     height: 100vh;
+    overflow-x: hidden;
 }
 </style>
