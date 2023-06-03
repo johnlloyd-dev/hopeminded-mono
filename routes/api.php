@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckAccessIdController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\QuizReportController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\TextbookController;
 use App\Http\Controllers\TextbookFlagController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -54,6 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/certificate/upload', [CertificateController::class, 'uploadFile']);
     Route::post('/certificate/delete', [CertificateController::class, 'deleteCertificate']);
     Route::get('/student-certificates/all', [CertificateController::class, 'getStudentCertificates']);
+
+    Route::post('/textbook/add', [TextbookController::class, 'addTextbook']);
 
     Route::get('quiz-report/student/{studentId}', [QuizReportController::class, 'getStudentQuizReport']);
 

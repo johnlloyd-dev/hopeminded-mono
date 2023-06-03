@@ -6,7 +6,7 @@
                 <div class="d-flex justify-content-center">
                     <div class="card rounded-0 py-5 px-5" style="width: 100%;">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h4 class="card-title">Quiz Reports </h4>
+                            <h4 class="fw-bold">Quiz Reports </h4>
                             <img src="/images/kids.png" alt="Kids" width="150">
                         </div>
                         <div class="card-body">
@@ -45,7 +45,7 @@
                                                         Alphabet-Letters/Memory Game
                                                     </button>
                                                 </h2>
-                                                <div id="collapseOne" class="accordion-collapse collapse"
+                                                <div id="collapseOne" class="accordion-collapse collapse bg-success"
                                                     aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                                     <div class="accordion-body">
                                                         <span v-if="certificates.memory.length === 0">No certificate/s found</span>
@@ -63,7 +63,7 @@
                                                         Vowels-Consonants/Typing Balloon
                                                     </button>
                                                 </h2>
-                                                <div id="collapseTwo" class="accordion-collapse collapse"
+                                                <div id="collapseTwo" class="accordion-collapse collapse bg-success"
                                                     aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
                                                     <div class="accordion-body">
                                                         <span v-if="certificates.typing.length === 0">No certificate/s found</span>
@@ -81,7 +81,7 @@
                                                         Alphabet-Words/Hangman Game
                                                     </button>
                                                 </h2>
-                                                <div id="collapseThree" class="accordion-collapse collapse"
+                                                <div id="collapseThree" class="accordion-collapse collapse bg-success"
                                                     aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                                                     <div class="accordion-body">
                                                         <span v-if="certificates.hangman.length === 0">No certificate/s found</span>

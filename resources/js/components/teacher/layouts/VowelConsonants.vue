@@ -127,23 +127,35 @@
                         <form>
                             <div class="mb-3">
                                 <label for="letter" class="form-label fw-bold">Alphabet</label>
-                                <input v-model="alphabetContent.letter" type="text" class="form-control" id="letter"
-                                    aria-describedby="letter">
+                                <input v-model="alphabetContent.letter" maxlength="1" type="text" class="form-control"
+                                    id="letter" aria-describedby="letter">
+                                <small class="text-danger" v-if="errors && errors.letter">{{ errors.letter[0] }}</small>
                             </div>
                             <div class="mb-3">
                                 <label for="objectName" class="form-label fw-bold">Object Name</label>
                                 <input v-model="alphabetContent.objectName" type="text" class="form-control" id="objectName"
                                     aria-describedby="objectName">
+                                <small class="text-danger" v-if="errors && errors.objectName">{{ errors.objectName[0]
+                                }}</small>
                             </div>
                             <div class="mb-3">
                                 <label for="image" class="form-label fw-bold">Image File</label>
-                                <input type="file" class="form-control" id="image">
+                                <input ref="imageFileInput" accept="image/*" @change="changeImageFile" type="file"
+                                    class="form-control" id="image">
+                                <small class="text-danger" v-if="errors && errors.image">{{ errors.image[0] }}</small>
                             </div>
                             <div class="mb-3">
                                 <label for="video" class="form-label fw-bold">Video File</label>
-                                <input type="file" class="form-control" id="video">
+                                <input ref="videoFileInput" @change="changeVideoFile" accept="video/*" type="file"
+                                    class="form-control" id="video">
+                                <small class="text-danger" v-if="errors && errors.video">{{ errors.video[0] }}</small>
                             </div>
                         </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button @click.prevent="submitAlphabet" type="button" class="btn-primary rounded-0 btn">
+                            Submit
+                        </button>
                     </div>
                 </div>
             </div>
@@ -152,6 +164,7 @@
 </template>
 
 <script>
+import swal from 'sweetalert2'
 export default {
     data() {
         return {
@@ -164,7 +177,8 @@ export default {
             image: null,
             video: null,
             alphabetContent: {
-                letter: '',
+                flag: null,
+                letter: null,
                 objectName: null,
                 image: null,
                 video: null
@@ -173,6 +187,7 @@ export default {
         }
     },
     created() {
+        this.alphabetContent.flag = this.$route.params.textbookFlag
         this.getTextbooks()
     },
     watch: {
@@ -225,6 +240,45 @@ export default {
         },
         navigate() {
             this.$router.push('/textbook-management')
+        },
+        changeImageFile(event) {
+            this.alphabetContent.image = event.target.files[0]
+        },
+        changeVideoFile(event) {
+            this.alphabetContent.video = event.target.files[0]
+        },
+        async submitAlphabet() {
+            this.errors = []
+            const data = new FormData()
+            data.append('flag', this.alphabetContent.flag)
+            if (this.alphabetContent.letter != null)
+                data.append('letter', this.alphabetContent.letter)
+            if (this.alphabetContent.objectName != null)
+                data.append('objectName', this.alphabetContent.objectName)
+            if (this.alphabetContent.image != null)
+                data.append('image', this.alphabetContent.image)
+            if (this.alphabetContent.video != null)
+                data.append('video', this.alphabetContent.video)
+            try {
+                const response = await axios.post('/api/textbook/add', data, {
+                    headers: { 'content-type': 'multipart/form-data' }
+                })
+                if (response.status === 200) {
+                    this.alphabetContent.flag = null
+                    this.alphabetContent.letter = null
+                    this.alphabetContent.objectName = null
+                    this.alphabetContent.image = null
+                    this.alphabetContent.video = null
+                    this.$refs.imageFileInput.value = '';
+                    this.$refs.videoFileInput.value = '';
+                    swal.fire('Success', response.data.message, 'success')
+                    this.getTextbooks()
+                    this.$('#addAlphabetModal').modal('hide');
+                }
+            } catch (error) {
+                console.log(error)
+                this.errors = error.response.data.errors
+            }
         }
     },
 }
