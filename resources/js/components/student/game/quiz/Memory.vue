@@ -1,5 +1,6 @@
 <template>
     <div v-if="!disabledGame" class="body">
+        <h3 class="fw-bold text-center w-100 mt-3">Timer: 00:{{ time }}</h3>
         <h4 class="text-right">Score: {{ memoryGame.score }}</h4>
         <h3 class="text-center" style="font-weight: bolder; font-family: 'Skranji', cursive;">Level {{ flag + 1 }}</h3>
         <div id="app" :class="flag == 0 ? 'cards-width-1' : 'cards-width-2'">
@@ -64,6 +65,18 @@ export default {
             memoryGame: {
                 highestLevel: 1,
                 score: 0
+            },
+            time: 60, // Initial time in seconds
+            timer: null // Timer reference
+        }
+    },
+    beforeDestroy() {
+        clearInterval(this.timer); // Clean up the timer before the component is destroyed
+    },
+    watch: {
+        time(newValue, oldVlue) {
+            if(newValue === 0) {
+                this.gameOver()
             }
         }
     },
@@ -96,7 +109,7 @@ export default {
                         icon: 'info',
                         width: 600,
                         padding: '3em',
-                        
+
                         backdrop: `
                             rgba(0,0,123,0.4)
                             url("https://sweetalert2.github.io/images/nyan-cat.gif)
@@ -105,6 +118,7 @@ export default {
                         `
                     }).then((result) => {
                         if (result.value) {
+                            this.startTimer();
                             this.disabledGame = false
                             this.storeQuizInfo()
                             this.fetchData();
@@ -126,7 +140,7 @@ export default {
                             icon: 'info',
                             width: 600,
                             padding: '3em',
-                            
+
                             backdrop: `
                                 rgba(0,0,123,0.4)
                                 url("https://sweetalert2.github.io/images/nyan-cat.gif)
@@ -135,6 +149,7 @@ export default {
                             `
                         }).then((result) => {
                             if (result.value) {
+                                this.startTimer();
                                 this.disabledGame = false
                                 this.storeQuizInfo()
                                 this.fetchData();
@@ -219,10 +234,12 @@ export default {
                                 this.memoryGame.score += 3;
                             }
                             if (this.memoryGame.score == 5 || this.memoryGame.score == 23) {
+                                clearInterval(this.timer);
                                 this.show = true
                                 this.text = `You finished level ${this.flag + 1}. Proceed to level ${this.flag + 2}.`
                                 this.nextButtonText = `Level ${this.flag + 2}`
                             } else if (this.memoryGame.score == 59) {
+                                clearInterval(this.timer);
                                 this.show = true
                                 this.text = `Congratulations! You finished all 3 levels. Your score is ${this.memoryGame.score}.`
                                 this.nextButtonText = 'Replay'
@@ -256,6 +273,8 @@ export default {
                 } else if (this.flag == 2) {
                     this.memoryGame.highestLevel = 3
                 }
+                this.time = 60
+                this.startTimer()
                 this.updateQuizInfo()
             }
             this.show = false
@@ -266,6 +285,22 @@ export default {
         cancelExit() {
             this.show = false
             this.$router.push('/student-quiz')
+        },
+        startTimer() {
+            this.timer = setInterval(() => {
+                if (this.time > 0) {
+                    this.time--;
+                } else {
+                    clearInterval(this.timer);
+                    // Timer has reached 0, you can trigger any action here
+                }
+            }, 1000); // Timer tick every second (1000ms)
+        },
+        gameOver() {
+            this.show = true
+            this.text = `Game Over. Your score is ${this.memoryGame.score}.`
+            this.nextButtonText = 'Replay'
+            this.cancelButtonText = 'Exit'
         }
     },
     mounted() {

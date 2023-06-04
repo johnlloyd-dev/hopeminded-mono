@@ -17,7 +17,7 @@ class GameSeeder extends Seeder
             'name' => 'Hangman Game',
             'flag' => 'hangman-game',
             'perfect_score' => 18,
-            'passing_score' => 14
+            'passing_score' => 10
         ]);
 
         Game::updateOrCreate([

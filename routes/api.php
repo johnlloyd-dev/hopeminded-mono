@@ -30,7 +30,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/register', [RegisterController::class, 'register']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request){
-        return $request->user();
+        return Auth::user();
     });
     Route::post('/textbook/flag/add', [TextbookFlagController::class, 'storeFlags']);
     Route::get('/users/students/get', [UserController::class, 'getStudents']);

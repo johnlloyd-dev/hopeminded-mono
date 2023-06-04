@@ -67,7 +67,7 @@
                             <h3 class="mb-3 fw-bold">Upload Certificates</h3>
                             <form @submit.prevent="uploadCertificate" enctype="multipart/form-data">
                                 <div class="mb-3">
-                                    <input ref="fileInput" name="file" @change="parseFile" type="file" class="form-control"
+                                    <input ref="fileInput" accept="image/*, .doc, .docx, .pdf" name="file" @change="parseFile" type="file" class="form-control"
                                         id="certificate">
                                     <small class="text-danger" v-if="errors && errors.file">{{ errors.file[0] }}</small>
                                 </div>

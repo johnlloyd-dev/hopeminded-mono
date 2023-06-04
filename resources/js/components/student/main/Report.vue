@@ -34,28 +34,32 @@
                                 <div class="card rounded-0">
                                     <div class="card-body">
                                         <h5 class="fw-bold fst-italic">Certificates</h5>
-                                        <p>These are certicates given by your teacher once you completed each of the textbook
+                                        <p>These are certicates given by your teacher once you completed each of the
+                                            textbook
                                             lessons and able to pass each of the quizzes.</p>
-                                        <div class="accordion" id="accordionExample">
-                                            <div class="accordion-item">
+                                        <div class="accordion rounded-0" id="accordionExample">
+                                            <div class="accordion-item rounded-0">
                                                 <h2 class="accordion-header" id="headingOne">
-                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseOne" aria-expanded="false"
-                                                        aria-controls="collapseOne">
+                                                    <button class="accordion-button collapsed" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                                                        aria-expanded="false" aria-controls="collapseOne">
                                                         Alphabet-Letters/Memory Game
                                                     </button>
                                                 </h2>
-                                                <div id="collapseOne" class="accordion-collapse collapse bg-success"
+                                                <div id="collapseOne" class="accordion-collapse collapse bg-secondary rounded-0"
                                                     aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                                     <div class="accordion-body">
-                                                        <span v-if="certificates.memory.length === 0">No certificate/s found</span>
-                                                        <ul v-else v-for="item in certificates.memory" :key="item.id" class="list-group">
-                                                            <li class="list-group-item"><a :href="item.file_url" download>{{ item.file }}</a></li>
+                                                        <span class="text-white" v-if="certificates.memory.length === 0">No
+                                                            certificate/s found</span>
+                                                        <ul v-else v-for="item in certificates.memory" :key="item.id"
+                                                            class="list-group">
+                                                            <li class="list-group-item"><a :href="item.file_url" download>{{
+                                                                item.file }}</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="accordion-item">
+                                            <div class="accordion-item rounded-0">
                                                 <h2 class="accordion-header" id="headingTwo">
                                                     <button class="accordion-button collapsed" type="button"
                                                         data-bs-toggle="collapse" data-bs-target="#collapseTwo"
@@ -63,17 +67,20 @@
                                                         Vowels-Consonants/Typing Balloon
                                                     </button>
                                                 </h2>
-                                                <div id="collapseTwo" class="accordion-collapse collapse bg-success"
+                                                <div id="collapseTwo" class="accordion-collapse collapse bg-secondary rounded-0"
                                                     aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
                                                     <div class="accordion-body">
-                                                        <span v-if="certificates.typing.length === 0">No certificate/s found</span>
-                                                        <ul v-else v-for="item in certificates.typing" :key="item.id" class="list-group">
-                                                            <li class="list-group-item"><a :href="item.file_url" download>{{ item.file }}</a></li>
+                                                        <span class="text-white" v-if="certificates.typing.length === 0">No
+                                                            certificate/s found</span>
+                                                        <ul v-else v-for="item in certificates.typing" :key="item.id"
+                                                            class="list-group">
+                                                            <li class="list-group-item"><a :href="item.file_url" download>{{
+                                                                item.file }}</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="accordion-item">
+                                            <div class="accordion-item rounded-0">
                                                 <h2 class="accordion-header" id="headingThree">
                                                     <button class="accordion-button collapsed" type="button"
                                                         data-bs-toggle="collapse" data-bs-target="#collapseThree"
@@ -81,16 +88,47 @@
                                                         Alphabet-Words/Hangman Game
                                                     </button>
                                                 </h2>
-                                                <div id="collapseThree" class="accordion-collapse collapse bg-success"
+                                                <div id="collapseThree" class="accordion-collapse collapse bg-secondary rounded-0"
                                                     aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                                                     <div class="accordion-body">
-                                                        <span v-if="certificates.hangman.length === 0">No certificate/s found</span>
-                                                        <ul v-else v-for="item in certificates.hangman" :key="item.id" class="list-group">
-                                                            <li class="list-group-item"><a :href="item.file_url" download>{{ item.file }}</a></li>
+                                                        <span class="text-white" v-if="certificates.hangman.length === 0">No
+                                                            certificate/s found</span>
+                                                        <ul v-else v-for="item in certificates.hangman" :key="item.id"
+                                                            class="list-group rounded-0">
+                                                            <li class="list-group-item">
+                                                                <a style="margin-right: 30px;" :href="item.file_url"
+                                                                    download>{{ item.file }}</a>
+                                                                <button type="button" @click="viewFile(item.file_url)"
+                                                                    class="btn btn-primary rounded-0 btn-sm">
+                                                                    View Certificate
+                                                                    <i class="fas fa-external-link-alt"></i>
+                                                                </button>
+                                                            </li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal -->
+                            <div class="modal fade" id="fileViewer" data-bs-backdrop="static" tabindex="-1" aria-labelledby="fileViewerLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="fileViewerLabel">View Certificate</h5>
+                                            <button @click="activateObject = false" type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center" style="height: 70vh;">
+                                            <object v-if="activateObject && documentFileExtensions.includes(fileExtension)" :data="fileUrl" :type="fileType" width="100%" height="100%">
+                                            </object>
+                                            <img v-if="activateObject && imageFileExtensions.includes(fileExtension)" :src="fileUrl" alt="Certificate Image">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a :href="fileUrl" download class="btn btn-primary">Download</a>
                                         </div>
                                     </div>
                                 </div>
@@ -113,6 +151,12 @@ export default {
             isMemoryGameNotAllowed: false,
             isTypingBalloonNotAllowed: false,
             isHangmanGameNotAllowed: false,
+            fileType: null,
+            fileUrl: null,
+            fileExtension: null,
+            imageFileExtensions: ['jpg', 'jpeg', 'png', 'gif', 'svg', 'bmp', 'tiff'],
+            documentFileExtensions: ['doc', 'docx', 'txt', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'csv'],
+            activateObject: false,
             certificates: {
                 hangman: [],
                 memory: [],
@@ -164,6 +208,32 @@ export default {
                 this.isLoading = false
             }
         },
+        viewFile(url) {
+            this.fileExtension = this.getFileTypeFromURL(url);
+            this.fileType = null
+            this.fileUrl = url
+
+            if (this.imageFileExtensions.includes(this.fileExtension)) {
+                this.fileType = `image/${this.fileExtension}`
+            } else if (this.documentFileExtensions.includes(this.fileExtension)) {
+                this.fileType = `application/${this.fileExtension}`
+            }
+
+            this.activateObject = true
+
+            $('#fileViewer').modal('show');
+        },
+        getFileTypeFromURL(url) {
+            // Create a new URL object with the provided URL
+            const urlObj = new URL(`http://${url}`);
+
+            // Get the file extension from the pathname of the URL
+            const path = urlObj.pathname;
+            const extension = path.substring(path.lastIndexOf('.') + 1);
+
+            // Return the file extension
+            return extension;
+        }
     },
     mounted() {
         this.getAlLeFlags()
@@ -174,7 +244,8 @@ export default {
 }
 </script>
 
-<style scoped>.body {
+<style scoped>
+.body {
     background-image: url("/images/background.jpg");
     background-size: cover;
     background-repeat: no-repeat;

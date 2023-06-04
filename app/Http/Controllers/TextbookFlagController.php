@@ -6,16 +6,17 @@ use App\Models\FlagAttribute;
 use App\Models\Student;
 use App\Models\TextbookFlag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TextbookFlagController extends Controller
 {
     public function getFlags(Request $request, $flag) {
-        $student = Student::where('user_id', $request->user()->id)->first();
+        $student = Student::where('user_id', Auth::user()->id)->first();
         return FlagAttribute::where('student_id', $student->id)->where('flag', $flag)->first();
     }
 
     public function updateFlag(Request $request, $flag) {
-        $student = Student::where('user_id', $request->user()->id)->first();
+        $student = Student::where('user_id', Auth::user()->id)->first();
         $model = FlagAttribute::where('student_id', $student->id)->where('flag', $flag)->first();
         $jsonData = json_decode($model->attributes, true);
         

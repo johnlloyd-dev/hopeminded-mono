@@ -27,8 +27,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-12 col-sm-12 p-0">
-                                    <div class="card-sl"
-                                        :class="{ 'opacity-75': !isTypingBalloonAllowed || isProcessing }">
+                                    <div class="card-sl" :class="{ 'opacity-75': !isTypingBalloonAllowed || isProcessing }">
                                         <div class="card-image">
                                             <img src="/images/balloon.png" />
                                         </div>
@@ -60,9 +59,31 @@
                                 <p class="fw-bold"><span class="text-danger">Note:</span> Each of the game/quiz is linked to
                                     a specific textbook lesson. If a game is disabled, it means you haven't finished the
                                     corresponding lesson yet.</p>
+                                <span class="fw-bold text-danger">Score Information</span>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <p class="text-dark fw-bold">Memory Game</p>
+                                        <ul>
+                                            <li>Perfect Score: <span class="fw-bold">59</span></li>
+                                            <li>Passing Score: <span class="fw-bold">44</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <p class="text-dark fw-bold">Typing Balloon</p>
+                                        <ul>
+                                            <li>Perfect Score: <span class="fw-bold">51</span></li>
+                                            <li>Passing Score: <span class="fw-bold">38</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <p class="text-dark fw-bold">Hangman Game</p>
+                                        <ul>
+                                            <li>Perfect Score: <span class="fw-bold">18</span></li>
+                                            <li>Passing Score: <span class="fw-bold">10</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
@@ -268,4 +289,5 @@ export default {
         transform: scale(0.9);
         box-shadow: 0 0 0 0 rgba(90, 153, 212, 0);
     }
-}</style>
+}
+</style>
