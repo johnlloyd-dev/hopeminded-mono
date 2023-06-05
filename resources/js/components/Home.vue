@@ -12,10 +12,16 @@
                         <button @click="adminLoginRedirect" class="btn-hover color-2">Admin</button>
                         <button @click="studentLoginRedirect" class="btn-hover color-3">Student</button>
                     </div>
-              </div>
+                </div>
             </div>
         </div>
-        <footer-component class="position-absolute bottom-0 start-50 translate-middle-x w-100"></footer-component>
+        <div class="w-100 mt-5 text-center custom-background">
+            <h2 class="mt-3 fw-bolder">How to play?</h2>
+            <div class="p-3 mb-3">
+                <iframe width="860" height="615" src="https://www.youtube.com/embed/nMLB0MFHJXk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+        </div>
+        <footer-component class="w-100"></footer-component>
     </body>
 </template>
 
@@ -50,6 +56,7 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
     align-items: center;
 }
 
@@ -129,4 +136,13 @@ body {
     align-items: center;
     background: #FFF;
 }
+
+.custom-background {
+    position: relative;
+    background-image: url('/images/background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 </style>

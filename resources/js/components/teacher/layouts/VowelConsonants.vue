@@ -50,11 +50,11 @@
                             <div class="row">
                                 <div class="col-6">
                                     <span class="fw-bold">
-                                        {{ item.image }}
+                                        {{ item.image_url }}
                                     </span>
                                 </div>
                                 <div class="col-6">
-                                    <button @click="viewMedia('image', item.image)"
+                                    <button @click="viewMedia('image', item.image_url)"
                                         class="btn btn-sm btn-primary rounded-0">
                                         <i class="fas fa-external-link-alt"></i>
                                     </button>
@@ -65,11 +65,11 @@
                             <div class="row">
                                 <div class="col-6">
                                     <span class="fw-bold">
-                                        {{ item.video }}
+                                        {{ item.video_url }}
                                     </span>
                                 </div>
                                 <div class="col-6">
-                                    <button @click="viewMedia('video', item.video)"
+                                    <button @click="viewMedia('video', item.video_url)"
                                         class="btn btn-sm btn-primary rounded-0">
                                         <i class="fas fa-external-link-alt"></i>
                                     </button>
@@ -197,7 +197,7 @@ export default {
     },
     methods: {
         async getTextbooks() {
-            const vowelConsonants = await axios.get('/storage/json/vowel-consonants.json')
+            const vowelConsonants = await axios.get(`/api/vowels-consonants/get?user=${'teacher'}`)
             this.vowelConsonants = vowelConsonants.data
             this.newData = this.vowelConsonants[this.alphabetFlag]
             this.data = this.newData

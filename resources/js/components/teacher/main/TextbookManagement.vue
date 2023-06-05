@@ -1,5 +1,5 @@
 <template>
-    <div class="body">
+    <div class="body position-relative">
         <div class="d-flex">
             <teacher-sidebar-component @collapse="onCollapse" />
             <div :class="collapsed ? 'collapsed-menu' : 'not-collapsed-menu'" class="main-content mx-5 w-100 h-100">
@@ -43,6 +43,9 @@
                 </div>
             </div>
         </div>
+        <button type="button" @click="seed" class="btn-primary btn-sm btn rounded-0 position-absolute bottom-0 end-0">
+            Seed
+        </button>
     </div>
 </template>
 
@@ -63,6 +66,9 @@ export default {
         },
         navigate(flag) {
             this.$router.push({path: `/textbook-management/${flag}`})
+        },
+        async seed() {
+            await axios.post('/api/seed')
         }
     },
 }

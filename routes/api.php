@@ -11,9 +11,12 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TextbookController;
 use App\Http\Controllers\TextbookFlagController;
 use App\Http\Controllers\UserController;
+use App\Models\Teacher;
+use App\Models\Textbook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +32,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/register', [RegisterController::class, 'register']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', function (Request $request){
+    Route::get('/user', function (Request $request) {
         return Auth::user();
     });
     Route::post('/textbook/flag/add', [TextbookFlagController::class, 'storeFlags']);
@@ -57,10 +60,62 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/student-certificates/all', [CertificateController::class, 'getStudentCertificates']);
 
     Route::post('/textbook/add', [TextbookController::class, 'addTextbook']);
+    Route::post('/textbook/alphabets-words/add', [TextbookController::class, 'addTextbookAlphabetWords']);
 
     Route::get('quiz-report/student/{studentId}', [QuizReportController::class, 'getStudentQuizReport']);
+    
+    Route::get('alphabets-letters/get', [TextbookController::class, 'getAlphabetsLetters']);
+    Route::get('vowels-consonants/get', [TextbookController::class, 'getVowelsConsonants']);
 
     Route::post('/logout', [LogoutController::class, 'logout']);
+
+    Route::post('seed', function () {
+        $jsonFile = Storage::path('public/json/alphabets-with-letters.json');
+        $jsonData = json_decode(file_get_contents($jsonFile), true);
+
+        foreach ($jsonData as $data) {
+            if (in_array($data["letter"], ['a', 'e', 'i', 'o', 'u']))
+                $type = 'vowel';
+            else
+                $type = 'consonant';
+            $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+            Textbook::updateOrCreate([
+                'flag' => 'alphabet-letters',
+                'type' => $type,
+                'teacher_id' => $teacherId,
+                'letter' => $data["letter"],
+                'object' => $data["object"],
+                'image' => json_encode($data["image"]),
+                'video' => json_encode($data["video"])
+            ]);
+        }
+
+        $jsonFile = Storage::path('public/json/vowel-consonants.json');
+        $jsonData = json_decode(file_get_contents($jsonFile), true);
+
+        foreach ($jsonData as $json) {
+            foreach ($json as $data) {
+                if (in_array($data["letter"], ['a', 'e', 'i', 'o', 'u']))
+                    $type = 'vowel';
+                else
+                    $type = 'consonant';
+                $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+                Textbook::updateOrCreate([
+                    'flag' => 'vowel-consonants',
+                    'type' => $type,
+                    'teacher_id' => $teacherId,
+                    'letter' => $data["letter"],
+                    'object' => $data["object"],
+                    'image' => json_encode($data["image"]),
+                    'video' => json_encode($data["video"])
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Textbooks are successfully inserted.'
+        ]);
+    });
 });
 
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);

@@ -60,17 +60,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="contact-information alert alert-primary" role="alert">
+                        <div class="contact-information alert alert-warning" role="alert">
+                            <h5 class="fw-bold text-danger">Email Address: </h5>
                             <ul>
                                 <li>
-                                    <h5 class="fw-bold text-dark">Email Address: </h5>
-                                    <p class="text-success">hopeminded22@gmail.com</p>
+                                    <p class="text-dark fw-bold">hopeminded22@gmail.com</p>
                                 </li>
                             </ul>
+                            <h5 class="fw-bold text-danger">Contact number:</h5>
                             <ul>
                                 <li>
-                                    <h5 class="fw-bold text-dark">Contact number:</h5>
-                                    <p class="text-success">+63985981702</p>
+                                    <p class="text-dark fw-bold">+63985981702</p>
                                 </li>
                             </ul>
                         </div>

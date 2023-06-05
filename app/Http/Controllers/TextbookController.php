@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AlphabetRequest;
 use App\Http\Requests\TextbookRequest;
+use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Textbook;
 use App\Rules\UniqueDependingOnFlag;
@@ -10,10 +12,54 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Laravel\Ui\Presets\React;
 
 class TextbookController extends Controller
 {
+    public function getVowelsConsonants(Request $request)
+    {
+        if ($request->get('user') == 'student') {
+            $teacherId = Student::where('user_id', Auth::user()->id)->first()->teacher_id;
+        } else {
+            $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        }
+        $textbooks = Textbook::where('teacher_id', $teacherId)
+            ->where('flag', 'vowel-consonants')
+            ->get()
+            ->map(function ($textbooks) {
+                $textbooks->image_url = Storage::url(json_decode($textbooks->image));
+                $textbooks->video_url = Storage::url(json_decode($textbooks->video));
+                return $textbooks;
+            })->toArray();
+
+        $vowels = array_filter($textbooks, function ($textbook) {
+            return $textbook["type"] == 'vowel';
+        });
+        $consonants = array_filter($textbooks, function ($textbook) {
+            return $textbook["type"] == 'consonant';
+        });
+        return [array_values($vowels), array_values($consonants)];
+    }
+
+    public function getAlphabetsLetters(Request $request)
+    {
+        if ($request->get('user') == 'student') {
+            $teacherId = Student::where('user_id', Auth::user()->id)->first()->teacher_id;
+        } else {
+            $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        }
+        return Textbook::where('teacher_id', $teacherId)
+            ->where('flag', 'alphabet-letters')
+            ->get()
+            ->map(function ($textbooks) {
+                $textbooks->image_url = Storage::url(json_decode($textbooks->image));
+                $textbooks->video_url = Storage::url(json_decode($textbooks->video));
+                return $textbooks;
+            })->toArray();
+    }
+
     public function addTextbook(TextbookRequest $request)
     {
         if (self::isLetterExist()) {
@@ -29,15 +75,22 @@ class TextbookController extends Controller
                 ]
             ], 422);
         }
-        
+
         if ($request->has('image') && $request->has('video')) {
+            if ($request->flag == 'alphabet-letters') {
+                $storagePath = 'alphabets-letters';
+            } else if ($request->flag == 'vowel-consonants') {
+                $storagePath = 'vowels-consonants';
+            } else {
+                $storagePath = 'alphabets-words';
+            }
             $imageFile = $request->file('image');
             $imageFileName = $imageFile->getClientOriginalName();
-            $imagePath = $imageFile->storeAs('alphabets-letters/images', $imageFileName, 'public');
+            $imagePath = $imageFile->storeAs(`{$storagePath}/images`, $imageFileName, 'public');
 
             $videoFile = $request->file('video');
             $videoFileName = $videoFile->getClientOriginalName();
-            $videoPath = $videoFile->storeAs('alphabets-letters/videos', $videoFileName, 'public');
+            $videoPath = $videoFile->storeAs(`{$storagePath}/videos`, $videoFileName, 'public');
 
             $alphabetType = in_array($request->letter, ['a', 'e', 'i', 'o', 'u']) ? 'vowel' : 'consonant';
 
@@ -56,6 +109,11 @@ class TextbookController extends Controller
         }
     }
 
+    public function addTextbookAlphabetWords(AlphabetRequest $request)
+    {
+        
+    }
+
     public function isLetterExist()
     {
         $count = Textbook::where('flag', request()->flag)
@@ -65,7 +123,8 @@ class TextbookController extends Controller
         return $count > 0;
     }
 
-    public function isFirstLetterMatch() {
+    public function isFirstLetterMatch()
+    {
         $letter = request()->letter;
         $firstLetter = request()->objectName[0];
 

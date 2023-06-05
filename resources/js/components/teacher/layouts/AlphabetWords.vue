@@ -121,47 +121,50 @@
                     </div>
                     <div class="modal-body">
                         <form>
-                            <div class="row">
-                                <div class="col-lg-10">
+                            <div class="mb-3">
+                                <label for="letter" class="form-label fw-bold">Alphabet</label>
+                                <input v-model="alphabetContent.letter" type="text" class="form-control" id="letter"
+                                    aria-describedby="letter">
+                                <small class="text-danger" v-if="errors && errors.letter">{{ errors.letter[0] }}</small>
+                            </div>
+                            <div v-for="val, index in fields" :key="val">
+                                <hr>
+                                <div class="rounded-2 p-2">
                                     <div class="mb-3">
-                                        <label for="letter" class="form-label fw-bold">Alphabet</label>
-                                        <input v-model="alphabetContent.letter" type="text" class="form-control" id="letter"
-                                            aria-describedby="letter">
+                                        <label for="objectName" class="form-label fw-bold">Object Number {{ val }}</label>
+                                        <input v-model="alphabetContent.objectName[index]" type="text" class="form-control"
+                                            id="objectName" aria-describedby="objectName">
+                                        <small class="text-danger" v-if="errors && errors.objectName">{{ }}</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="image" class="form-label fw-bold">Image File</label>
+                                        <input accept="image/*" @change="changeImageFile($event, index)" type="file" class="form-control" id="image">
+                                        <!-- <small class="text-danger" v-if="errors && errors.image">{{ errors.image[index][0] }}</small> -->
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="video" class="form-label fw-bold">Video File</label>
+                                        <input accept="video/*" @change="changeVideoFile($event, index)" type="file" class="form-control" id="video">
+                                        <!-- <small class="text-danger" v-if="errors && errors.video">{{ errors.video[index][0] }}</small> -->
                                     </div>
                                 </div>
-                            </div>
-                            <div v-for="num, index in alphabetContent" :key="index">
-                                <hr style="width: 39.5rem">
-                                <div class="row">
-                                    <div class="col-10 rounded-2 p-2">
-                                        <div class="mb-3">
-                                            <label for="objectName" class="form-label fw-bold">Object Name</label>
-                                            <input v-model="alphabetContent.objectName" type="text" class="form-control"
-                                                id="objectName" aria-describedby="objectName">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="image" class="form-label fw-bold">Image File</label>
-                                            <input type="file" class="form-control" id="image">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="video" class="form-label fw-bold">Video File</label>
-                                            <input type="file" class="form-control" id="video">
-                                        </div>
-                                    </div>
-                                    <div class="col-2 d-flex align-items-center justify-content-around">
-                                        <button :disabled="alphabetContent.length == 5" @click="manageFields('plus')"
+                                <!-- <div class="col-2 d-flex align-items-center justify-content-around">
+                                        <button :disabled="fields.length == 5" @click="manageFields('plus')"
                                             class="btn btn-success rounded-0" type="button">
                                             <i class="fas fa-plus"></i>
                                         </button>
-                                        <button :disabled="alphabetContent.length == 1"
-                                            @click="manageFields('minus', index)" class="btn btn-danger rounded-0"
+                                        <button :disabled="fields.length == 1"
+                                            @click="manageFields('minus', val.id)" class="btn btn-danger rounded-0"
                                             type="button">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
-                                    </div>
-                                </div>
+                                    </div> -->
                             </div>
                         </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button @click.prevent="submitAlphabet" type="button" class="btn-primary rounded-0 btn">
+                            Submit
+                        </button>
                     </div>
                 </div>
             </div>
@@ -174,27 +177,31 @@ export default {
     data() {
         return {
             alphabetWords: [],
+            fields: [1, 2, 3, 4, 5],
+            nextId: 1,
             data: [],
             flag: 0,
             count: 1,
             media: null,
             image: null,
             video: null,
-            alphabetContent: [{
+            alphabetContent: {
+                flag: null,
                 letter: '',
-                objectName: null,
-                image: null,
-                video: null
-            }],
+                objectName: [null, null, null, null, null],
+                image: [null, null, null, null, null],
+                video: [null, null, null, null, null]
+            },
             errors: []
         }
     },
     created() {
+        this.alphabetContent.flag = this.$route.params.textbookFlag
         this.getTextbooks()
     },
     computed: {
         isModalOpen() {
-            if($('#addAlphabetModal').hasClass('show')) return true;
+            if ($('#addAlphabetModal').hasClass('show')) return true;
             else return false;
         }
     },
@@ -204,12 +211,14 @@ export default {
             this.alphabetWords = _.chunk(alphabetWords.data, 5)
             this.data = this.alphabetWords[this.flag]
         },
-        manageFields(flag, index) {
-            if (flag == 'plus' && this.alphabetContent.length <= 5) {
-                this.alphabetContent.push({ letter: '', objectName: null, image: null, video: null })
+        manageFields(flag, id) {
+            if (flag == 'plus') {
+                this.nextId++
+                this.fields.push({ id: this.nextId })
             } else {
-                if (this.alphabetContent.length != 1) {
-                    this.alphabetContent.splice(index, 1)
+                const index = this.fields.findIndex(field => field.id === id);
+                if (index !== -1) {
+                    this.fields.splice(index, 1);
                 }
             }
         },
@@ -240,6 +249,42 @@ export default {
         },
         navigate() {
             this.$router.push('/textbook-management')
+        },
+        changeImageFile(event, index) {
+            this.alphabetContent.image[index] = event.target.files[0]
+        },
+        changeVideoFile(event, index) {
+            this.alphabetContent.video[index] = event.target.files[0]
+        },
+        async submitAlphabet() {
+            this.errors = []
+            const data = new FormData()
+            data.append('flag', this.alphabetContent.flag)
+            if(this.alphabetContent.letter != null) {
+                data.append('letter', this.alphabetContent.letter)
+            }
+                data.append('objectName', this.alphabetContent.objectName)
+                data.append('image', this.alphabetContent.image)
+                data.append('video', this.alphabetContent.video)
+            try {
+                const response = await axios.post('/api/textbook/alphabets-words/add', data, {
+                    headers: { 'content-type': 'multipart/form-data' }
+                })
+                // if (response.status === 200) {
+                //     this.alphabetContent.flag = null
+                //     this.alphabetContent.letter = null
+                //     this.alphabetContent.objectName = null
+                //     this.alphabetContent.image = null
+                //     this.alphabetContent.video = null
+                //     this.$refs.imageFileInput.value = '';
+                //     this.$refs.videoFileInput.value = '';
+                //     swal.fire('Success', response.data.message, 'success')
+                //     this.getTextbooks()
+                //     this.$('#addAlphabetModal').modal('hide');
+                // }
+            } catch (error) {
+                this.errors = error.response.data.errors
+            }
         }
     },
 }

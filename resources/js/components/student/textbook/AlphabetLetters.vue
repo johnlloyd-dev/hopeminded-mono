@@ -3,7 +3,7 @@
         <button type="button" @click="navigate" class="btn btn-secondary mt-5 mx-5 rounded-0 position-absolute top-0 start-0">
             Back
         </button>
-        <div class="p-5">
+        <div v-if="count != 0" class="p-5">
             <h3 class="text-center title-header">Alphabets</h3>
             <div class="row w-100">
                 <div class="col-lg-6 mt-2 mb-4">
@@ -24,7 +24,7 @@
             <div class="row w-100 justify-content-center mr-0">
                 <div class="col-lg-4 col-md-6 text-center mb-4" v-for="(item, index) in data[pageFlag]" :key="index">
                     <button @click="setVideo(index, item)" class="btn rounded image-button p-0" type="button">
-                        <img width="300" height="200" class="rounded" :class="{ 'opacity-75': item.isDone, 'box-shadow': !item.isDone }" :src="item.image" alt="" />
+                        <img width="300" height="200" class="rounded" :class="{ 'opacity-75': item.isDone, 'box-shadow': !item.isDone }" :src="item.image_url" alt="" />
                     </button>
                 </div>
             </div>
@@ -49,6 +49,7 @@
                 </div>
             </div>
         </div>
+        <h3 v-else class="position-absolute top-50 start-50 translate-middle fw-bold">No records found</h3>
     </div>
 </template>
 
@@ -75,7 +76,10 @@ export default {
     computed: {
         ...mapGetters({
             data: 'alphabetLetters'
-        })
+        }),
+        count() {
+            return this.data.length
+        }
     },
     methods: {
         ...mapActions({
@@ -85,7 +89,7 @@ export default {
             this.$router.push('/student-textbook')
         },
         setVideo(index, item) {
-            this.video = item.video
+            this.video = item.video_url
             $('#alphabetsModal').modal('show')
             var video = document.getElementById("myVideo");
             video.setAttribute("src", this.video); // set the new video src

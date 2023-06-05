@@ -33,11 +33,11 @@
                             <div class="row">
                                 <div class="col-6">
                                     <span class="fw-bold">
-                                        {{ item.image }}
+                                        {{ item.image_url }}
                                     </span>
                                 </div>
                                 <div class="col-6">
-                                    <button @click="viewMedia('image', item.image)"
+                                    <button @click="viewMedia('image', item.image_url)"
                                         class="btn btn-sm btn-primary rounded-0">
                                         <i class="fas fa-external-link-alt"></i>
                                     </button>
@@ -48,11 +48,11 @@
                             <div class="row">
                                 <div class="col-6">
                                     <span class="fw-bold">
-                                        {{ item.video }}
+                                        {{ item.video_url }}
                                     </span>
                                 </div>
                                 <div class="col-6">
-                                    <button @click="viewMedia('video', item.video)"
+                                    <button @click="viewMedia('video', item.video_url)"
                                         class="btn btn-sm btn-primary rounded-0">
                                         <i class="fas fa-external-link-alt"></i>
                                     </button>
@@ -169,7 +169,7 @@ export default {
     },
     methods: {
         async getTextbooks() {
-            const alphabetLetters = await axios.get('/storage/json/alphabets-with-letters.json')
+            const alphabetLetters = await axios.get(`/api/alphabets-letters/get?user=${'teacher'}`)
             this.alphabetLetters = _.chunk(alphabetLetters.data, 5)
             this.data = this.alphabetLetters[this.flag]
         },
