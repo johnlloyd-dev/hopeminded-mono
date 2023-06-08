@@ -18,6 +18,7 @@
                         <th class="text-white" style="font-size: 20px">Object</th>
                         <th class="text-white" style="font-size: 20px">Image Path</th>
                         <th class="text-white" style="font-size: 20px">Video Path</th>
+                        <th class="text-white" style="font-size: 20px">Action</th>
                     </tr>
                 </thead>
                 <tbody v-if="alphabetLetters.length == 0">
@@ -59,6 +60,11 @@
                                 </div>
                             </div>
                         </td>
+                        <td class="d-flex justify-content-center">
+                            <button class="btn-danger btn rounded-0 btn-sm">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -77,6 +83,7 @@
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="viewModalLabel">View Media</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -98,6 +105,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="addAlphabetModalLabel">Add Alphabet</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>

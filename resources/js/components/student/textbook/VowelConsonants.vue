@@ -1,5 +1,8 @@
 <template>
     <div class="body position-relative" :class="isConsonant ? 'night-background' : 'day-background'">
+        <div class="position-absolute top-0 end-0">
+            <img width="100" src="/images/main-logo.png" :class="{ logo: isConsonant }" alt="Hopeminded Logo">
+        </div>
         <button type="button" @click="navigate" class="btn btn-secondary mt-5 mx-5 rounded-0 position-absolute top-0 start-0">
             Back
         </button>
@@ -235,6 +238,10 @@ export default {
 
 .night-background {
     background-image: url("/images/night-background.jpg");
+}
+
+.logo {
+    box-shadow: rgba(240, 46, 170, 0.4) -5px 5px, rgba(240, 46, 170, 0.3) -10px 10px, rgba(240, 46, 170, 0.2) -15px 15px, rgba(240, 46, 170, 0.1) -20px 20px, rgba(240, 46, 170, 0.05) -25px 25px;
 }
 
 .toggle__handler {

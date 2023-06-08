@@ -6,6 +6,7 @@
                     <button @click="navigate()" class="btn-secondary btn rounded-0">
                         Back
                     </button>
+                    <img width="100" src="/images/main-logo.png" class="logo position-absolute top-0 end-0" alt="Hopeminded Logo">
                     <alphabet-letters-component v-if="textbookFlag == 'alphabet-letters'"></alphabet-letters-component>
                     <alphabet-words-component v-if="textbookFlag == 'alphabet-words'"></alphabet-words-component>
                     <vowel-consonants-component v-if="textbookFlag == 'vowel-consonants'"></vowel-consonants-component>

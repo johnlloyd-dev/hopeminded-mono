@@ -16,6 +16,7 @@
                     <tr class="bg-secondary">
                         <th class="text-white" style="font-size: 20px" scope="col">Letter</th>
                         <th class="text-white" style="font-size: 20px">Media Path</th>
+                        <th class="text-white" style="font-size: 20px">Action</th>
                     </tr>
                 </thead>
                 <tbody v-if="alphabetWords.length == 0">
@@ -77,6 +78,11 @@
                                 </div>
                             </div>
                         </td>
+                        <td class="d-flex justify-content-center">
+                            <button class="btn-danger btn rounded-0 btn-sm">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -95,6 +101,7 @@
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="viewModalLabel">View Media</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -116,53 +123,70 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="addAlphabetModalLabel">Add Alphabet</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form>
+                            <div v-if="errorsLength > 0" class="alert alert-danger" role="alert">
+                                <ul class="mb-0">
+                                    <li v-if="errors && errors.letter">{{ errors.letter[0] }}</li>
+                                </ul>
+                            </div>
                             <div class="mb-3">
-                                <label for="letter" class="form-label fw-bold">Alphabet</label>
-                                <input v-model="alphabetContent.letter" type="text" class="form-control" id="letter"
+                                <label for="letter" class="form-label fw-bold">Alphabet:</label>
+                                <input v-model="alphabetContent.letter" ref="letterField" type="text" maxlength="1" class="form-control" id="letter"
                                     aria-describedby="letter">
-                                <small class="text-danger" v-if="errors && errors.letter">{{ errors.letter[0] }}</small>
+                            </div>
+                            <hr>
+                            <p class="fw-bold"><span class="text-danger">Note: </span>You can upload atleast one object with image and video.</p>
+                            <div class="row">
+                                <div class="col-6 text-center">
+                                    <button :disabled="fields.length == 5" @click="manageFields('plus')"
+                                        class="btn btn-success rounded-0 fw-bold" type="button">
+                                        Add field <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <button :disabled="fields.length == 1"
+                                        @click="manageFields('minus')" class="btn btn-danger rounded-0 fw-bold"
+                                        type="button">
+                                        Remove field <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div v-for="val, index in fields" :key="val">
                                 <hr>
                                 <div class="rounded-2 p-2">
                                     <div class="mb-3">
-                                        <label for="objectName" class="form-label fw-bold">Object Number {{ val }}</label>
+                                        <label for="objectName" class="form-label fw-bold">Object Name:</label>
                                         <input v-model="alphabetContent.objectName[index]" type="text" class="form-control"
                                             id="objectName" aria-describedby="objectName">
-                                        <small class="text-danger" v-if="errors && errors.objectName">{{ }}</small>
+                                        <p class="fw-bold"><span class="text-danger">Note: </span>Object name must corresponds to the alphabet entered in the alphabet field. Ex: d -> dog, dove, etc.</p>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="image" class="form-label fw-bold">Image File</label>
-                                        <input accept="image/*" @change="changeImageFile($event, index)" type="file" class="form-control" id="image">
-                                        <!-- <small class="text-danger" v-if="errors && errors.image">{{ errors.image[index][0] }}</small> -->
+                                        <label for="image" class="form-label fw-bold">Image File:</label>
+                                        <input :ref="'imageFileInput' + index" accept="image/*" @change="changeImageFile($event, index)" type="file"
+                                            class="form-control" id="image">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="video" class="form-label fw-bold">Video File</label>
-                                        <input accept="video/*" @change="changeVideoFile($event, index)" type="file" class="form-control" id="video">
-                                        <!-- <small class="text-danger" v-if="errors && errors.video">{{ errors.video[index][0] }}</small> -->
+                                        <label for="video" class="form-label fw-bold">Video File:</label>
+                                        <input :ref="'videoFieldInput' + index" accept="video/*" @change="changeVideoFile($event, index)" type="file"
+                                            class="form-control" id="video">
                                     </div>
                                 </div>
-                                <!-- <div class="col-2 d-flex align-items-center justify-content-around">
-                                        <button :disabled="fields.length == 5" @click="manageFields('plus')"
-                                            class="btn btn-success rounded-0" type="button">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                        <button :disabled="fields.length == 1"
-                                            @click="manageFields('minus', val.id)" class="btn btn-danger rounded-0"
-                                            type="button">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div> -->
                             </div>
+                            <hr>
+                            <p class="fw-bold">Submit button is disabled due to following possible reasons:</p>
+                            <ul>
+                                <li><span class="text-danger text-justify fw-bold">Some fields have no values. Make sure to fill up all fields.</span> </li>
+                                <li><span class="text-danger text-justify fw-bold">The first letter of the object name and the entered alphabet is not match.</span> </li>
+                            </ul>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button @click.prevent="submitAlphabet" type="button" class="btn-primary rounded-0 btn">
+                        <button :disabled="disabledButton" @click.prevent="submitAlphabet" type="button" class="btn-primary rounded-0 btn">
                             Submit
                         </button>
                     </div>
@@ -173,11 +197,13 @@
 </template>
 
 <script>
+import swal from 'sweetalert2'
+import { Popover } from 'bootstrap'
 export default {
     data() {
         return {
             alphabetWords: [],
-            fields: [1, 2, 3, 4, 5],
+            fields: [0],
             nextId: 1,
             data: [],
             flag: 0,
@@ -185,12 +211,14 @@ export default {
             media: null,
             image: null,
             video: null,
+            error: null,
+            popover: null,
             alphabetContent: {
                 flag: null,
                 letter: '',
-                objectName: [null, null, null, null, null],
-                image: [null, null, null, null, null],
-                video: [null, null, null, null, null]
+                objectName: [''],
+                image: [null],
+                video: [null]
             },
             errors: []
         }
@@ -198,27 +226,70 @@ export default {
     created() {
         this.alphabetContent.flag = this.$route.params.textbookFlag
         this.getTextbooks()
+        // axios.get(`/api/alphabets-words/get?user=${'teacher'}`)
     },
+    beforeUnmount() {
+        $('#addAlphabetModal').modal('hide')
+    },  
     computed: {
+        errorsLength() {
+            return Object.keys(this.errors).length
+        },
         isModalOpen() {
             if ($('#addAlphabetModal').hasClass('show')) return true;
             else return false;
+        },
+        disabledButton() {
+            const objectName = this.alphabetContent.objectName.filter(data =>  {
+                return data == null
+            })
+
+            const image = this.alphabetContent.image.filter(data =>  {
+                return data == null
+            })
+
+            const video = this.alphabetContent.video.filter(data =>  {
+                return data == null
+            })
+
+            const letterNotMatch = this.alphabetContent.objectName.filter(data => {
+                return data.charAt(0) != this.alphabetContent.letter
+            })
+            
+            if(this.alphabetContent.letter == null || objectName.length > 0 || image.length > 0 || video.length > 0 || letterNotMatch.length > 0) {
+                return true
+            }
+
+            return false
         }
     },
     methods: {
         async getTextbooks() {
-            const alphabetWords = await axios.get('/storage/json/alphabets-with-words.json')
-            this.alphabetWords = _.chunk(alphabetWords.data, 5)
+            const alphabetWords = await axios.get(`/api/alphabets-words/get?user=${'teacher'}`)
+            let newData = []
+            alphabetWords.data.forEach(element => {
+                var variableName = element.letter;
+                var value = element.attributes;
+
+                var obj = {};
+                obj[variableName] = value;
+                newData.push(obj);
+            });
+            this.alphabetWords = _.chunk(newData, 5)
             this.data = this.alphabetWords[this.flag]
         },
-        manageFields(flag, id) {
-            if (flag == 'plus') {
-                this.nextId++
-                this.fields.push({ id: this.nextId })
+        manageFields(flag) {
+            if (flag == 'plus' && this.fields.length != 5) {
+                this.fields.push(0)
+                this.alphabetContent.objectName.push('')
+                this.alphabetContent.image.push(null)
+                this.alphabetContent.video.push(null)
             } else {
-                const index = this.fields.findIndex(field => field.id === id);
-                if (index !== -1) {
-                    this.fields.splice(index, 1);
+                if (this.fields.length != 1) {
+                    this.fields.pop();
+                    this.alphabetContent.objectName.pop()
+                    this.alphabetContent.image.pop()
+                    this.alphabetContent.video.pop()
                 }
             }
         },
@@ -260,30 +331,44 @@ export default {
             this.errors = []
             const data = new FormData()
             data.append('flag', this.alphabetContent.flag)
-            if(this.alphabetContent.letter != null) {
+            if (this.alphabetContent.letter != null) {
                 data.append('letter', this.alphabetContent.letter)
             }
-                data.append('objectName', this.alphabetContent.objectName)
-                data.append('image', this.alphabetContent.image)
-                data.append('video', this.alphabetContent.video)
+            data.append('objectName', JSON.stringify(this.alphabetContent.objectName))
+            const videoFilter = this.alphabetContent.video.filter( data => {
+                return data == null;
+            });
+
+            const imageFilter = this.alphabetContent.image.filter( data => {
+                return data == null;
+            });
+            this.fields.forEach((element, index) => {
+                if (videoFilter.length == 0 && imageFilter.length == 0) {
+                    data.append('image[]', this.alphabetContent.image[index])
+                    data.append('video[]', this.alphabetContent.video[index])
+                }
+            });
+
+            const headers = { 'Content-Type': 'multipart/form-data' };
             try {
-                const response = await axios.post('/api/textbook/alphabets-words/add', data, {
-                    headers: { 'content-type': 'multipart/form-data' }
-                })
-                // if (response.status === 200) {
-                //     this.alphabetContent.flag = null
-                //     this.alphabetContent.letter = null
-                //     this.alphabetContent.objectName = null
-                //     this.alphabetContent.image = null
-                //     this.alphabetContent.video = null
-                //     this.$refs.imageFileInput.value = '';
-                //     this.$refs.videoFileInput.value = '';
-                //     swal.fire('Success', response.data.message, 'success')
-                //     this.getTextbooks()
-                //     this.$('#addAlphabetModal').modal('hide');
-                // }
+                const response = await axios.post('/api/textbook/alphabets-words/add', data, {headers})
+                if (response.status === 200) {
+                    this.alphabetContent.flag = null
+                    this.alphabetContent.letter = null
+                    this.alphabetContent.objectName = ['']
+                    this.alphabetContent.image = [null]
+                    this.alphabetContent.video = [null]
+                    this.files = [0]
+                    swal.fire('Success', response.data.message, 'success')
+                    this.getTextbooks()
+                    $('#addAlphabetModal').modal('hide');
+                }
             } catch (error) {
+                console.log(error)
                 this.errors = error.response.data.errors
+                if(this.errors && this.errors.letter) {
+                    this.$refs.letterField.focus()
+                }
             }
         }
     },

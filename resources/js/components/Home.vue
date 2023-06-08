@@ -1,12 +1,15 @@
 <template>
     <body class="position-relative">
-        <div class="card rounded-0">
+        <div class="card rounded-0 position-relative">
             <div class="card-body">
-                <h1 class="card-title text-center mb-3">HOPEMINDED</h1>
+                <div class="text-center">
+                    <img width="150" src="/images/main-logo.png" class="logo my-3 " alt="Hopeminded Logo">
+                    <h1 class="card-title text-center mb-3">HOPEMINDED</h1>
+                </div>
                 <h3 class="text-center font-weight-bold next-step">
                     Login as
                 </h3>
-                <div class="d-flex justify-content-around">
+                <div class="d-flex justify-content-around mb-5">
                     <div class="buttons">
                         <button @click="teacherLoginRedirect" class="btn-hover color-1">Teacher</button>
                         <button @click="adminLoginRedirect" class="btn-hover color-2">Admin</button>
@@ -16,9 +19,18 @@
             </div>
         </div>
         <div class="w-100 mt-5 text-center custom-background">
-            <h2 class="mt-3 fw-bolder">How to play?</h2>
-            <div class="p-3 mb-3">
-                <iframe width="860" height="615" src="https://www.youtube.com/embed/nMLB0MFHJXk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <div class="row p-5">
+                <div class="col-lg-12 d-flex align-items-center justify-content-center">
+                    <h1 class="mt-3 fw-bolder text-white">How to use Hopeminded?</h1>
+                </div>
+                <div class="col-lg-12">
+                    <div class="p-3 mb-3">
+                        <iframe width="860" height="615" src="https://www.youtube.com/embed/nMLB0MFHJXk"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen></iframe>
+                    </div>
+                </div>
             </div>
         </div>
         <footer-component class="w-100"></footer-component>
@@ -81,6 +93,10 @@ body {
     text-align: center;
 }
 
+.logo {
+    box-shadow: rgba(135, 206, 250, 0.4) 5px 5px, rgba(135, 206, 250, 0.3) 10px 10px, rgba(135, 206, 250, 0.2) 15px 15px, rgba(135, 206, 250, 0.1) 20px 20px, rgba(135, 206, 250, 0.05) 25px 25px;
+}
+
 .btn-hover {
     width: 200px;
     font-size: 16px;
@@ -139,10 +155,9 @@ body {
 
 .custom-background {
     position: relative;
-    background-image: url('/images/background.jpg');
+    background-image: url('/images/night-background.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
 }
-
 </style>

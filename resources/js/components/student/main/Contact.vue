@@ -9,7 +9,7 @@
                             <h4 class="fw-bold">Contact Us </h4>
                             <img src="/images/kids.png" alt="Kids" width="150">
                         </div>
-                        <h3 class="title-header text-center text-decoration-underline">Magistech</h3>
+                        <h3 class="title-header text-center text-decoration-underline mb-3">Magistech</h3>
                         <div class="row">
                             <div class="col-sm-12 col-lg-3 col-md-6">
                                 <div class="profile-card">
@@ -60,19 +60,28 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="contact-information alert alert-warning" role="alert">
-                            <h5 class="fw-bold text-danger">Email Address: </h5>
-                            <ul>
-                                <li>
-                                    <p class="text-dark fw-bold">hopeminded22@gmail.com</p>
-                                </li>
-                            </ul>
-                            <h5 class="fw-bold text-danger">Contact number:</h5>
-                            <ul>
-                                <li>
-                                    <p class="text-dark fw-bold">+63985981702</p>
-                                </li>
-                            </ul>
+                        <div class="contact-information alert alert-success" role="alert">
+                            <div class="row align-items-center">
+                                <div class="col-lg-3">
+                                    <div class="text-center">
+                                        <img width="200" src="/images/main-logo.png" class="logo" alt="Hopeminded Logo">
+                                    </div>
+                                </div>
+                                <div class="col-lg-9">
+                                    <h5 class="fw-bold text-danger">Email Address: </h5>
+                                    <ul>
+                                        <li>
+                                            <p class="text-dark fw-bold">hopeminded22@gmail.com</p>
+                                        </li>
+                                    </ul>
+                                    <h5 class="fw-bold text-danger">Contact number:</h5>
+                                    <ul>
+                                        <li>
+                                            <p class="text-dark fw-bold">+63985981702</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -121,7 +130,7 @@ export default {
 .card {
     background-color: rgba(255, 255, 255, 0.5);
     border: none;
-    height: 100vh;
+    height: 100%;
     position: relative;
 }
 

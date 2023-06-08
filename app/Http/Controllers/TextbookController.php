@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Laravel\Ui\Presets\React;
+use stdClass;
 
 class TextbookController extends Controller
 {
@@ -60,6 +61,31 @@ class TextbookController extends Controller
             })->toArray();
     }
 
+    public function getAlphabetsWords(Request $request) {
+        if ($request->get('user') == 'student') {
+            $teacherId = Student::where('user_id', Auth::user()->id)->first()->teacher_id;
+        } else {
+            $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        }
+        return Textbook::where('teacher_id', $teacherId)
+            ->where('flag', 'alphabet-words')
+            ->get()
+            ->map(function ($textbooks) {
+                $images = json_decode($textbooks->image);
+                $videos = json_decode($textbooks->video);
+                $objectNames = json_decode($textbooks->object);
+                foreach ($objectNames as $key => $value) {
+                    $data[] = [
+                        "object" => $value,
+                        "image" => Storage::url($images[$key]),
+                        "video" => Storage::url($videos[$key]),
+                    ];
+                }
+                $textbooks['attributes'] = $data;
+                return $textbooks;
+            })->toArray();
+    }
+
     public function addTextbook(TextbookRequest $request)
     {
         if (self::isLetterExist()) {
@@ -68,7 +94,7 @@ class TextbookController extends Controller
                     'letter' => ["This letter already exist."]
                 ]
             ], 422);
-        } else if (!self::isFirstLetterMatch()) {
+        } else if (!self::isFirstLetterMatch($request->flag)) {
             return response()->json([
                 'errors' => [
                     'objectName' => ["The first letter of the object name and the entered letter did not match."]
@@ -81,8 +107,6 @@ class TextbookController extends Controller
                 $storagePath = 'alphabets-letters';
             } else if ($request->flag == 'vowel-consonants') {
                 $storagePath = 'vowels-consonants';
-            } else {
-                $storagePath = 'alphabets-words';
             }
             $imageFile = $request->file('image');
             $imageFileName = $imageFile->getClientOriginalName();
@@ -109,9 +133,73 @@ class TextbookController extends Controller
         }
     }
 
-    public function addTextbookAlphabetWords(AlphabetRequest $request)
+    public function addTextbookAlphabetWords(Request $request)
     {
-        
+        // return json_decode($request->objectName);
+        $objectNames = array_filter(json_decode($request->objectName), function ($value) {
+            return $value == null;
+        });
+
+        $objectNames2 = array_filter(json_decode($request->objectName), function ($value) {
+            return $value == "";
+        });
+
+        if ($request->letter == null) {
+            return response()->json([
+                'errors' => [
+                    'letter' => ["Alphabet field is required."]
+                ]
+            ], 422);
+        }
+
+        if (!empty($objectNames) || !empty($objectNames2)) {
+            return response()->json([
+                'errors' => [
+                    'letter' => ["Object name fields are required."]
+                ]
+            ], 422);
+        }
+
+        if (!$request->has('image') || !$request->has('video')) {
+            return response()->json([
+                'errors' => [
+                    'letter' => ["Object image or video fields are required."]
+                ]
+            ], 422);
+        }
+
+        if (self::isLetterExist()) {
+            return response()->json([
+                'errors' => [
+                    'letter' => ["This letter already exist."]
+                ]
+            ], 422);
+        }
+
+        foreach (json_decode($request->objectName) as $key => $value) {
+            $imageFile[] = $request->file('image')[$key];
+            $imageFileName[] = $imageFile[$key]->getClientOriginalName();
+            $imagePath[] = $imageFile[$key]->storeAs('/alphabets-words/images', $imageFileName[$key], 'public');
+
+            $videoFile[] = $request->file('video')[$key];
+            $videoFileName[] = $videoFile[$key]->getClientOriginalName();
+            $videoPath[] = $videoFile[$key]->storeAs('alphabets-words/videos', $videoFileName[$key], 'public');
+        }
+
+        $alphabetType = in_array($request->letter, ['a', 'e', 'i', 'o', 'u']) ? 'vowel' : 'consonant';
+
+        $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        Textbook::create([
+            'flag' => $request->flag,
+            'letter' => strtolower($request->letter),
+            'object' => $request->objectName,
+            'image' => json_encode($imagePath),
+            'video' => json_encode($videoPath),
+            'type' => $alphabetType,
+            'teacher_id' => $teacherId
+        ]);
+
+        return response()->json(['message' => 'An alphabet is added successfully.']);
     }
 
     public function isLetterExist()
@@ -123,11 +211,12 @@ class TextbookController extends Controller
         return $count > 0;
     }
 
-    public function isFirstLetterMatch()
+    public function isFirstLetterMatch($flag)
     {
-        $letter = request()->letter;
-        $firstLetter = request()->objectName[0];
-
-        return $firstLetter === $letter;
+        if ($flag != 'alphabet-words') {
+            $letter = request()->letter;
+            $firstLetter = request()->objectName[0];
+            return $firstLetter === $letter;
+        }
     }
 }

@@ -4,6 +4,9 @@
             Back to Home Page
         </button>
         <div class="card px-5 rounded-0 w-50">
+            <div class="text-center">
+                <img width="150" src="/images/main-logo.png" class="logo my-3" alt="Hopeminded Logo">
+            </div>
             <h4 class="text-center mb-2 font-weight-bold title-header mt-3">Student Register</h4>
             <div :class="{ 'card-body': canAccess }">
                 <form>
@@ -188,6 +191,9 @@ body {
     align-items: center;
 }
 
+.logo {
+    box-shadow: rgba(135, 206, 250, 0.4) 5px 5px, rgba(135, 206, 250, 0.3) 10px 10px, rgba(135, 206, 250, 0.2) 15px 15px, rgba(135, 206, 250, 0.1) 20px 20px, rgba(135, 206, 250, 0.05) 25px 25px;
+}
 .card {
     background-color: rgba(255, 255, 255, 0.5);
     border: none;

@@ -1,5 +1,6 @@
 <template>
-    <div class="body">
+    <div class="body position-relative">
+        <img width="100" src="/images/main-logo.png" class="logo position-absolute top-0 end-0" alt="Hopeminded Logo">
         <div class="d-flex">
             <div class="main-content mx-5 w-100 h-100">
                 <div class="my-3">

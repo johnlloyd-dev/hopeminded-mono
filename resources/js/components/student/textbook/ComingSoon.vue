@@ -1,5 +1,8 @@
 <template>
-    <div class="body">
+    <div class="body position-relative">
+        <div class="position-absolute top-0 end-0">
+            <img width="100" src="/images/main-logo.png" class="logo" alt="Hopeminded Logo">
+        </div>
         <button type="button" @click="navigate" class="btn btn-secondary mt-5 mx-5 rounded-0">
             Back
         </button>

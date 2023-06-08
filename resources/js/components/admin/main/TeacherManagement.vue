@@ -1,5 +1,5 @@
 <template>
-    <div class="body">
+    <div class="body position-relative">
         <div class="d-flex">
             <admin-sidebar-component @collapse="onCollapse" />
             <div :class="collapsed ? 'collapsed-menu' : 'not-collapsed-menu'" class="main-content mx-5 w-100 h-100 mt-5">
@@ -49,6 +49,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="addTeacherModalLabel">Add Teacher</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>

@@ -66,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::get('alphabets-letters/get', [TextbookController::class, 'getAlphabetsLetters']);
     Route::get('vowels-consonants/get', [TextbookController::class, 'getVowelsConsonants']);
+    Route::get('alphabets-words/get', [TextbookController::class, 'getAlphabetsWords']);
 
     Route::post('/logout', [LogoutController::class, 'logout']);
 

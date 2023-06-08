@@ -23,12 +23,21 @@ class AlphabetRequest extends FormRequest
     {
         return [
             'letter' => 'required',
-            'objectName' => 'required|array|size:5',
-            'objectName.*' => 'required',
-            'image' => 'required|array|size:5',
-            'image.*' => 'required',
-            'video' => 'required|array|size:5',
-            'video.*' => 'required',
+            'objectName' => 'required|min:1',
+            'image' => 'required|min:1',
+            'video' => 'required|min:1',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'objectName.min' => 'Object name field must have atleast one value.',
+            // 'objectName.max' => 'Object name field must have atleast one value.',
+            'image.min' => 'Image field must have atleast one value.',
+            // 'image.max' => 'Image field must have atleast one value.',
+            'video.min' => 'Video field must have atleast one value.',
+            // 'video.max' => 'Video field must have atleast one value.',
         ];
     }
 }
