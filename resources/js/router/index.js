@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from "vue-router";
 import { store } from "../store";
 
 const home = () => import("../components/Home.vue");
+const mainAuth = () => import("../components/MainAuth.vue");
 const notFound = () => import("../components/NotFound.vue");
 const studentDashboard = () => import("../components/student/main/Dashboard.vue");
 const teacherDashboard = () => import("../components/teacher/main/Dashboard.vue");
@@ -43,11 +44,11 @@ const viewTextbook = () => import("../components/teacher/layouts/Textbook.vue");
 
 const routes = [
     {
-        name: "home",
+        name: "main-auth",
         path: "/",
-        component: home,
+        component: mainAuth,
         meta: {
-            title: `Home Page`,
+            title: `Main Auth Page`,
         },
     },
     {

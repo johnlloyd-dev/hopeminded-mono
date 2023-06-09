@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CheckAccessIdController;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\QuizReportController;
 use App\Http\Controllers\TeacherController;
@@ -63,7 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/textbook/alphabets-words/add', [TextbookController::class, 'addTextbookAlphabetWords']);
 
     Route::get('quiz-report/student/{studentId}', [QuizReportController::class, 'getStudentQuizReport']);
-    
+
     Route::get('alphabets-letters/get', [TextbookController::class, 'getAlphabetsLetters']);
     Route::get('vowels-consonants/get', [TextbookController::class, 'getVowelsConsonants']);
     Route::get('alphabets-words/get', [TextbookController::class, 'getAlphabetsWords']);
@@ -118,5 +119,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 });
-
+Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);
+Route::get('/reset-password/form', function() {
+    return redirect('/reset-password');
+});
+
+Route::post('/reset-password', [EmailController::class, 'resetPassword']);

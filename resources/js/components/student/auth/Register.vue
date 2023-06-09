@@ -1,11 +1,11 @@
 <template>
     <body class="position-relative">
         <button @click="$router.push('/')" class="btn btn-secondary rounded-0 position-absolute top-0 start-0">
-            Back to Home Page
+            Back
         </button>
         <div class="card px-5 rounded-0 w-50">
             <div class="text-center">
-                <img width="150" src="/images/main-logo.png" class="logo my-3" alt="Hopeminded Logo">
+                <img width="150" src="/images/logo.png" class="logo my-3" alt="Hopeminded Logo">
             </div>
             <h4 class="text-center mb-2 font-weight-bold title-header mt-3">Student Register</h4>
             <div :class="{ 'card-body': canAccess }">
@@ -139,7 +139,7 @@ export default {
     },
     methods: {
         redirectStudentLogin() {
-            this.$router.push({ path: '/student-login' })
+            this.$router.push({ path: '/' })
         },
         async register() {
             this.errors = []

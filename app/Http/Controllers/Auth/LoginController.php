@@ -16,13 +16,13 @@ class LoginController extends Controller
 {
     public function login(LoginRequest $request)
     {
-        $user = User::where('user_flag', $request->userFlag)->where('username', $request->username)->first();
+        $user = User::where('username', $request->username)->first();
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
                 if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
                     $auth = $request->user();
-                    if($request->userFlag != 'admin') {
-                        switch ($request->userFlag) {
+                    if($auth->user_flag != 'admin') {
+                        switch ($auth->user_flag) {
                             case 'student':
                                 $owner = Student::where('user_id', $auth->id)->first();
                                 break;
@@ -32,6 +32,7 @@ class LoginController extends Controller
                         }
                         $data['fullname'] = $owner->first_name . " " . $owner->middle_name . " " . $owner->last_name;
                     }
+                    $data['user_flag'] = $auth->user_flag;
                     $data['token'] = $auth->createToken('LoginToken')->plainTextToken;
                     return response()->json(['data' => $data]);
                 }
@@ -42,7 +43,7 @@ class LoginController extends Controller
             }
         } else {
             return response()->json([
-                'username' => ['Incorrect username.']
+                'username' => ['Username is incorrect or does not exist.']
             ], 401);
         }
     }

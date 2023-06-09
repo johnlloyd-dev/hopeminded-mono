@@ -17,6 +17,10 @@ Route::get('/', function () {
     return view('home');
 });
 
+Route::get('/reset-password', function () {
+    return view('new-password');
+});
+
 Route::get('/register', function () {
     return view('auth.register');
 });

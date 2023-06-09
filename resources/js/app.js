@@ -34,6 +34,9 @@ app.component('vowel-consonants-component', VowelConsonants);
 import HandSign from './components/teacher/layouts/HandSign.vue';
 app.component('hand-sign-component', HandSign);
 
+import PasswordResetForm from './components/PasswordResetForm.vue';
+app.component('password-reset-component', PasswordResetForm);
+
 import Object from './components/teacher/layouts/Objects.vue';
 app.component('object-component', Object);
 
