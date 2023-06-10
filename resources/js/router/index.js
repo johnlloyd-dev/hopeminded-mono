@@ -35,12 +35,15 @@ const vowelConsonants = () => import("../components/student/textbook/VowelConson
 const studentManagement = () => import("../components/teacher/main/StudentManagement.vue");
 const textbookManagement = () => import("../components/teacher/main/TextbookManagement.vue");
 const quizManagement = () => import("../components/teacher/main/QuizManagement.vue");
+const studentsView = () => import("../components/admin/layouts/Students.vue");
 
 const teacherManagement = () => import("../components/admin/main/TeacherManagement.vue");
 const quizReport = () => import("../components/student/reports/QuizReports.vue");
 const studentQuizReport = () => import("../components/teacher/reports/Reports.vue");
 const comingSoon = () => import("../components/student/textbook/ComingSoon.vue");
 const viewTextbook = () => import("../components/teacher/layouts/Textbook.vue");
+
+const editProfile = () => import("../components/student/layouts/EditProfile.vue");
 
 const routes = [
     {
@@ -280,11 +283,27 @@ const routes = [
         },
     },
     {
+        name: "student-view",
+        path: "/teacher-management/:teacherId",
+        component: studentsView,
+        meta: {
+            title: `View Students`,
+        },
+    },
+    {
         name: "student-quiz-report",
         path: "/student-quiz-report/:studentId",
         component: studentQuizReport,
         meta: {
             title: `StudentQuizReport`,
+        },
+    },
+    {
+        name: "edit-profile",
+        path: "/student/edit-profile",
+        component: editProfile,
+        meta: {
+            title: `Edit Profile`,
         },
     },
 ];

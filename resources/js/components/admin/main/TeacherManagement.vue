@@ -15,6 +15,7 @@
                                 <th scope="col">Last Name</th>
                                 <th scope="col">Username</th>
                                 <th scope="col">Email</th>
+                                <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody v-if="teachers.length !== 0">
@@ -24,6 +25,11 @@
                                 <td>{{ teacher.last_name }}</td>
                                 <td>{{ teacher.username }}</td>
                                 <td>{{ teacher.email }}</td>
+                                <td class="d-flex justify-content-center">
+                                    <button @click="viewStudents(teacher.id)" class="btn btn-success rounded-0">
+                                        <span>View Students </span><i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                         <tbody v-else>
@@ -34,10 +40,10 @@
                     </table>
                 </div>
                 <div v-if="teachers.length !== 0" class="d-flex justify-content-around">
-                    <button class="btn btn-secondary rounded-0">
+                    <button :disabled="teachers.length < 11" class="btn btn-secondary rounded-0">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button class="btn btn-secondary rounded-0">
+                    <button :disabled="teachers.length < 11" class="btn btn-secondary rounded-0">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -49,7 +55,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%;" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="addTeacherModalLabel">Add Teacher</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -171,6 +177,11 @@ export default {
                 .finally(() => {
                     this.isLoading = false
                 })
+        },
+        viewStudents(teacherId) {
+            this.$router.push({
+                path: `/teacher-management/${teacherId}`
+            });
         }
     }
 }

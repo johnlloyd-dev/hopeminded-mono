@@ -17,7 +17,10 @@ class GameController extends Controller
 
     public function allGameRecords(Request $request) {
         $student = Student::where('user_id', Auth::user()->id)->first();
-        return QuizReport::where('student_id', $student->id)->where('game_id', $request->gameId)->get();
+        return QuizReport::where('student_id', $student->id)
+            ->where('game_id', $request->gameId)
+            ->orderByRaw('-total_score ASC')
+            ->get();
     }
 
     public function storeGameInfo(Request $request, $flag) {
@@ -67,6 +70,8 @@ class GameController extends Controller
 
     public function getQuizReports(Request $request) {
         $student = Student::where('user_id', Auth::user()->id)->first();
-        return QuizReport::where('student_id', $student->id)->get();
+        return QuizReport::where('student_id', $student->id)
+            ->orderByRaw('-total_score ASC')
+            ->get();
     }
 }

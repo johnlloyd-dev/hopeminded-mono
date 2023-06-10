@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 class QuizReportController extends Controller
 {
     public function getStudentQuizReport($studentId) {
-        return QuizReport::where('student_id', $studentId)->get();
+        return QuizReport::where('student_id', $studentId)
+            ->orderByRaw('-total_score ASC')
+            ->get();
     }
 }

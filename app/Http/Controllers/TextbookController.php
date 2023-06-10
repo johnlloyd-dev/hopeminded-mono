@@ -179,11 +179,11 @@ class TextbookController extends Controller
         foreach (json_decode($request->objectName) as $key => $value) {
             $imageFile[] = $request->file('image')[$key];
             $imageFileName[] = $imageFile[$key]->getClientOriginalName();
-            $imagePath[] = $imageFile[$key]->storeAs('/alphabets-words/images', $imageFileName[$key], 'public');
+            $imagePath[] = $imageFile[$key]->storeAs('alphabets-words/' . 'images/' . strtoupper($request->letter), $imageFileName[$key], 'public');
 
             $videoFile[] = $request->file('video')[$key];
             $videoFileName[] = $videoFile[$key]->getClientOriginalName();
-            $videoPath[] = $videoFile[$key]->storeAs('alphabets-words/videos', $videoFileName[$key], 'public');
+            $videoPath[] = $videoFile[$key]->storeAs('alphabets-words/' . 'videos/' . strtoupper($request->letter), $videoFileName[$key], 'public');
         }
 
         $alphabetType = in_array($request->letter, ['a', 'e', 'i', 'o', 'u']) ? 'vowel' : 'consonant';

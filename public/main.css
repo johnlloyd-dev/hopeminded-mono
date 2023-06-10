@@ -21,3 +21,12 @@ body {
 .v-sidebar-menu .vsm--toggle-btn_default::before {
     display: none !important;
 }
+
+.circle-image {
+    display: inline-block;
+    width: 150px; /* adjust the size as needed */
+    height: 150px; /* adjust the size as needed */
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.4);
+  }
+

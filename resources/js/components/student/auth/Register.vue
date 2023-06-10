@@ -5,7 +5,7 @@
         </button>
         <div class="card px-5 rounded-0 w-50">
             <div class="text-center">
-                <img width="150" src="/images/logo.png" class="logo my-3" alt="Hopeminded Logo">
+                <img width="150" src="/images/main-logo.png" class="circle-image my-3" alt="Hopeminded Logo">
             </div>
             <h4 class="text-center mb-2 font-weight-bold title-header mt-3">Student Register</h4>
             <div :class="{ 'card-body': canAccess }">

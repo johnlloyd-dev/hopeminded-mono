@@ -2,26 +2,26 @@
     <body class="position-relative">
         <div class="card px-5 rounded-0 w-50">
             <div class="text-center">
-                <img width="150" src="/images/logo.png" class="logo my-3" alt="Hopeminded Logo">
+                <img width="150" src="/images/main-logo.png" class="circle-image my-3" alt="Hopeminded Logo">
             </div>
             <h4 class="text-center mb-2 font-weight-bold title-header mt-3">Login</h4>
             <div class="card-body">
                 <form>
-                    <div class="row mb-2">
-                        <div class="col-lg-12 mb-3">
-                            <label for="username" class="form-label" style="font-weight: bold">Username:</label>
-                            <input type="text" v-model="auth.username" class="form-control" id="username">
-                            <small class="text-danger font-weight-bold" v-if="errors && errors.username">{{
-                                errors.username[0] }}</small>
+                    <div class="alert alert-secondary" role="alert">
+                        <div class="row mb-2">
+                            <div class="col-lg-12 mb-3">
+                                <label for="username" class="form-label text-dark" style="font-weight: bold">Username:</label>
+                                <input type="text" v-model="auth.username" class="form-control" id="username">
+                                <small class="text-danger font-weight-bold" v-if="errors && errors.username">{{
+                                    errors.username[0] }}</small>
+                            </div>
+                            <div class="col-lg-12 mb-3">
+                                <label for="password" class="form-label text-dark" style="font-weight: bold">Password:</label>
+                                <input type="password" v-model="auth.password" class="form-control" id="password">
+                                <small class="text-danger font-weight-bold" v-if="errors && errors.password">{{
+                                    errors.password[0] }}</small>
+                            </div>
                         </div>
-                        <div class="col-lg-12 mb-3">
-                            <label for="password" class="form-label" style="font-weight: bold">Password:</label>
-                            <input type="password" v-model="auth.password" class="form-control" id="password">
-                            <small class="text-danger font-weight-bold" v-if="errors && errors.password">{{
-                                errors.password[0] }}</small>
-                        </div>
-                    </div>
-                    <div class="alert alert-primary" role="alert">
                         <div class="mb-3">
                             <button @click.prevent="login" v-if="!isLoading" style="font-weight: bold; width: 120px;"
                                 type="button" class="btn btn-primary me-3">Login</button>
@@ -58,12 +58,13 @@
                                         errors.email[0] }}</small>
                                 </div>
                                 <div class="modal-footer">
-                                    <button v-if="!processing" type="submit" style="width: 230px;" class="btn btn-primary rounded-0">Send
+                                    <button v-if="!processing" type="submit" style="width: 230px;"
+                                        class="btn btn-primary rounded-0">Send
                                         Password Reset Link</button>
-                                        <button v-else disabled style="font-weight: bold; width: 230px;" type="button"
-                                            class="btn btn-primary pb-0 me-3">
-                                            <Loading />
-                                        </button>
+                                    <button v-else disabled style="font-weight: bold; width: 230px;" type="button"
+                                        class="btn btn-primary pb-0 me-3">
+                                        <Loading />
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -164,10 +165,6 @@ body {
     flex-direction: column;
     align-items: center;
     /* justify-content: center; */
-}
-
-.logo {
-    box-shadow: rgba(135, 206, 250, 0.4) 5px 5px, rgba(135, 206, 250, 0.3) 10px 10px, rgba(135, 206, 250, 0.2) 15px 15px, rgba(135, 206, 250, 0.1) 20px 20px, rgba(135, 206, 250, 0.05) 25px 25px;
 }
 
 .card {

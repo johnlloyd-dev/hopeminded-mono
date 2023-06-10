@@ -83,7 +83,7 @@
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="viewModalLabel">View Media</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -105,7 +105,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="addAlphabetModalLabel">Add Alphabet</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>

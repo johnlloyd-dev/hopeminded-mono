@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckAccessIdController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\QuizReportController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TextbookController;
 use App\Http\Controllers\TextbookFlagController;
@@ -68,6 +69,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('alphabets-letters/get', [TextbookController::class, 'getAlphabetsLetters']);
     Route::get('vowels-consonants/get', [TextbookController::class, 'getVowelsConsonants']);
     Route::get('alphabets-words/get', [TextbookController::class, 'getAlphabetsWords']);
+
+    Route::get('students-of-teacher/{teacherId}', [TeacherController::class, 'getStudents']);
+
+    Route::get('profile/get', [StudentController::class, 'getProfile']);
+    Route::post('profile/update', [StudentController::class, 'updateProfile']);
 
     Route::post('/logout', [LogoutController::class, 'logout']);
 

@@ -1,8 +1,5 @@
 <template>
     <div class="body position-relative" :class="isConsonant ? 'night-background' : 'day-background'">
-        <div class="position-absolute top-0 end-0">
-            <img width="100" src="/images/main-logo.png" :class="{ logo: isConsonant }" alt="Hopeminded Logo">
-        </div>
         <button type="button" @click="navigate" class="btn btn-secondary mt-5 mx-5 rounded-0 position-absolute top-0 start-0">
             Back
         </button>

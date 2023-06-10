@@ -1,8 +1,5 @@
 <template>
     <div class="body position-relative">
-        <div class="position-absolute top-0 end-0">
-            <img width="100" src="/images/main-logo.png" class="logo" alt="Hopeminded Logo">
-        </div>
         <button type="button" @click="navigate" class="btn btn-secondary mt-5 mx-5 rounded-0 position-absolute top-0 start-0">
             Back
         </button>
@@ -13,14 +10,19 @@
             <div v-else>
                 <h3 class="text-center title-header">Alphabets with Words</h3>
                 <div class="row w-100">
-                    <div class="col-lg-6 mt-2 mb-4">
+                    <div class="col-lg-4 mt-2 mb-4">
                         <div class="text-center" v-if="pageFlag != 0">
                             <button class="btn btn-success rounded-0 btn-lg" @click="setPrevButton()">
                                 Previous
                             </button>
                         </div>
                     </div>
-                    <div class="col-lg-6 mt-2 mb-4">
+                    <div class="col-lg-4 mt-2 mb-4">
+                        <div class="text-center">
+                            <h2 class="fw-bolder fst-italic text-decoration-underline">{{ Object.keys(data[pageFlag])[0].toUpperCase() }}</h2>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mt-2 mb-4">
                         <div class="text-center" v-if="pageFlag != (data.length - 1)">
                             <button class="btn btn-success rounded-0 btn-lg" @click="setNextButton()">
                                 Next

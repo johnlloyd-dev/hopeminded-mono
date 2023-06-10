@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TeacherRequest;
+use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Database\Query\JoinClause;
@@ -39,5 +40,9 @@ class TeacherController extends Controller
                 'message' => 'A teacher has been added successfully.'
             ]);
         }
+    }
+
+    public function getStudents($teacherId) {
+        return Student::where('teacher_id', $teacherId)->get();
     }
 }

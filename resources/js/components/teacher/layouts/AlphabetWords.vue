@@ -29,7 +29,7 @@
                         <td class="fw-bold">{{ Object.keys(item)[0].toUpperCase() }}</td>
                         <td>
                             <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle rounded-0 px-2" type="button"
+                                <button class="btn btn-secondary dropdown-toggle rounded-0 px-2 w-100" type="button"
                                     id="dropdownMenuButton" data-bs-toggle="dropdown" data-bs-auto-close="outside"
                                     aria-expanded="false">
                                     <span class="fas fa-chevron-circle-down fa-lg mb-0"></span>
@@ -78,7 +78,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="d-flex justify-content-center">
+                        <td class="d-flex justify-content-center h-100">
                             <button class="btn-danger btn rounded-0 btn-sm">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
@@ -101,7 +101,7 @@
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="viewModalLabel">View Media</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -123,7 +123,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px" class="logo" alt="Hopeminded Logo">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%" class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="addAlphabetModalLabel">Add Alphabet</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -140,7 +140,6 @@
                                     aria-describedby="letter">
                             </div>
                             <hr>
-                            <p class="fw-bold"><span class="text-danger">Note: </span>You can upload atleast one object with image and video.</p>
                             <div class="row">
                                 <div class="col-6 text-center">
                                     <button :disabled="fields.length == 5" @click="manageFields('plus')"
@@ -163,7 +162,6 @@
                                         <label for="objectName" class="form-label fw-bold">Object Name:</label>
                                         <input v-model="alphabetContent.objectName[index]" type="text" class="form-control"
                                             id="objectName" aria-describedby="objectName">
-                                        <p class="fw-bold"><span class="text-danger">Note: </span>Object name must corresponds to the alphabet entered in the alphabet field. Ex: d -> dog, dove, etc.</p>
                                     </div>
                                     <div class="mb-3">
                                         <label for="image" class="form-label fw-bold">Image File:</label>
@@ -230,7 +228,7 @@ export default {
     },
     beforeUnmount() {
         $('#addAlphabetModal').modal('hide')
-    },  
+    },
     computed: {
         errorsLength() {
             return Object.keys(this.errors).length
@@ -255,7 +253,7 @@ export default {
             const letterNotMatch = this.alphabetContent.objectName.filter(data => {
                 return data.charAt(0) != this.alphabetContent.letter
             })
-            
+
             if(this.alphabetContent.letter == null || objectName.length > 0 || image.length > 0 || video.length > 0 || letterNotMatch.length > 0) {
                 return true
             }
