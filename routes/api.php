@@ -78,6 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LogoutController::class, 'logout']);
 
     Route::post('seed', function () {
+        $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         $jsonFile = Storage::path('public/json/alphabets-with-letters.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 
@@ -86,7 +87,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 $type = 'vowel';
             else
                 $type = 'consonant';
-            $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+
             Textbook::updateOrCreate([
                 'flag' => 'alphabet-letters',
                 'type' => $type,
@@ -107,7 +108,7 @@ Route::middleware('auth:sanctum')->group(function () {
                     $type = 'vowel';
                 else
                     $type = 'consonant';
-                $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+
                 Textbook::updateOrCreate([
                     'flag' => 'vowel-consonants',
                     'type' => $type,
@@ -116,6 +117,34 @@ Route::middleware('auth:sanctum')->group(function () {
                     'object' => $data["object"],
                     'image' => json_encode($data["image"]),
                     'video' => json_encode($data["video"])
+                ]);
+            }
+        }
+
+        $jsonFile = Storage::path('public/json/alphabets-with-words.json');
+        $jsonData = json_decode(file_get_contents($jsonFile), true);
+        foreach ($jsonData as $json) {
+            foreach ($json as $key => $data) {
+                $object = [];
+                $image = [];
+                $video = [];
+                foreach ($data as $key2 => $data2) {
+                    $object[] = $data2['object'];
+                    $image[] = $data2['image'];
+                    $video[] = $data2['video'];
+                }
+                if (in_array($key, ['a', 'e', 'i', 'o', 'u']))
+                    $type = 'vowel';
+                else
+                    $type = 'consonant';
+                Textbook::updateOrCreate([
+                    'flag' => 'alphabet-words',
+                    'type' => $type,
+                    'teacher_id' => $teacherId,
+                    'letter' => $key,
+                    'object' => json_encode($object),
+                    'image' => json_encode($image),
+                    'video' => json_encode($video)
                 ]);
             }
         }

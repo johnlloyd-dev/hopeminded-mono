@@ -304,12 +304,12 @@ export default {
             }
         },
         viewMedia(flag, media) {
+            var video2 = document.getElementById("myVideo");
             this.media = flag
             if (flag == 'image') {
                 this.image = media
             } else {
                 this.video = media
-                var video2 = document.getElementById("myVideo");
                 video2.setAttribute("src", media); // set the new video src
                 video2.load(); // load the new video
                 video2.play(); // play the new video

@@ -11,7 +11,7 @@
                             <div class="form-icon">
                                 <span><img width="100" src="/images/logo.png" alt="Main Logo"></span>
                             </div>
-                            <h3 class="fw-bold text-center mb-3">Edit Your Profile</h3>
+                            <h3 class="fw-bold text-center mb-3">Your Profile</h3>
                             <div class="form-group mb-3">
                                 <label for="firstName" class="fw-bold">First Name:</label>
                                 <input v-model="profile.first_name" type="text" class="form-control item" id="firstName">
@@ -38,7 +38,7 @@
                                 <small class="text-danger" v-if="errors && errors.gender">{{ errors.gender[0] }}</small>
                             </div>
                             <hr>
-                            <h3 class="fw-bold text-center mb-3">Edit Auth Credentials</h3>
+                            <h3 class="fw-bold text-center mb-3">Auth Credentials</h3>
                             <div class="form-group mb-3">
                                 <label for="email" class="fw-bold">Email Address:</label>
                                 <input v-model="profile.email" type="email" class="form-control item" id="email">

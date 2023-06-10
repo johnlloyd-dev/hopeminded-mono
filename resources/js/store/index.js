@@ -139,12 +139,21 @@ export const store = new createStore({
         },
         async setAlphabetWords(context) {
             let alphabets = await axios.get(
-                "storage/json/alphabets-with-words.json"
+                `/api/alphabets-words/get?user=${'student'}`
             );
+            let newData = []
+            alphabets.data.forEach(element => {
+                var variableName = element.letter;
+                var value = element.attributes;
+
+                var obj = {};
+                obj[variableName] = value;
+                newData.push(obj);
+            });
             let flags = await axios.get(`/api/flags/alphabet-words`);
             let data = [];
             let attributes = JSON.parse(flags.data.attributes);
-            alphabets.data.forEach(function (element, index) {
+            newData.forEach(function (element, index) {
                 let key = Object.keys(element);
                 let flagData = attributes[key];
                 Object.values(element).forEach((element) => {

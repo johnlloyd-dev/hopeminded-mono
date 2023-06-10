@@ -19,7 +19,7 @@
                     </div>
                     <div class="col-lg-4 mt-2 mb-4">
                         <div class="text-center">
-                            <h2 class="fw-bolder fst-italic text-decoration-underline">{{ Object.keys(data[pageFlag])[0].toUpperCase() }}</h2>
+                            <h2 class="fw-bolder fst-italic text-decoration-underline" v-if="data && data.length > 0">{{ Object.keys(data[pageFlag])[0].toUpperCase() }}</h2>
                         </div>
                     </div>
                     <div class="col-lg-4 mt-2 mb-4">
