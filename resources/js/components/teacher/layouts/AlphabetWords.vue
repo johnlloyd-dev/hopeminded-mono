@@ -21,7 +21,7 @@
                 </thead>
                 <tbody v-if="alphabetWords.length == 0">
                     <tr>
-                        <td colspan="4" class="text-center fw-bold">No data found</td>
+                        <td colspan="3" class="text-center fw-bold">No data found</td>
                     </tr>
                 </tbody>
                 <tbody v-else>

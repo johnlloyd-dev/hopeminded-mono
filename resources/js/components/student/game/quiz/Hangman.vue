@@ -1,96 +1,100 @@
 <template>
-    <div v-if="!disabledGame" id="app" @keyup="handleKeyPress">
-        <h3 style="font-weight: bold;">Chances:
-            <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
-            <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
-            <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
-            <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
-        </h3>
-        <h4 v-if="isQuiz" style="font-weight: bolder; font-family: 'Skranji', cursive;" class="text-center mt-2">Level
-            {{ flag + 1 }} - <span>Test {{ test + 1 }}</span></h4>
-        <div class="row w-100">
-            <div class="col-6">
-                <h4 class="text-start fw-bold ms-4">Highest Score: {{ highestScore }}
-                </h4>
-            </div>
-            <div class="col-6">
-                <h4 class="text-end fw-bold me-4">Score: {{ hangmanGame.score }}
-                </h4>
-            </div>
-        </div>
-        <div class="mx-5 mt-4">
-            <div class="row">
+    <div id="overlay"></div>
+    <div style="z-index: 9999">
+        <div v-if="!disabledGame" id="app" @keyup="handleKeyPress">
+            <h3 style="font-weight: bold;">Chances:
+                <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png"
+                    alt="">
+                <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
+                <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
+                <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
+            </h3>
+            <h4 v-if="isQuiz" style="font-weight: bolder; font-family: 'Skranji', cursive;" class="text-center mt-2">Level
+                {{ flag + 1 }} - <span>Test {{ test + 1 }}</span></h4>
+            <div class="row w-100">
                 <div class="col-6">
-                    <p id="quote" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
-                        <span v-for="word in splitQuote" :key="word">
-                            <template v-for="letter in word">{{ isRevealed(letter) }}</template>
-                        </span>
-                        <small v-if="gameOver">
-                            —{{ quoteAuthor }}
-                        </small>
-                    </p>
+                    <h4 class="text-start fw-bold ms-4">Highest Score: {{ highestScore }}
+                    </h4>
                 </div>
                 <div class="col-6">
-                    <div v-if="flag == 0">
-                        <div id="quote2" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
-                            <div class="col-lg-12 d-flex justify-content-center align-items-center">
-                                <img width="160" class="rounded" :src="currentData.image" alt="hangman image">
+                    <h4 class="text-end fw-bold me-4">Score: {{ hangmanGame.score }}
+                    </h4>
+                </div>
+            </div>
+            <div class="mx-5 mt-4">
+                <div class="row">
+                    <div class="col-6">
+                        <p id="quote" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
+                            <span v-for="word in splitQuote" :key="word">
+                                <template v-for="letter in word">{{ isRevealed(letter) }}</template>
+                            </span>
+                            <small v-if="gameOver">
+                                —{{ quoteAuthor }}
+                            </small>
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        <div v-if="flag == 0">
+                            <div id="quote2" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
+                                <div class="col-lg-12 d-flex justify-content-center align-items-center">
+                                    <img width="160" class="rounded" :src="currentData.image" alt="hangman image">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div v-else>
-                        <div id="quote2" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
-                            <div class="row p-1">
-                                <div v-for="data in currentData.image" :key="data.image"
-                                    class="d-flex justify-content-center align-items-center"
-                                    :class="`col-${12 / currentData.image.length}`">
-                                    <img width="160" height="110" class="rounded" :src="data" alt="hangman image">
+                        <div v-else>
+                            <div id="quote2" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
+                                <div class="row p-1">
+                                    <div v-for="data in currentData.image" :key="data.image"
+                                        class="d-flex justify-content-center align-items-center"
+                                        :class="`col-${12 / currentData.image.length}`">
+                                        <img width="160" height="110" class="rounded" :src="data" alt="hangman image">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="container z-50">
-            <div class="status">
-                <h2>Strikes:</h2>
-                <ul class="status">
-                    <li v-for="strike in strikes" :key="strike">{{ strike.icon }}</li>
-                </ul>
-            </div>
+            <div class="container z-50">
+                <div class="status">
+                    <h2>Strikes:</h2>
+                    <ul class="status">
+                        <li v-for="strike in strikes" :key="strike">{{ strike.icon }}</li>
+                    </ul>
+                </div>
 
-            <div id="button-board">
-                <button v-for="letter in letters" @click="guess(letter.letter)" :key="letter.letter"
-                    :class="{ 'strike': badGuesses.includes(letter.letter), 'highlight': guesses.includes(letter.letter) }"
-                    :disabled="guesses.includes(letter.letter) || gameOver || disabled">
-                    <img :src="letter.image" class="letter" :class="{ 'riser': guesses.includes(letter.letter) }" />
-                    <span class="background"></span>
-                </button>
-            </div>
-            <button v-if="puzzleComplete" @click="nextTest" :class="{ 'highlight': gameOver }">Next - Test {{ test + 1
-            }}</button>
-
-            <div class="status">
-                <p>{{ message }}</p>
-            </div>
-        </div>
-    </div>
-    <div v-else class="bg-white position-relative" style="height: 100vh">
-        <div class="spinner-grow position-absolute top-50 start-50 translate-middle" style="width: 5rem; height: 5rem;"
-            role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
-    <div v-show="show" id="container">
-        <div class="container-inner">
-            <div class="content">
-                <p>{{ text }}</p>
-            </div>
-            <div class="buttons">
-                <button @click="nextLevel()" v-if="!hideNextButton" type="button" class="confirm">{{ nextButtonText
+                <div id="button-board">
+                    <button v-for="letter in letters" @click="guess(letter.letter)" :key="letter.letter"
+                        :class="{ 'strike': badGuesses.includes(letter.letter), 'highlight': guesses.includes(letter.letter) }"
+                        :disabled="guesses.includes(letter.letter) || gameOver || disabled">
+                        <img :src="letter.image" class="letter" :class="{ 'riser': guesses.includes(letter.letter) }" />
+                        <span class="background"></span>
+                    </button>
+                </div>
+                <button v-if="puzzleComplete" @click="nextTest" :class="{ 'highlight': gameOver }">Next - Test {{ test + 1
                 }}</button>
-                <button @click="cancelExit()" type="button" class="cancel">{{ cancelButtonText }}</button>
+
+                <div class="status">
+                    <p>{{ message }}</p>
+                </div>
+            </div>
+        </div>
+        <div v-else class="bg-white position-relative" style="height: 100vh">
+            <div class="spinner-grow position-absolute top-50 start-50 translate-middle" style="width: 5rem; height: 5rem;"
+                role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div v-show="show" id="container">
+            <div class="container-inner">
+                <div class="content">
+                    <p>{{ text }}</p>
+                </div>
+                <div class="buttons">
+                    <button @click="nextLevel()" v-if="!hideNextButton" type="button" class="confirm">{{ nextButtonText
+                    }}</button>
+                    <button @click="cancelExit()" type="button" class="cancel">{{ cancelButtonText }}</button>
+                </div>
             </div>
         </div>
     </div>
@@ -178,7 +182,7 @@ export default {
                     }).then((result) => {
                         if (result.value) {
                             this.disabledGame = false
-                            // this.storeQuizInfo()
+                            this.storeQuizInfo()
                             this.setLetters()
                             this.fetchWords()
                         }
@@ -210,7 +214,7 @@ export default {
                         }).then((result) => {
                             if (result.value) {
                                 this.disabledGame = false
-                                // this.storeQuizInfo()
+                                this.storeQuizInfo()
                                 this.setLetters()
                                 this.fetchWords()
                             }
@@ -221,7 +225,7 @@ export default {
                     const scores = record.map(data => {
                         return data.total_score
                     })
-                    this.highestScore = Math.max(scores)
+                    this.highestScore = Math.max(...scores)
                     if (record[1].mark == 'failed') {
                         this.disabledGame = true
                         this.show = true
@@ -230,7 +234,7 @@ export default {
                         this.cancelButtonText = 'Exit'
                     } else {
                         this.disabledGame = false
-                        // this.storeQuizInfo()
+                        this.storeQuizInfo()
                         this.setLetters()
                         this.fetchWords()
                     }
@@ -587,6 +591,17 @@ body {
     font-family: "Rubik Mono One", "Pathway Gothic One";
     color: $darkGray;
     background: lighten($lightBlue, 35%);
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-image: url("/images/background.jpg");
+    z-index: -1;
 }
 
 .container {

@@ -10,17 +10,34 @@ use Illuminate\Support\Facades\Auth;
 
 class GameController extends Controller
 {
-    public function getGameInfo() {
+    public function getGameInfo(Request $request) {
         $student = Student::where('user_id', Auth::user()->id)->first();
-        return QuizReport::where('student_id', $student->id)->latest('created_at')->first();
+        if($request->get('flag') && $request->get('flag') === 'tutorial') {
+            return QuizReport::where('student_id', $student->id)
+                ->where('flag', 'tutorial')
+                ->latest('created_at')
+                ->first();
+        } else {
+            return QuizReport::where('student_id', $student->id)
+                ->where('flag', 'quiz')
+                ->latest('created_at')
+                ->first();
+        }
     }
 
     public function allGameRecords(Request $request) {
         $student = Student::where('user_id', Auth::user()->id)->first();
-        return QuizReport::where('student_id', $student->id)
-            ->where('game_id', $request->gameId)
-            ->orderByRaw('-total_score ASC')
-            ->get();
+        if($request->get('flag') && $request->get('flag') === 'tutorial') {
+            return QuizReport::where('student_id', $student->id)
+                ->where('flag', 'tutorial')
+                ->where('game_id', $request->gameId)
+                ->get();
+        } else {
+            return QuizReport::where('student_id', $student->id)
+                ->where('flag', 'quiz')
+                ->where('game_id', $request->gameId)
+                ->get();
+        }
     }
 
     public function storeGameInfo(Request $request, $flag) {
@@ -31,7 +48,8 @@ class GameController extends Controller
             'game_id' => $gameInfo->id,
             'highest_level' =>  $request->highestLevel,
             'total_score' => $request->score,
-            'mark' => 'failed'
+            'mark' => 'failed',
+            'flag' => $request->get('flag') && $request->get('flag') === 'tutorial' ? 'tutorial' : 'quiz'
         ]);
 
         return $quiz;
@@ -40,20 +58,25 @@ class GameController extends Controller
     public function updateGameInfo(Request $request, $id) {
         $quiz = QuizReport::findOrFail($id);
         $mark = null;
-        if($request->gameId == 1) {
-            if ($request->score < 10) {
+
+        $hangmanPassingScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 6 : 10;
+        $balloonPassingScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 20 : 38;
+        $memoryPassingScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 9 : 44;
+
+        if($request->get('gameId') == 1) {
+            if ($request->score < $hangmanPassingScore) {
                 $mark = 'failed';
             } else {
                 $mark = 'passed';
             }
-        } else if($request->gameId == 2) {
-            if ($request->score < 38) {
+        } else if($request->get('gameId') == 2) {
+            if ($request->score < $balloonPassingScore) {
                 $mark = 'failed';
             } else {
                 $mark = 'passed';
             }
         } else {
-            if ($request->score < 44) {
+            if ($request->score < $memoryPassingScore) {
                 $mark = 'failed';
             } else {
                 $mark = 'passed';
@@ -71,6 +94,7 @@ class GameController extends Controller
     public function getQuizReports(Request $request) {
         $student = Student::where('user_id', Auth::user()->id)->first();
         return QuizReport::where('student_id', $student->id)
+            ->where('flag', 'quiz')
             ->orderByRaw('-total_score ASC')
             ->get();
     }

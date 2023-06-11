@@ -23,7 +23,7 @@
                 </thead>
                 <tbody v-if="alphabetLetters.length == 0">
                     <tr>
-                        <td colspan="4" class="text-center fw-bold">No data found</td>
+                        <td colspan="5" class="text-center fw-bold">No data found</td>
                     </tr>
                 </tbody>
                 <tbody v-else>
@@ -241,7 +241,7 @@ export default {
                     this.$refs.videoFileInput.value = '';
                     swal.fire('Success', response.data.message, 'success')
                     this.getTextbooks()
-                    this.$('#addAlphabetModal').modal('hide');
+                    $('#addAlphabetModal').modal('hide');
                 }
             } catch (error) {
                 this.errors = error.response.data.errors

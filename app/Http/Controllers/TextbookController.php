@@ -41,7 +41,13 @@ class TextbookController extends Controller
         $consonants = array_filter($textbooks, function ($textbook) {
             return $textbook["type"] == 'consonant';
         });
-        return [array_values($vowels), array_values($consonants)];
+        if(count($vowels) || count($vowels)) {
+            return [array_values($vowels), array_values($consonants)];
+        } else {
+            return [];
+        }
+
+
     }
 
     public function getAlphabetsLetters(Request $request)

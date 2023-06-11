@@ -3,7 +3,7 @@
         <button type="button" @click="navigate" class="btn btn-secondary mt-5 mx-5 rounded-0 position-absolute top-0 start-0">
             Back
         </button>
-        <div v-if="data.length != 0" class="p-5">
+        <div v-if="data && data.length != 0" class="p-5">
             <h3 class="text-center title-header" :class="isConsonant ? 'text-white' : 'text-black'">Vowels/Consonants</h3>
             <div class="row w-100">
                 <div class="col-lg-3 mt-2 mb-4">

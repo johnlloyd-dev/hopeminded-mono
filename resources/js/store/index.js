@@ -172,8 +172,13 @@ export const store = new createStore({
             });
             context.commit("SET_ALPHABET_WORDS_DATA", data);
         },
-        async getQuizInfo(context) {
-            const data = await axios.get("/api/quiz/info/get");
+        async getQuizInfo(context, tutorial) {
+            let data = [];
+            if(tutorial) {
+                data = await axios.get("/api/quiz/info/get?flag=tutorial");
+            } else {
+                data = await axios.get("/api/quiz/info/get");
+            }
             context.commit("SET_QUIZ_INFO", data.data);
         },
         async setSelectedChapter(context, chapter) {

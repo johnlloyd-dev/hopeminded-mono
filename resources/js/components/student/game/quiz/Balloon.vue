@@ -1,12 +1,6 @@
 
 <template>
     <body v-if="!disabledGame">
-        <!-- <h3 style="font-weight: bold;">Chances:
-            <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
-            <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
-            <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
-            <code v-if="chances == 'unli'" class="text-danger">Unlimited</code>
-        </h3> -->
         <canvas id="canvas" ref="canvas"></canvas>
     </body>
     <div v-else class="bg-white position-relative" style="height: 100vh">
@@ -171,7 +165,7 @@ export default {
                     const scores = record.map(data => {
                         return data.total_score
                     })
-                    this.highestScore = Math.max(scores)
+                    this.highestScore = Math.max(...scores)
                     if (record[1].mark == 'failed') {
                         this.disabledGame = true
                         this.show = true
@@ -298,7 +292,7 @@ export default {
                 img3.src = 'images/white-heart.png';
                 this.ctx.drawImage(img3, 165, 5, 30, 30);
             } else {
-                this.ctx.font = "20px Century Gothic";
+                this.ctx.font = "25px Century Gothic";
                 this.ctx.fillStyle = "red";
                 this.ctx.fillText(`Unlimited`, 130, 25);
             }
@@ -448,6 +442,8 @@ body {
     width: 100%;
     height: 100%;
     border: 1px solid black;
+    background-size: cover;
+    background-image: url("/images/background.jpg");
 }
 
 #container {

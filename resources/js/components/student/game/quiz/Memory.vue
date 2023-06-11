@@ -1,44 +1,48 @@
 <template>
-    <div v-if="!disabledGame" class="body">
-        <h3 style="font-weight: bold;">Chances:
-            <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
-            <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
-            <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
-            <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
-        </h3>
-        <h3 class="fw-bold text-center w-100 mt-3">Timer: 00:{{ time }}</h3>
-        <div class="row w-100">
-            <div class="col-6">
-                <h4 class="text-left">Highest Score: {{ highestScore }}</h4>
+    <div id="overlay"></div>
+    <div style="z-index: 9999">
+        <div v-if="!disabledGame" class="body">
+            <h3 style="font-weight: bold;">Chances:
+                <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png"
+                    alt="">
+                <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
+                <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
+                <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
+            </h3>
+            <h3 class="fw-bold text-center w-100 mt-3">Timer: 00:{{ time }}</h3>
+            <div class="row w-100">
+                <div class="col-6">
+                    <h4 class="text-left">Highest Score: {{ highestScore }}</h4>
+                </div>
+                <div class="col-6">
+                    <h4 class="text-right">Score: {{ memoryGame.score }}</h4>
+                </div>
             </div>
-            <div class="col-6">
-                <h4 class="text-right">Score: {{ memoryGame.score }}</h4>
+            <h3 class="text-center" style="font-weight: bolder; font-family: 'Skranji', cursive;">Level {{ flag + 1 }}</h3>
+            <div id="app" :class="flag == 0 ? 'cards-width-1' : 'cards-width-2'">
+                <div v-for="(card, index) in cards" :key="index"
+                    :class="[{ 'down': card.down && !card.matched, 'up': !card.down, 'matched': card.matched }, ' card']"
+                    v-on:click="handleClick(card)">
+                    <img :src="card.image" />
+                </div>
             </div>
         </div>
-        <h3 class="text-center" style="font-weight: bolder; font-family: 'Skranji', cursive;">Level {{ flag + 1 }}</h3>
-        <div id="app" :class="flag == 0 ? 'cards-width-1' : 'cards-width-2'">
-            <div v-for="(card, index) in cards" :key="index"
-                :class="[{ 'down': card.down && !card.matched, 'up': !card.down, 'matched': card.matched }, ' card']"
-                v-on:click="handleClick(card)">
-                <img :src="card.image" />
+        <div v-else class="bg-white position-relative" style="height: 100vh">
+            <div class="spinner-grow position-absolute top-50 start-50 translate-middle" style="width: 5rem; height: 5rem;"
+                role="status">
+                <span class="sr-only">Loading...</span>
             </div>
         </div>
-    </div>
-    <div v-else class="bg-white position-relative" style="height: 100vh">
-        <div class="spinner-grow position-absolute top-50 start-50 translate-middle" style="width: 5rem; height: 5rem;"
-            role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
-    <div v-show="show" id="container">
-        <div class="container-inner">
-            <div class="content">
-                <p>{{ text }}</p>
-            </div>
-            <div class="buttons">
-                <button @click="nextLevel()" v-if="!hideNextButton" type="button" class="confirm">{{ nextButtonText
-                }}</button>
-                <button @click="cancelExit()" type="button" class="cancel">{{ cancelButtonText }}</button>
+        <div v-show="show" id="container">
+            <div class="container-inner">
+                <div class="content">
+                    <p>{{ text }}</p>
+                </div>
+                <div class="buttons">
+                    <button @click="nextLevel()" v-if="!hideNextButton" type="button" class="confirm">{{ nextButtonText
+                    }}</button>
+                    <button @click="cancelExit()" type="button" class="cancel">{{ cancelButtonText }}</button>
+                </div>
             </div>
         </div>
     </div>
@@ -90,7 +94,7 @@ export default {
     },
     watch: {
         time(newValue, oldVlue) {
-            if(newValue === 0) {
+            if (newValue === 0) {
                 this.gameOver()
             }
         }
@@ -180,7 +184,7 @@ export default {
                     const scores = record.map(data => {
                         return data.total_score
                     })
-                    this.highestScore = Math.max(scores)
+                    this.highestScore = Math.max(...scores)
                     if (record[1].mark == 'failed') {
                         this.disabledGame = true
                         this.show = true
@@ -188,6 +192,7 @@ export default {
                         this.text = `Sorry. You already used up your play chances.`
                         this.cancelButtonText = 'Exit'
                     } else {
+                        this.startTimer();
                         this.disabledGame = false
                         this.storeQuizInfo()
                         this.fetchData();
@@ -381,6 +386,17 @@ body {
     transform: translate(-50%, -50%);
 }
 
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-image: url("/images/background.jpg");
+    z-index: -1;
+}
+
 .cards-width-1 {
     max-width: 700px;
 }
@@ -549,32 +565,33 @@ img {
 }
 
 #heart {
-  position: relative;
-  width: 100px;
-  height: 90px;
-  margin-top: 10px;
+    position: relative;
+    width: 100px;
+    height: 90px;
+    margin-top: 10px;
 }
 
-#heart::before, #heart::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  width: 52px;
-  height: 80px;
-  border-radius: 50px 50px 0 0;
-  background: red;
+#heart::before,
+#heart::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 52px;
+    height: 80px;
+    border-radius: 50px 50px 0 0;
+    background: red;
 }
 
 #heart::before {
-  left: 50px;
-  transform: rotate(-45deg);
-  transform-origin: 0 100%;
+    left: 50px;
+    transform: rotate(-45deg);
+    transform-origin: 0 100%;
 }
 
 #heart::after {
-  left: 0;
-  transform: rotate(45deg);
-  transform-origin: 100% 100%;
+    left: 0;
+    transform: rotate(45deg);
+    transform-origin: 100% 100%;
 }
 
 .buttons {

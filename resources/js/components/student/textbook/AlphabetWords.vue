@@ -3,12 +3,8 @@
         <button type="button" @click="navigate" class="btn btn-secondary mt-5 mx-5 rounded-0 position-absolute top-0 start-0">
             Back
         </button>
-        <div class="p-5">
-            <div v-if="isProcessing" class="position-absolute top-50 start-50 translate-middle">
-                Processing...
-            </div>
-            <div v-else>
-                <h3 class="text-center title-header">Alphabets with Words</h3>
+        <div v-if="data && data.length != 0" class="p-5">
+                <h3 class="text-center title-header">Alphabets/Words</h3>
                 <div class="row w-100">
                     <div class="col-lg-4 mt-2 mb-4">
                         <div class="text-center" v-if="pageFlag != 0">
@@ -39,9 +35,7 @@
                             </button>
                         </div>
                     </template>
-
                 </div>
-            </div>
             <!-- Modal -->
             <div class="modal fade" id="alphabetsModal" data-bs-backdrop="static" tabindex="-1"
                 aria-labelledby="alphabetsModalLabel" aria-hidden="true">
@@ -63,6 +57,7 @@
                 </div>
             </div>
         </div>
+        <h3 v-else class="position-absolute top-50 start-50 translate-middle fw-bold">No records found</h3>
     </div>
 </template>
 
