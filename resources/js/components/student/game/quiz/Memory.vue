@@ -1,7 +1,20 @@
 <template>
     <div v-if="!disabledGame" class="body">
+        <h3 style="font-weight: bold;">Chances:
+            <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
+            <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
+            <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
+            <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
+        </h3>
         <h3 class="fw-bold text-center w-100 mt-3">Timer: 00:{{ time }}</h3>
-        <h4 class="text-right">Score: {{ memoryGame.score }}</h4>
+        <div class="row w-100">
+            <div class="col-6">
+                <h4 class="text-left">Highest Score: {{ highestScore }}</h4>
+            </div>
+            <div class="col-6">
+                <h4 class="text-right">Score: {{ memoryGame.score }}</h4>
+            </div>
+        </div>
         <h3 class="text-center" style="font-weight: bolder; font-family: 'Skranji', cursive;">Level {{ flag + 1 }}</h3>
         <div id="app" :class="flag == 0 ? 'cards-width-1' : 'cards-width-2'">
             <div v-for="(card, index) in cards" :key="index"
@@ -57,11 +70,13 @@ export default {
             runing: false,
             score: 0,
             previousScore: 0,
+            chances: null,
             disabledGame: false,
             hideNextButton: false,
             cancelButtonText: "Cancel",
             nextButtonText: "Level 1",
             text: "",
+            highestScore: 0,
             memoryGame: {
                 highestLevel: 1,
                 score: 0
@@ -101,6 +116,8 @@ export default {
             if (data.data) {
                 const record = data.data
                 if (record.length == 0) {
+                    this.chances = 2
+                    this.highestScore = 0
                     this.disabledGame = true
                     swal.fire({
                         title: 'Remember',
@@ -125,6 +142,8 @@ export default {
                         }
                     })
                 } else if (record.length == 1) {
+                    this.chances = 1
+                    this.highestScore = record[0].total_score
                     if (record[0].mark == 'failed' && record[0].highest_level == 3) {
                         this.disabledGame = true
                         this.show = true
@@ -157,6 +176,11 @@ export default {
                         })
                     }
                 } else if (record.length > 1) {
+                    this.chances = 'unli'
+                    const scores = record.map(data => {
+                        return data.total_score
+                    })
+                    this.highestScore = Math.max(scores)
                     if (record[1].mark == 'failed') {
                         this.disabledGame = true
                         this.show = true
@@ -352,7 +376,7 @@ body {
     perspective: 800px;
     margin: 0 auto;
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
@@ -471,9 +495,14 @@ img {
 
 .text-right {
     text-align: right;
-    margin-top: 20px;
     font-weight: bold;
     margin-right: 100px;
+}
+
+.text-left {
+    text-align: left;
+    font-weight: bold;
+    margin-left: 100px;
 }
 
 #container {
@@ -517,6 +546,35 @@ img {
         box-sizing: border-box;
         color: #461417;
     }
+}
+
+#heart {
+  position: relative;
+  width: 100px;
+  height: 90px;
+  margin-top: 10px;
+}
+
+#heart::before, #heart::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 52px;
+  height: 80px;
+  border-radius: 50px 50px 0 0;
+  background: red;
+}
+
+#heart::before {
+  left: 50px;
+  transform: rotate(-45deg);
+  transform-origin: 0 100%;
+}
+
+#heart::after {
+  left: 0;
+  transform: rotate(45deg);
+  transform-origin: 100% 100%;
 }
 
 .buttons {

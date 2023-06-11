@@ -1,7 +1,13 @@
 
 <template>
     <body v-if="!disabledGame">
-        <canvas ref="canvas"></canvas>
+        <!-- <h3 style="font-weight: bold;">Chances:
+            <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
+            <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
+            <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
+            <code v-if="chances == 'unli'" class="text-danger">Unlimited</code>
+        </h3> -->
+        <canvas id="canvas" ref="canvas"></canvas>
     </body>
     <div v-else class="bg-white position-relative" style="height: 100vh">
         <div class="spinner-grow position-absolute top-50 start-50 translate-middle" style="width: 5rem; height: 5rem;"
@@ -42,6 +48,8 @@ export default {
             text: "",
             show: false,
             char: "",
+            chances: null,
+            highestScore: 0,
             hideNextButton: false,
             cancelButtonText: "Cancel",
             nextButtonText: "Level 1",
@@ -101,6 +109,8 @@ export default {
             if (data.data) {
                 const record = data.data
                 if (record.length == 0) {
+                    this.chances = 2
+                    this.highestScore = 0
                     this.disabledGame = true
                     swal.fire({
                         title: 'Remember',
@@ -124,6 +134,8 @@ export default {
                         }
                     })
                 } else if (record.length == 1) {
+                    this.chances = 1
+                    this.highestScore = record[0].total_score
                     if (record[0].mark == 'failed' && record[0].highest_level == 3) {
                         this.disabledGame = true
                         this.show = true
@@ -155,6 +167,11 @@ export default {
                         })
                     }
                 } else if (record.length > 1) {
+                    this.chances = 'unli'
+                    const scores = record.map(data => {
+                        return data.total_score
+                    })
+                    this.highestScore = Math.max(scores)
                     if (record[1].mark == 'failed') {
                         this.disabledGame = true
                         this.show = true
@@ -242,17 +259,18 @@ export default {
         animate() {
             requestAnimationFrame(this.animate);
             this.ctx.clearRect(0, 0, innerWidth, innerHeight);
-            this.ctx.font = "bolder 18px Century Gothic";
+            this.ctx.font = "bold 20px Century Gothic";
             this.ctx.fillStyle = "black";
-            this.ctx.fillText(`SCORE: ${this.typingBalloon.score}`, 1200, 50);
-
-            this.ctx.font = "40px Arial";
-            this.ctx.strokeStyle = "lightgrey";
-            this.ctx.strokeText("Vowel/Consonants", 10, 40);
+            this.ctx.fillText(`Score: ${this.typingBalloon.score}`, 1300, 70);
+            this.ctx.fillText(`Highest Score: ${this.highestScore}`, 100, 70);
 
             this.ctx.font = "bolder 25px Skranji";
             this.ctx.strokeStyle = "black";
-            this.ctx.fillText(`Level ${this.flag + 1}`, 650, 100);
+            this.ctx.fillText(`Level ${this.flag + 1}`, 756, 100);
+
+            this.ctx.font = "25px Century Gothic";
+            this.ctx.strokeStyle = "black";
+            this.ctx.fillText(`Chances:`, 7, 25);
 
             this.ctx.beginPath();
             this.ctx.fillStyle = "lightgrey";
@@ -263,6 +281,28 @@ export default {
                 50
             );
             this.ctx.fill();
+
+            let img = new Image()
+            let img2 = new Image()
+            let img3 = new Image()
+            if (this.chances == 2) {
+                img.src = 'images/red-heart.png';
+                this.ctx.drawImage(img, 130, 5, 30, 30);
+
+                img2.src = 'images/red-heart.png';
+                this.ctx.drawImage(img2, 165, 5, 30, 30);
+            } else if(this.chances == 1) {
+                img.src = 'images/red-heart.png';
+                this.ctx.drawImage(img, 130, 5, 30, 30);
+
+                img3.src = 'images/white-heart.png';
+                this.ctx.drawImage(img3, 165, 5, 30, 30);
+            } else {
+                this.ctx.font = "20px Century Gothic";
+                this.ctx.fillStyle = "red";
+                this.ctx.fillText(`Unlimited`, 130, 25);
+            }
+
             for (let m = 0; m < this.array.length; m++) {
                 this.drawBalloon(this.array[m]);
             }
@@ -303,7 +343,7 @@ export default {
         typeBalloon(balloon) {
             this.ctx.font = "40px Arial";
             this.ctx.fillStyle = "black";
-            this.ctx.fillText(this.char.toUpperCase(), 681, 640);
+            this.ctx.fillText(this.char.toUpperCase(), 756, 713);
         },
         handleKeyUp(event) {
             this.char = ""
@@ -399,6 +439,15 @@ body {
     background: linear-gradient(#ffffff, #7d7d7d);
     height: 100vh;
     width: 100vw;
+}
+
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid black;
 }
 
 #container {

@@ -1,9 +1,23 @@
 <template>
     <div v-if="!disabledGame" id="app" @keyup="handleKeyPress">
+        <h3 style="font-weight: bold;">Chances:
+            <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
+            <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
+            <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
+            <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
+        </h3>
         <h4 v-if="isQuiz" style="font-weight: bolder; font-family: 'Skranji', cursive;" class="text-center mt-2">Level
             {{ flag + 1 }} - <span>Test {{ test + 1 }}</span></h4>
-        <h5 class="text-center" style="font-weight: bolder; font-family: 'Skranji', cursive;">Score: {{ hangmanGame.score }}
-        </h5>
+        <div class="row w-100">
+            <div class="col-6">
+                <h4 class="text-start fw-bold ms-4">Highest Score: {{ highestScore }}
+                </h4>
+            </div>
+            <div class="col-6">
+                <h4 class="text-end fw-bold me-4">Score: {{ hangmanGame.score }}
+                </h4>
+            </div>
+        </div>
         <div class="mx-5 mt-4">
             <div class="row">
                 <div class="col-6">
@@ -124,7 +138,9 @@ export default {
         disabledGame: false,
         words: [],
         test: 0,
+        chances: null,
         mainScore: 0,
+        highestScore: 0,
         hangmanGame: {
             highestLevel: 1,
             score: 0
@@ -143,6 +159,8 @@ export default {
             if (data.data) {
                 const record = data.data
                 if (record.length == 0) {
+                    this.chances = 2
+                    this.highestScore = 0
                     this.disabledGame = true
                     swal.fire({
                         title: 'Remember',
@@ -160,12 +178,14 @@ export default {
                     }).then((result) => {
                         if (result.value) {
                             this.disabledGame = false
-                            this.storeQuizInfo()
+                            // this.storeQuizInfo()
                             this.setLetters()
                             this.fetchWords()
                         }
                     })
                 } else if (record.length == 1) {
+                    this.chances = 1
+                    this.highestScore = record[0].total_score
                     if (record[0].mark == 'failed' && record[0].highest_level == 3) {
                         this.disabledGame = true
                         this.show = true
@@ -190,13 +210,18 @@ export default {
                         }).then((result) => {
                             if (result.value) {
                                 this.disabledGame = false
-                                this.storeQuizInfo()
+                                // this.storeQuizInfo()
                                 this.setLetters()
                                 this.fetchWords()
                             }
                         })
                     }
                 } else if (record.length > 1) {
+                    this.chances = 'unli'
+                    const scores = record.map(data => {
+                        return data.total_score
+                    })
+                    this.highestScore = Math.max(scores)
                     if (record[1].mark == 'failed') {
                         this.disabledGame = true
                         this.show = true
@@ -205,7 +230,7 @@ export default {
                         this.cancelButtonText = 'Exit'
                     } else {
                         this.disabledGame = false
-                        this.storeQuizInfo()
+                        // this.storeQuizInfo()
                         this.setLetters()
                         this.fetchWords()
                     }
@@ -222,7 +247,7 @@ export default {
             axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=1`, this.hangmanGame)
         },
         fetchWords() {
-            axios.get('/storage/json/hangman.json')
+            axios.get('/storage/json/hangman-game.json')
                 .then((response) => {
                     this.words = response.data.filter(item => {
                         return item.word.length != 3
@@ -409,32 +434,32 @@ export default {
         },
         setLetters() {
             this.letters = [
-                { letter: 'A', image: 'images/signs/A.png' },
-                { letter: 'B', image: 'images/signs/B.png' },
-                { letter: 'C', image: 'images/signs/C.png' },
-                { letter: 'D', image: 'images/signs/D.png' },
-                { letter: 'E', image: 'images/signs/E.png' },
-                { letter: 'F', image: 'images/signs/F.png' },
-                { letter: 'G', image: 'images/signs/G.png' },
-                { letter: 'H', image: 'images/signs/H.png' },
-                { letter: 'I', image: 'images/signs/I.png' },
-                { letter: 'J', image: 'images/signs/J.png' },
-                { letter: 'K', image: 'images/signs/K.png' },
-                { letter: 'L', image: 'images/signs/L.png' },
-                { letter: 'M', image: 'images/signs/M.png' },
-                { letter: 'N', image: 'images/signs/N.png' },
-                { letter: 'O', image: 'images/signs/O.png' },
-                { letter: 'P', image: 'images/signs/P.png' },
-                { letter: 'Q', image: 'images/signs/Q.png' },
-                { letter: 'R', image: 'images/signs/R.png' },
-                { letter: 'S', image: 'images/signs/S.png' },
-                { letter: 'T', image: 'images/signs/T.png' },
-                { letter: 'U', image: 'images/signs/U.png' },
-                { letter: 'V', image: 'images/signs/V.png' },
-                { letter: 'W', image: 'images/signs/W.png' },
-                { letter: 'X', image: 'images/signs/X.png' },
-                { letter: 'Y', image: 'images/signs/Y.png' },
-                { letter: 'Z', image: 'images/signs/Z.png' },
+                { letter: 'A', image: 'storage/hand-signs/A.png' },
+                { letter: 'B', image: 'storage/hand-signs/B.png' },
+                { letter: 'C', image: 'storage/hand-signs/C.png' },
+                { letter: 'D', image: 'storage/hand-signs/D.png' },
+                { letter: 'E', image: 'storage/hand-signs/E.png' },
+                { letter: 'F', image: 'storage/hand-signs/F.png' },
+                { letter: 'G', image: 'storage/hand-signs/G.png' },
+                { letter: 'H', image: 'storage/hand-signs/H.png' },
+                { letter: 'I', image: 'storage/hand-signs/I.png' },
+                { letter: 'J', image: 'storage/hand-signs/J.png' },
+                { letter: 'K', image: 'storage/hand-signs/K.png' },
+                { letter: 'L', image: 'storage/hand-signs/L.png' },
+                { letter: 'M', image: 'storage/hand-signs/M.png' },
+                { letter: 'N', image: 'storage/hand-signs/N.png' },
+                { letter: 'O', image: 'storage/hand-signs/O.png' },
+                { letter: 'P', image: 'storage/hand-signs/P.png' },
+                { letter: 'Q', image: 'storage/hand-signs/Q.png' },
+                { letter: 'R', image: 'storage/hand-signs/R.png' },
+                { letter: 'S', image: 'storage/hand-signs/S.png' },
+                { letter: 'T', image: 'storage/hand-signs/T.png' },
+                { letter: 'U', image: 'storage/hand-signs/U.png' },
+                { letter: 'V', image: 'storage/hand-signs/V.png' },
+                { letter: 'W', image: 'storage/hand-signs/W.png' },
+                { letter: 'X', image: 'storage/hand-signs/X.png' },
+                { letter: 'Y', image: 'storage/hand-signs/Y.png' },
+                { letter: 'Z', image: 'storage/hand-signs/Z.png' },
             ]
         }
     },
