@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import swal from 'sweetalert2'
 export default {
     data() {
         return {
@@ -68,7 +69,14 @@ export default {
             this.$router.push({path: `/textbook-management/${flag}`})
         },
         async seed() {
-            await axios.post('/api/seed')
+            try {
+                const response = await axios.post('/api/seed')
+                if (response.status === 200) {
+                    swal.fire('Success', response.data.message, 'success')
+                }
+            } catch (error) {
+                console.log(error)
+            }
         }
     },
 }

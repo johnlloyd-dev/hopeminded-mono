@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/textbook/add', [TextbookController::class, 'addTextbook']);
     Route::post('/textbook/alphabets-words/add', [TextbookController::class, 'addTextbookAlphabetWords']);
+    Route::delete('textbook/delete/{textbookId}', [TextbookController::class, 'deleteTextbook']);
 
     Route::get('quiz-report/student/{studentId}', [QuizReportController::class, 'getStudentQuizReport']);
 
@@ -78,6 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LogoutController::class, 'logout']);
 
     Route::post('seed', function () {
+        Textbook::query()->delete();
         $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         $jsonFile = Storage::path('public/json/alphabets-with-letters.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);

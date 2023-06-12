@@ -208,6 +208,11 @@ class TextbookController extends Controller
         return response()->json(['message' => 'An alphabet is added successfully.']);
     }
 
+    public function deleteTextbook($textbookId) {
+        Textbook::find($textbookId)->delete();
+        return response()->json(['message' => 'An alphabet is deleted successfully.']);
+    }
+
     public function isLetterExist()
     {
         $count = Textbook::where('flag', request()->flag)

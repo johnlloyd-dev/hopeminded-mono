@@ -27,7 +27,7 @@
         </div>
 
         <div class="d-flex justify-content-center mt-3">
-            <table class="table table-bordered table-responsive table-striped">
+            <table class="table table-bordered table-responsive">
                 <thead>
                     <tr class="bg-secondary">
                         <th class="text-white" style="font-size: 20px" scope="col">Letter</th>
@@ -77,7 +77,7 @@
                             </div>
                         </td>
                         <td class="d-flex justify-content-center">
-                            <button class="btn-danger btn rounded-0 btn-sm">
+                            <button @click="deleteConfirmation(item.id)" class="btn-danger btn rounded-0 btn-sm">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
@@ -162,6 +162,24 @@
                 </div>
             </div>
         </div>
+        <!-- Delete Textbook Modal -->
+        <div class="modal fade" id="deleteTextbook" tabindex="-1" aria-labelledby="deleteTextbookLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTextbookLabel">Delete Textbook Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this textbook item?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal">Close</button>
+                    <button @click="deleteTextbook" type="button" class="btn btn-danger rounded-0">Delete <i class="fas fa-trash-alt"></i></button>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -178,6 +196,7 @@ export default {
             media: null,
             image: null,
             video: null,
+            textbookId: null,
             alphabetContent: {
                 flag: null,
                 letter: null,
@@ -280,6 +299,25 @@ export default {
             } catch (error) {
                 console.log(error)
                 this.errors = error.response.data.errors
+            }
+        },
+        deleteConfirmation(textbookId) {
+            this.textbookId = textbookId
+            $('#deleteTextbook').modal('show')
+        },
+        async deleteTextbook() {
+            try {
+                this.isProcessing = true
+                const response = await axios.delete(`/api/textbook/delete/${this.textbookId}`)
+                if(response.status == 200) {
+                    $('#deleteTextbook').modal('hide');
+                    swal.fire('Success', response.data.message, 'success')
+                    this.getTextbooks()
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.isProcessing = false
             }
         }
     },

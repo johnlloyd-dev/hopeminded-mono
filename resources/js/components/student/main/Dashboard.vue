@@ -12,18 +12,18 @@
 
                         <div class="card-body">
                             <div class="row d-flex justify-content-between mb-5">
-                                <div class="col-lg-3 col-md-12 col-sm-12 p-0">
+                                <div class="col-lg-4 col-md-12 col-sm-12 p-0">
                                     <div class="card-sl">
                                         <div class="card-image">
-                                            <img src="/images/hangman.png" />
+                                            <img src="/images/memory.png" />
                                         </div>
-                                        <router-link to="/hangman-game" class="card-action"><i class="fa fa-play"></i></router-link>
+                                        <router-link to="/memory-game" class="card-action"><i class="fa fa-play"></i></router-link>
                                         <div class="card-heading">
-                                            Hangman
+                                            Memory Game
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-12 col-sm-12 p-0">
+                                <div class="col-lg-4 col-md-12 col-sm-12 p-0">
                                     <div class="card-sl">
                                         <div class="card-image">
                                             <img src="/images/balloon.png" />
@@ -34,14 +34,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-12 col-sm-12 p-0">
+                                <div class="col-lg-4 col-md-12 col-sm-12 p-0">
                                     <div class="card-sl">
                                         <div class="card-image">
-                                            <img src="/images/memory.png" />
+                                            <img src="/images/hangman.png" />
                                         </div>
-                                        <router-link to="/memory-game" class="card-action"><i class="fa fa-play"></i></router-link>
+                                        <router-link to="/hangman-game" class="card-action"><i class="fa fa-play"></i></router-link>
                                         <div class="card-heading">
-                                            Memory Game
+                                            Hangman
                                         </div>
                                     </div>
                                 </div>

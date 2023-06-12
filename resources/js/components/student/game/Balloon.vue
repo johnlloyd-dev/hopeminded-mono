@@ -102,10 +102,14 @@ export default {
             const data = await axios.get(`/api/quiz-reports/get?gameId=${2}&flag=tutorial`)
             if (data.data) {
                 const record = data.data
-                const scores = record.map(data => {
-                    return data.total_score
-                })
-                this.highestScore = Math.max(...scores)
+                if(record.length) {
+                    const scores = record.map(data => {
+                        return data.total_score
+                    })
+                    this.highestScore = Math.max(...scores)
+                } else {
+                    this.highestScore = 0
+                }
                 this.disabledGame = true
                 swal.fire({
                     title: 'Hi Player',
@@ -189,10 +193,6 @@ export default {
             this.ctx.fillStyle = "black";
             this.ctx.fillText(`Score: ${this.typingBalloon.score}`, 1300, 70);
             this.ctx.fillText(`Highest Score: ${this.highestScore}`, 100, 70);
-
-            this.ctx.font = "bolder 25px Skranji";
-            this.ctx.strokeStyle = "black";
-            this.ctx.fillText(`Level ${this.flag + 1}`, 756, 100);
 
             this.ctx.beginPath();
             this.ctx.fillStyle = "lightgrey";

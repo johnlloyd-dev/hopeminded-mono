@@ -1,16 +1,7 @@
 <template>
     <div id="overlay"></div>
-    <div style="z-index: 9999">
+    <div class="mt-3" style="z-index: 9999">
         <div v-if="!disabledGame" id="app" @keyup="handleKeyPress">
-            <h3 style="font-weight: bold;">Chances:
-                <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png"
-                    alt="">
-                <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
-                <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
-                <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
-            </h3>
-            <h4 v-if="isQuiz" style="font-weight: bolder; font-family: 'Skranji', cursive;" class="text-center mt-2">Level
-                {{ flag + 1 }} - <span>Test {{ test + 1 }}</span></h4>
             <div class="row w-100">
                 <div class="col-6">
                     <h4 class="text-start fw-bold ms-4">Highest Score: {{ highestScore }}
@@ -159,96 +150,49 @@ export default {
         }),
         async initQuizInfo() {
             this.disabledGame = true
-            const data = await axios.get(`/api/quiz-reports/get?gameId=${1}`)
+            const data = await axios.get(`/api/quiz-reports/get?gameId=${1}&flag=tutorial`)
             if (data.data) {
                 const record = data.data
-                if (record.length == 0) {
-                    this.chances = 2
-                    this.highestScore = 0
-                    this.disabledGame = true
-                    swal.fire({
-                        title: 'Remember',
-                        text: `If you have played levels 1 and 2 in your first attempt but failed to get the passing score, you will be given another chance to play the game. But if you reach level 3 but failed to get the passing score, you will not be given another chance to play this game. When the game starts, don't exit or refresh the browser. Happy playing.`,
-                        confirmButtonText: `Got it!`,
-                        icon: 'info',
-                        width: 600,
-                        padding: '3em',
-                        backdrop: `
-                            gray
-                            url("https://sweetalert2.github.io/images/nyan-cat.gif")
-                            left top
-                            no-repeat
-                        `
-                    }).then((result) => {
-                        if (result.value) {
-                            this.disabledGame = false
-                            this.storeQuizInfo()
-                            this.setLetters()
-                            this.fetchWords()
-                        }
-                    })
-                } else if (record.length == 1) {
-                    this.chances = 1
-                    this.highestScore = record[0].total_score
-                    if (record[0].mark == 'failed' && record[0].highest_level == 3) {
-                        this.disabledGame = true
-                        this.show = true
-                        this.hideNextButton = true
-                        this.text = `Sorry. You already used up your play chances.`
-                        this.cancelButtonText = 'Exit'
-                    } else {
-                        this.disabledGame = true
-                        swal.fire({
-                            title: 'Remember',
-                            text: `You failed to get the passing score on your first attempt. This will be your final chance. When the game starts, don't exit or refresh the browser. Happy playing.`,
-                            confirmButtonText: `Got it!`,
-                            icon: 'info',
-                            width: 600,
-                            padding: '3em',
-                            backdrop: `
-                                gray
-                                url("https://sweetalert2.github.io/images/nyan-cat.gif")
-                                left top
-                                no-repeat
-                            `
-                        }).then((result) => {
-                            if (result.value) {
-                                this.disabledGame = false
-                                this.storeQuizInfo()
-                                this.setLetters()
-                                this.fetchWords()
-                            }
-                        })
-                    }
-                } else if (record.length > 1) {
-                    this.chances = 'unli'
+                if(record.length) {
                     const scores = record.map(data => {
                         return data.total_score
                     })
                     this.highestScore = Math.max(...scores)
-                    if (record[1].mark == 'failed') {
-                        this.disabledGame = true
-                        this.show = true
-                        this.hideNextButton = true
-                        this.text = `Sorry. You already used up your play chances.`
-                        this.cancelButtonText = 'Exit'
-                    } else {
+                } else {
+                    this.highestScore = 0
+                }
+                this.disabledGame = true
+                swal.fire({
+                    title: 'Hi Player',
+                    text: `This is just a tutorial game. Happy playing.`,
+                    confirmButtonText: `Got it!`,
+                    icon: 'info',
+                    width: 600,
+                    padding: '3em',
+                    backdrop: `
+                        gray
+                        url("https://sweetalert2.github.io/images/nyan-cat.gif")
+                        left top
+                        no-repeat
+                    `
+                }).then((result) => {
+                    if (result.value) {
                         this.disabledGame = false
                         this.storeQuizInfo()
                         this.setLetters()
                         this.fetchWords()
                     }
-                }
+                })
             }
         },
         storeQuizInfo() {
-            axios.post(`/api/quiz/info/store/hangman-game`, this.hangmanGame)
+            axios.post(`/api/quiz/info/store/hangman-game?flag=tutorial`, this.hangmanGame)
                 .then(() => {
-                    this.getQuizInfo()
+                    this.getQuizInfo('tutorial')
                 })
         },
         updateQuizInfo() {
-            axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=1`, this.hangmanGame)
+            axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=1&flag=tutorial`, this.hangmanGame)
         },
         fetchWords() {
             axios.get('/storage/json/hangman-game.json')
@@ -263,55 +207,8 @@ export default {
         },
         divideCards() {
             this.words = _.shuffle(this.words)
-            const subArraySizes = [3, 6, 9];
-            const dividedArrays = [];
-
-            let currentIndex = 0;
-            for (let i = 0; i < subArraySizes.length; i++) {
-                const subArraySize = subArraySizes[i];
-                const subArray = this.words.slice(currentIndex, currentIndex + subArraySize);
-                switch (i) {
-                    case 0:
-                        dividedArrays.push(subArray);
-                        break;
-                    case 1:
-                        const data = _.chunk(subArray, 2);
-                        let words = ''
-                        let images = []
-
-                        let fullData = []
-                        for (let index1 = 0; index1 < data.length; index1++) {
-                            for (let index2 = 0; index2 < data[index1].length; index2++) {
-                                words += data[index1][index2].word + ' ';
-                                images.push(data[index1][index2].image)
-                            }
-                            fullData.push({ word: words, image: images })
-                            words = ''
-                            images = []
-                        }
-                        dividedArrays.push(fullData);
-                        break;
-                    case 2:
-                        const data2 = _.chunk(subArray, 3);
-                        let words2 = '';
-                        let images2 = []
-
-                        let fullData2 = []
-                        for (let index1 = 0; index1 < data2.length; index1++) {
-                            for (let index2 = 0; index2 < data2[index1].length; index2++) {
-                                words2 += data2[index1][index2].word + ' ';
-                                images2.push(data2[index1][index2].image)
-                            }
-                            fullData2.push({ word: words2, image: images2 })
-                            words2 = ''
-                            images2 = []
-                        }
-                        dividedArrays.push(fullData2);
-                        break;
-                }
-                currentIndex += subArraySize;
-            }
-            this.quotes = dividedArrays
+            const subArray = this.words.slice(0, 8);
+            this.quotes = subArray
         },
         handleKeyPress(e) {
             const key = e.key.toUpperCase()
@@ -321,9 +218,9 @@ export default {
         },
         pickAQuote() {
             this.currentData = []
-            const random = Math.floor(Math.random() * this.quotes[this.flag].length)
-            this.currentData = this.quotes[this.flag][this.test]
-            this.currentQuote = this.quotes[this.flag][this.test].word.toUpperCase()
+            const random = Math.floor(Math.random() * this.quotes.length)
+            this.currentData = this.quotes[random]
+            this.currentQuote = this.quotes[random].word.toUpperCase()
         },
         //The function that turns unguessed letters into blank spots
         isRevealed(letter) {
@@ -353,17 +250,16 @@ export default {
                 this.score++
                 this.setMainScore()
 
-                if (this.score == 9) {
+                if (this.score == 8) {
                     this.show = true
-                    this.text = `Congratulations! You finished all 3 levels. Your score is ${this.hangmanGame.score}.`
+                    this.text = `Congratulations! You've got the perfect score. Your score is ${this.hangmanGame.score}.`
                     this.nextButtonText = 'Replay'
                     this.cancelButtonText = 'Exit'
                 } else {
-                    if (this.test < 2) {
-                        swal.fire({
-                            text: `You finished test ${this.test + 1} of level ${this.flag + 1}. Proceed to test ${this.test + 2}.`,
+                    swal.fire({
+                            text: `Great. Proceed to next object.`,
                             showCancelButton: true,
-                            confirmButtonText: `Test ${this.test + 2}`,
+                            confirmButtonText: `Got it.`,
                             cancelButtonText: 'Exit',
                             icon: 'info',
                             width: 600,
@@ -378,15 +274,10 @@ export default {
                             if (result.value) {
                                 this.nextTest()
                             } else if (result.dismiss === swal.DismissReason.cancel) {
-                                window.location.href = '/student-quiz'
+                                window.location.href = '/student-dashboard'
                                 return
                             }
                         })
-                    } else {
-                        this.show = true
-                        this.text = `You finished level ${this.flag + 1}. Proceed to level ${this.flag + 2}.`
-                        this.nextButtonText = `Level ${this.flag + 2}`
-                    }
                 }
             }
         },
@@ -404,36 +295,15 @@ export default {
             if (this.nextButtonText == 'Replay') {
                 window.location.reload()
                 return
-            } else {
-                this.flag++
-                if ((this.flag + 1) == 1) {
-                    this.hangmanGame.highestLevel == 1
-                } else if ((this.flag + 1) == 2) {
-                    this.hangmanGame.highestLevel == 2
-                } else if ((this.flag + 1) == 3) {
-                    this.hangmanGame.highestLevel == 3
-                }
-                this.updateQuizInfo()
-                this.test = 0
-                this.pickAQuote()
-                this.guesses = []
-                this.strikes = [...defaultStrikes]
-                this.gameOver = false
             }
             this.show = false
         },
         cancelExit() {
             this.show = false
-            this.$router.push('/student-quiz')
+            this.$router.push('/student-dashboard')
         },
         setMainScore() {
-            if ((this.flag + 1) == 1) {
-                this.hangmanGame.score += 1;
-            } else if ((this.flag + 1) == 2) {
-                this.hangmanGame.score += 2;
-            } else if ((this.flag + 1) == 3) {
-                this.hangmanGame.score += 3;
-            }
+            this.hangmanGame.score++;
             this.updateQuizInfo()
         },
         setLetters() {

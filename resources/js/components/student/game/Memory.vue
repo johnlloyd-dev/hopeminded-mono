@@ -2,13 +2,6 @@
     <div id="overlay"></div>
     <div style="z-index: 9999">
         <div v-if="!disabledGame" class="body">
-            <h3 style="font-weight: bold;">Chances:
-                <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png"
-                    alt="">
-                <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
-                <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
-                <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
-            </h3>
             <h3 class="fw-bold text-center w-100 mt-3">Timer: 00:{{ time }}</h3>
             <div class="row w-100">
                 <div class="col-6">
@@ -18,8 +11,7 @@
                     <h4 class="text-right">Score: {{ memoryGame.score }}</h4>
                 </div>
             </div>
-            <h3 class="text-center" style="font-weight: bolder; font-family: 'Skranji', cursive;">Level {{ flag + 1 }}</h3>
-            <div id="app" :class="flag == 0 ? 'cards-width-1' : 'cards-width-2'">
+            <div id="app" class="cards-width">
                 <div v-for="(card, index) in cards" :key="index"
                     :class="[{ 'down': card.down && !card.matched, 'up': !card.down, 'matched': card.matched }, ' card']"
                     v-on:click="handleClick(card)">
@@ -85,7 +77,7 @@ export default {
                 highestLevel: 1,
                 score: 0
             },
-            time: 60, // Initial time in seconds
+            time: 30, // Initial time in seconds
             timer: null // Timer reference
         }
     },
@@ -107,7 +99,6 @@ export default {
             axios.get('storage/json/memory-game.json')
                 .then(response => {
                     this.icons = response.data
-                    this.divideCards()
                     this.cardsShuffle()
                 })
                 .catch(error => {
@@ -116,95 +107,48 @@ export default {
         },
         async initQuizInfo() {
             this.disabledGame = true
-            const data = await axios.get(`/api/quiz-reports/get?gameId=${3}`)
+            const data = await axios.get(`/api/quiz-reports/get?gameId=${3}&flag=tutorial`)
             if (data.data) {
                 const record = data.data
-                if (record.length == 0) {
-                    this.chances = 2
-                    this.highestScore = 0
-                    this.disabledGame = true
-                    swal.fire({
-                        title: 'Remember',
-                        text: `If you have played levels 1 and 2 in your first attempt but failed to get the passing score, you will be given another chance to play the game. But if you reach level 3 but failed to get the passing score, you will not be given another chance to play this game. When the game starts, don't exit or refresh the browser. Happy playing.`,
-                        confirmButtonText: `Got it!`,
-                        icon: 'info',
-                        width: 600,
-                        padding: '3em',
-
-                        backdrop: `
-                            rgba(0,0,123,0.4)
-                            url("https://sweetalert2.github.io/images/nyan-cat.gif)
-                            left top
-                            no-repeat
-                        `
-                    }).then((result) => {
-                        if (result.value) {
-                            this.startTimer();
-                            this.disabledGame = false
-                            this.storeQuizInfo()
-                            this.fetchData();
-                        }
-                    })
-                } else if (record.length == 1) {
-                    this.chances = 1
-                    this.highestScore = record[0].total_score
-                    if (record[0].mark == 'failed' && record[0].highest_level == 3) {
-                        this.disabledGame = true
-                        this.show = true
-                        this.hideNextButton = true
-                        this.text = `Sorry. You already used up your play chances.`
-                        this.cancelButtonText = 'Exit'
-                    } else {
-                        this.disabledGame = true
-                        swal.fire({
-                            title: 'Remember',
-                            text: `You failed to get the passing score on your first attempt. This will be your final chance. When the game starts, don't exit or refresh the browser. Happy playing.`,
-                            confirmButtonText: `Got it!`,
-                            icon: 'info',
-                            width: 600,
-                            padding: '3em',
-
-                            backdrop: `
-                                rgba(0,0,123,0.4)
-                                url("https://sweetalert2.github.io/images/nyan-cat.gif)
-                                left top
-                                no-repeat
-                            `
-                        }).then((result) => {
-                            if (result.value) {
-                                this.startTimer();
-                                this.disabledGame = false
-                                this.storeQuizInfo()
-                                this.fetchData();
-                            }
-                        })
-                    }
-                } else if (record.length > 1) {
-                    this.chances = 'unli'
+                if(record.length) {
                     const scores = record.map(data => {
                         return data.total_score
                     })
                     this.highestScore = Math.max(...scores)
-                    if (record[1].mark == 'failed') {
-                        this.disabledGame = true
-                        this.show = true
-                        this.hideNextButton = true
-                        this.text = `Sorry. You already used up your play chances.`
-                        this.cancelButtonText = 'Exit'
-                    } else {
+                } else {
+                    this.highestScore = 0
+                }
+                this.disabledGame = true
+                swal.fire({
+                    title: 'Hi Player',
+                    text: `This is just a tutorial game. Happy playing.`,
+                    confirmButtonText: `Got it!`,
+                    icon: 'info',
+                    width: 600,
+                    padding: '3em',
+
+                    backdrop: `
+                        rgba(0,0,123,0.4)
+                        url("https://sweetalert2.github.io/images/nyan-cat.gif)
+                        left top
+                        no-repeat
+                    `
+                }).then((result) => {
+                    if (result.value) {
                         this.startTimer();
                         this.disabledGame = false
                         this.storeQuizInfo()
                         this.fetchData();
                     }
-                }
+                })
             }
         },
         // Create cards array based on icons, shuffle them
         cardsShuffle() {
             // prep objects
+            this.icons = this.icons.slice(0, 12);
             this.cards = []
-            this.cards = _.range(0, this.icons[this.flag].length * 2)
+            this.cards = _.range(0, this.icons.length * 2)
             this.cards.forEach((card, index) => {
                 this.cards[index] = {
                     icon: '',
@@ -213,7 +157,7 @@ export default {
                     matched: false
                 }
             });
-            const icons = this.icons[this.flag]
+            const icons = this.icons
             icons.forEach((icon, index) => {
                 this.cards[index].icon = icon.letter;
                 this.cards[index + icons.length].icon = icon.letter;
@@ -221,20 +165,6 @@ export default {
                 this.cards[index + icons.length].image = icon.image;
             });
             this.cards = _.shuffle(this.cards);
-        },
-        divideCards() {
-            this.icons = _.shuffle(this.icons)
-            const subArraySizes = [5, 9, 12];
-            const dividedArrays = [];
-
-            let currentIndex = 0;
-            for (let i = 0; i < subArraySizes.length; i++) {
-                const subArraySize = subArraySizes[i];
-                const subArray = this.icons.slice(currentIndex, currentIndex + subArraySize);
-                dividedArrays.push(subArray);
-                currentIndex += subArraySize;
-            }
-            this.icons = dividedArrays
         },
         handleClick(cardClicked) {
             if (!this.runing) {
@@ -255,27 +185,16 @@ export default {
                             }
                         });
                         if (match) {
-                            if (this.flag == 0) {
-                                this.memoryGame.score += 1;
-                            } else if (this.flag == 1) {
-                                this.memoryGame.score += 2;
-                            } else if (this.flag == 2) {
-                                this.memoryGame.score += 3;
-                            }
-                            if (this.memoryGame.score == 5 || this.memoryGame.score == 23) {
+                            this.memoryGame.score++;
+                            if (this.memoryGame.score == 16) {
                                 clearInterval(this.timer);
                                 this.show = true
-                                this.text = `You finished level ${this.flag + 1}. Proceed to level ${this.flag + 2}.`
-                                this.nextButtonText = `Level ${this.flag + 2}`
-                            } else if (this.memoryGame.score == 59) {
-                                clearInterval(this.timer);
-                                this.show = true
-                                this.text = `Congratulations! You finished all 3 levels. Your score is ${this.memoryGame.score}.`
+                                this.text = `Congratulations! You've got the perfect score. Your score is ${this.memoryGame.score}.`
                                 this.nextButtonText = 'Replay'
                                 this.cancelButtonText = 'Exit'
+                            } else {
+                                this.updateQuizInfo()
                             }
-
-                            this.updateQuizInfo()
                         }
                         this.runing = false;
                     }, 1000);
@@ -283,37 +202,24 @@ export default {
             }
         },
         storeQuizInfo() {
-            axios.post(`/api/quiz/info/store/memory-game`, this.memoryGame)
+            axios.post(`/api/quiz/info/store/memory-game?flag=tutorial`, this.memoryGame)
                 .then(() => {
-                    this.getQuizInfo()
+                    this.getQuizInfo('tutorial')
                 })
         },
         updateQuizInfo() {
-            axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=3`, this.memoryGame)
+            axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=3&flag=tutorial`, this.memoryGame)
         },
         nextLevel() {
             if (this.nextButtonText == 'Replay') {
                 window.location.reload()
                 return
-            } else {
-                this.flag++
-                if (this.flag == 1) {
-                    this.memoryGame.highestLevel = 2
-                } else if (this.flag == 2) {
-                    this.memoryGame.highestLevel = 3
-                }
-                this.time = 60
-                this.startTimer()
-                this.updateQuizInfo()
             }
             this.show = false
-            this.previousScore = 0
-            this.previousScore += this.memoryGame.score
-            this.cardsShuffle()
         },
         cancelExit() {
             this.show = false
-            this.$router.push('/student-quiz')
+            this.$router.push('/student-dashboard')
         },
         startTimer() {
             this.timer = setInterval(() => {
@@ -381,7 +287,7 @@ body {
     perspective: 800px;
     margin: 0 auto;
     position: absolute;
-    top: 60%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
@@ -397,8 +303,8 @@ body {
     z-index: -1;
 }
 
-.cards-width-1 {
-    max-width: 700px;
+.cards-width {
+    max-width: 1100px;
 }
 
 .cards-width-2 {
