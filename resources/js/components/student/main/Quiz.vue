@@ -128,7 +128,7 @@ export default {
         async getAlWoFlags() {
             const flags = await axios.get(`/api/flags/alphabet-words`)
             const attributes = JSON.parse(flags.data.attributes)
-            this.isHangmanGameAllowed = Object.values(attributes).some(value => value.length === 1);
+            this.isHangmanGameAllowed = Object.values(attributes).some(value => value.length > 0);
             // this.isHangmanGameNotAllowed = Object.values(attributes).some(value => value.length === 0);
             this.isProcessing = false
         },

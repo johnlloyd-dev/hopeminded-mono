@@ -72,7 +72,22 @@
                 </div>
             </div>
         </div>
-        <footer-component class="position-absolute bottom-0 start-50 translate-middle-x w-100"></footer-component>
+        <div class="w-100 mt-5 text-center custom-background">
+            <div class="row p-5">
+                <div class="col-lg-12 d-flex align-items-center justify-content-center">
+                    <h1 class="mt-3 fw-bolder text-white">How to use Hopeminded?</h1>
+                </div>
+                <div class="col-lg-12">
+                    <div class="p-3 mb-3">
+                        <iframe width="860" height="615" src="https://www.youtube.com/embed/nMLB0MFHJXk"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer-component class="w-100"></footer-component>
     </body>
 </template>
 
@@ -164,6 +179,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-x: hidden;
     /* justify-content: center; */
 }
 
@@ -180,5 +196,12 @@ body {
 .title-header {
     font-family: 'Bangers', cursive;
     font-size: 30px;
+}
+.custom-background {
+    position: relative;
+    background-image: url('/images/night-background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 </style>
