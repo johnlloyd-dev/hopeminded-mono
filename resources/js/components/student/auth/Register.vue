@@ -110,6 +110,7 @@
 </template>
 
 <script>
+import swal from 'sweetalert2'
 import Loading from '../../loading/Loading.vue'
 export default {
     name: "Register",
@@ -145,10 +146,17 @@ export default {
             this.errors = []
             this.isLoading = true
             await axios.post('api/register', this.auth)
-                .then(({ data }) => {
-                    localStorage.setItem('fullname', data.data.fullname)
-                    localStorage.setItem('token', data.data.token)
-                    this.$router.push({ path: '/student-dashboard' })
+                .then(response => {
+                    swal.fire({
+                        title: 'Success',
+                        text: response.data.message,
+                        icon: 'success',
+                        confirmButtonText: 'Proceed to Login',
+                    }).then((result) => {
+                        if (result.value) {
+                            location.href = '/'
+                        }
+                    })
                 }).catch((error) => {
                     this.errors = error.response.data.errors
                 }).finally(() => {

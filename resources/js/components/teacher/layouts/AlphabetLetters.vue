@@ -1,8 +1,11 @@
 <template>
     <div>
         <div class="row d-flex align-items-center mb-3 mt-5">
-            <div class="col-4">
+            <div class="col-2">
                 <h3 class="fw-bold">Alphabet/Letters</h3>
+            </div>
+            <div class="col-2">
+                <h3 class="fw-bold">Chapter {{ selectedChapter }}</h3>
             </div>
             <div class="col-8">
                 <button data-bs-toggle="modal" data-bs-target="#addAlphabetModal" class="btn btn-success rounded-0 fw-bold">
@@ -168,6 +171,7 @@
 <script>
 import swal from 'sweetalert2'
 export default {
+    props: ['chapter'],
     data() {
         return {
             isProcessing: false,
@@ -188,13 +192,23 @@ export default {
             errors: []
         }
     },
+    computed: {
+        selectedChapter() {
+            return this.chapter
+        }
+    },
+    watch: {
+        selectedChapter(newValue, oldValue) {
+            this.getTextbooks()
+        }
+    },
     created() {
         this.alphabetContent.flag = this.$route.params.textbookFlag
         this.getTextbooks()
     },
     methods: {
         async getTextbooks() {
-            const alphabetLetters = await axios.get(`/api/alphabets-letters/get?user=${'teacher'}`)
+            const alphabetLetters = await axios.get(`/api/alphabets-letters/get?user=${'teacher'}&chapter=${this.selectedChapter}`)
             this.alphabetLetters = _.chunk(alphabetLetters.data, 5)
             this.data = this.alphabetLetters[this.flag]
         },
@@ -245,7 +259,7 @@ export default {
             if(this.alphabetContent.video != null)
                 data.append('video', this.alphabetContent.video)
             try {
-                const response = await axios.post('/api/textbook/add', data, {
+                const response = await axios.post(`/api/textbook/add?chapter=${this.selectedChapter}`, data, {
                     headers: { 'content-type': 'multipart/form-data' }
                 })
                 if (response.status === 200) {

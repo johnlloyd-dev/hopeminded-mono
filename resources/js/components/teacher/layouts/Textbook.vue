@@ -6,9 +6,28 @@
                     <button @click="navigate()" class="btn-secondary btn rounded-0">
                         Back
                     </button>
-                    <alphabet-letters-component v-if="textbookFlag == 'alphabet-letters'"></alphabet-letters-component>
-                    <alphabet-words-component v-if="textbookFlag == 'alphabet-words'"></alphabet-words-component>
-                    <vowel-consonants-component v-if="textbookFlag == 'vowel-consonants'"></vowel-consonants-component>
+                    <div class="row mb-3">
+                        <div class="col-lg-12 mt-2">
+                            <div class="btn-group">
+                                <button class="btn btn-lg btn-success dropdown-toggle rounded-0" type="button"
+                                    id="defaultDropdown" data-bs-toggle="dropdown" data-bs-auto-close="true"
+                                    aria-expanded="false">
+                                    Select Chapter
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="defaultDropdown">
+                                    <li><button class="dropdown-item"
+                                            :class="{ active: selectedChapter == 1 }"
+                                            @click="selectChapter(1)">Chapter 1</button></li>
+                                    <li><button class="dropdown-item"
+                                            :class="{ active: selectedChapter == 2 }"
+                                            @click="selectChapter(2)">Chapter 2</button></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <alphabet-letters-component :chapter="selectedChapter" v-if="textbookFlag == 'alphabet-letters'"></alphabet-letters-component>
+                    <alphabet-words-component :chapter="selectedChapter" v-if="textbookFlag == 'alphabet-words'"></alphabet-words-component>
+                    <vowel-consonants-component :chapter="selectedChapter" v-if="textbookFlag == 'vowel-consonants'"></vowel-consonants-component>
                 </div>
             </div>
         </div>
@@ -17,6 +36,12 @@
 
 <script>
 export default {
+    data() {
+        return {
+            selectedChapter: 1,
+            isSwitching: false
+        }
+    },
     created() {
 
     },
@@ -28,6 +53,13 @@ export default {
     methods: {
         navigate() {
             this.$router.push({ path: `/textbook-management` })
+        },
+        selectChapter(value) {
+            this.selectedChapter = value
+            this.isSwitching = true
+            setTimeout(() => {
+                this.isSwitching = false
+            }, 500);
         },
     },
 }

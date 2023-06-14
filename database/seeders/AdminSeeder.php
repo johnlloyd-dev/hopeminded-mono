@@ -17,7 +17,7 @@ class AdminSeeder extends Seeder
     {
         $user = User::updateOrCreate([
             'username' => 'hopeminded2023',
-            'password' => Hash::make('@hopeminded123411!'),
+            'password' => Hash::make('123456789'),
             'user_flag' => 'admin'
         ]);
 

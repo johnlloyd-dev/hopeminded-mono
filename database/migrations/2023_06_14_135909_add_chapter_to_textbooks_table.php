@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('textbooks', function (Blueprint $table) {
-            $table->unique(['flag', 'letter'])->change();
+            $table->integer('chapter')->nullable()->default(1);
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('textbooks', function (Blueprint $table) {
-            $table->unique(['flag', 'letter'])->change();
+            $table->integer('chapter')->nullable()->default(1);
         });
     }
 };

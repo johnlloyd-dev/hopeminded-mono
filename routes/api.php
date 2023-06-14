@@ -97,7 +97,8 @@ Route::middleware('auth:sanctum')->group(function () {
                 'letter' => $data["letter"],
                 'object' => $data["object"],
                 'image' => json_encode($data["image"]),
-                'video' => json_encode($data["video"])
+                'video' => json_encode($data["video"]),
+                'chapter' => 1
             ]);
         }
 
@@ -118,7 +119,8 @@ Route::middleware('auth:sanctum')->group(function () {
                     'letter' => $data["letter"],
                     'object' => $data["object"],
                     'image' => json_encode($data["image"]),
-                    'video' => json_encode($data["video"])
+                    'video' => json_encode($data["video"]),
+                    'chapter' => 1
                 ]);
             }
         }
@@ -146,7 +148,8 @@ Route::middleware('auth:sanctum')->group(function () {
                     'letter' => $key,
                     'object' => json_encode($object),
                     'image' => json_encode($image),
-                    'video' => json_encode($video)
+                    'video' => json_encode($video),
+                    'chapter' => 1
                 ]);
             }
         }

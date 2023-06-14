@@ -32,7 +32,8 @@ class TeacherController extends Controller
             'middle_name' => $request->middleName,
             'last_name' => $request->lastName,
             'email' => $request->email,
-            'user_id' => $user->id
+            'user_id' => $user->id,
+            'unhashed' => $request->password
         ]);
 
         if($teacher) {

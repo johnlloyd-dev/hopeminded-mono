@@ -80,7 +80,7 @@ export const store = new createStore({
             context.commit("SET_MENU_FLAG", menuFlag);
         },
         async setAlphabetLetters(context, flag) {
-            const alphabets = await axios.get(`/api/alphabets-letters/get?user=${'student'}`);
+            const alphabets = await axios.get(`/api/alphabets-letters/get?user=${'student'}&chapter=1`);
             const flags = await axios.get(`/api/flags/alphabet-letters`);
             let data = [];
             for (let i = 0; i <= alphabets.data.length - 1; i++) {
@@ -106,7 +106,7 @@ export const store = new createStore({
                 flags = [];
                 data = [];
                 newData = [];
-                alphabets = await axios.get(`/api/vowels-consonants/get?user=${'student'}`);
+                alphabets = await axios.get(`/api/vowels-consonants/get?user=${'student'}&chapter=1`);
                 flags = await axios.get(`/api/flags/vowel-consonants`);
             }
             alphabets.data.forEach((element) => {
@@ -139,7 +139,7 @@ export const store = new createStore({
         },
         async setAlphabetWords(context) {
             let alphabets = await axios.get(
-                `/api/alphabets-words/get?user=${'student'}`
+                `/api/alphabets-words/get?user=${'student'}&chapter=1`
             );
             let newData = []
             alphabets.data.forEach(element => {

@@ -1,8 +1,11 @@
 <template>
     <div>
         <div class="row d-flex align-items-center mb-3 mt-5">
-            <div class="col-4">
+            <div class="col-2">
                 <h3 class="fw-bold">Alphabet/Words</h3>
+            </div>
+            <div class="col-2">
+                <h3 class="fw-bold">Chapter {{ selectedChapter }}</h3>
             </div>
             <div class="col-8">
                 <button data-bs-toggle="modal" data-bs-target="#addAlphabetModal" class="btn btn-success rounded-0 fw-bold">
@@ -216,6 +219,7 @@
 import swal from 'sweetalert2'
 import { Popover } from 'bootstrap'
 export default {
+    props: ['chapter'],
     data() {
         return {
             alphabetWords: [],
@@ -278,11 +282,19 @@ export default {
             }
 
             return false
+        },
+        selectedChapter() {
+            return this.chapter
+        }
+    },
+    watch: {
+        selectedChapter(newValue, oldValue) {
+            this.getTextbooks()
         }
     },
     methods: {
         async getTextbooks() {
-            const alphabetWords = await axios.get(`/api/alphabets-words/get?user=${'teacher'}`)
+            const alphabetWords = await axios.get(`/api/alphabets-words/get?user=${'teacher'}&chapter=${this.selectedChapter}`)
             let newData = []
             alphabetWords.data.forEach(element => {
                 var variableName = element.letter;
@@ -370,7 +382,7 @@ export default {
 
             const headers = { 'Content-Type': 'multipart/form-data' };
             try {
-                const response = await axios.post('/api/textbook/alphabets-words/add', data, {headers})
+                const response = await axios.post(`/api/textbook/alphabets-words/add?chapter=${this.selectedChapter}`, data, {headers})
                 if (response.status === 200) {
                     this.alphabetContent.flag = null
                     this.alphabetContent.letter = null

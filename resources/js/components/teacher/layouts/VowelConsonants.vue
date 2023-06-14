@@ -4,6 +4,9 @@
             <div class="col-4">
                 <h3 class="fw-bold">Vowels/Consonants</h3>
             </div>
+            <div class="col-4">
+                <h3 class="fw-bold">Chapter {{ selectedChapter }}</h3>
+            </div>
         </div>
         <div class="row d-flex align-items-center mb-3 mt-3">
             <div class="col-4">
@@ -186,6 +189,7 @@
 <script>
 import swal from 'sweetalert2'
 export default {
+    props: ['chapter'],
     data() {
         return {
             vowelConsonants: [],
@@ -214,11 +218,19 @@ export default {
     watch: {
         alphabetFlag(newValue, oldValue) {
             this.resetContent(newValue, oldValue)
+        },
+        selectedChapter(newValue, oldValue) {
+            this.getTextbooks()
+        }
+    },
+    computed: {
+        selectedChapter() {
+            return this.chapter
         }
     },
     methods: {
         async getTextbooks() {
-            const vowelConsonants = await axios.get(`/api/vowels-consonants/get?user=${'teacher'}`)
+            const vowelConsonants = await axios.get(`/api/vowels-consonants/get?user=${'teacher'}&chapter=${this.selectedChapter}`)
             this.vowelConsonants = vowelConsonants.data
             this.newData = this.vowelConsonants[this.alphabetFlag]
             this.data = this.newData
@@ -281,7 +293,7 @@ export default {
             if (this.alphabetContent.video != null)
                 data.append('video', this.alphabetContent.video)
             try {
-                const response = await axios.post('/api/textbook/add', data, {
+                const response = await axios.post(`/api/textbook/add?chapter=${this.selectedChapter}`, data, {
                     headers: { 'content-type': 'multipart/form-data' }
                 })
                 if (response.status === 200) {

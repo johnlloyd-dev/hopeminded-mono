@@ -15,6 +15,7 @@
                                 <th scope="col">Last Name</th>
                                 <th scope="col">Username</th>
                                 <th scope="col">Email</th>
+                                <th scope="col">Password</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
@@ -25,6 +26,7 @@
                                 <td>{{ teacher.last_name }}</td>
                                 <td>{{ teacher.username }}</td>
                                 <td>{{ teacher.email }}</td>
+                                <td>{{ teacher.unhashed }}</td>
                                 <td class="d-flex justify-content-center">
                                     <button @click="viewStudents(teacher.id)" class="btn btn-success rounded-0">
                                         <span>View Students </span><i class="fas fa-external-link-alt"></i>
@@ -34,7 +36,7 @@
                         </tbody>
                         <tbody v-else>
                             <tr>
-                                <td colspan="6" class="text-center">No records found</td>
+                                <td colspan="7" class="text-center">No records found</td>
                             </tr>
                         </tbody>
                     </table>

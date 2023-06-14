@@ -28,6 +28,7 @@ class TextbookController extends Controller
         }
         $textbooks = Textbook::where('teacher_id', $teacherId)
             ->where('flag', 'vowel-consonants')
+            ->where('chapter', $request->get('chapter'))
             ->get()
             ->map(function ($textbooks) {
                 $textbooks->image_url = Storage::url(json_decode($textbooks->image));
@@ -59,6 +60,7 @@ class TextbookController extends Controller
         }
         return Textbook::where('teacher_id', $teacherId)
             ->where('flag', 'alphabet-letters')
+            ->where('chapter', $request->get('chapter'))
             ->get()
             ->map(function ($textbooks) {
                 $textbooks->image_url = Storage::url(json_decode($textbooks->image));
@@ -75,6 +77,7 @@ class TextbookController extends Controller
         }
         return Textbook::where('teacher_id', $teacherId)
             ->where('flag', 'alphabet-words')
+            ->where('chapter', $request->get('chapter'))
             ->get()
             ->map(function ($textbooks) {
                 $images = json_decode($textbooks->image);
@@ -132,7 +135,8 @@ class TextbookController extends Controller
                 'image' => json_encode($imagePath),
                 'video' => json_encode($videoPath),
                 'type' => $alphabetType,
-                'teacher_id' => $teacherId
+                'teacher_id' => $teacherId,
+                'chapter' => $request->get('chapter')
             ]);
 
             return response()->json(['message' => 'An alphabet is added successfully.']);
@@ -202,7 +206,8 @@ class TextbookController extends Controller
             'image' => json_encode($imagePath),
             'video' => json_encode($videoPath),
             'type' => $alphabetType,
-            'teacher_id' => $teacherId
+            'teacher_id' => $teacherId,
+            'chapter' => $request->get('chapter')
         ]);
 
         return response()->json(['message' => 'An alphabet is added successfully.']);
@@ -215,7 +220,10 @@ class TextbookController extends Controller
 
     public function isLetterExist()
     {
+        $teacher = Teacher::where('user_id', Auth::user()->id)->first();
         $count = Textbook::where('flag', request()->flag)
+            ->where('teacher_id', $teacher->id)
+            ->where('chapter', request()->get('chapter'))
             ->where('letter', request()->letter)
             ->count();
 

@@ -116,12 +116,6 @@ class RegisterController extends Controller
                 'attributes' => json_encode($attributes),
             ]);
         // }
-
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
-            $auth = $request->user();
-            $data['fullname'] = $student->first_name . " " . $student->middle_name . " " . $student->last_name;
-            $data['token'] = $auth->createToken('LoginToken')->plainTextToken;
-            return response()->json(['data' => $data]);
-        }
+        return response()->json(['message' => 'You have successfully registered.']);
     }
 }
