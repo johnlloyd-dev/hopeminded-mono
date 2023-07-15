@@ -16,7 +16,7 @@ const review = () => import("../components/student/main/Review.vue");
 const studentLogin = () => import("../components/student/auth/Login.vue");
 const teacherLogin = () => import("../components/teacher/auth/Login.vue");
 const studentRegister = () => import("../components/student/auth/Register.vue");
-const teacherRegister = () => import("../components/teacher/auth/Register.vue");
+const teacherRegister = () => import("../components/student/auth/Register.vue");
 const adminLogin = () => import("../components/admin/auth/Login.vue");
 
 const hangmanGame = () => import("../components/student/game/Hangman.vue");

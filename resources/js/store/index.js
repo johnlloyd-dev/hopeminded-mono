@@ -1,8 +1,4 @@
 import { createStore } from "vuex";
-let alphabets = [];
-let flags = [];
-let data = [];
-let newData = [];
 export const store = new createStore({
     namespaced: true,
     state: {
@@ -14,6 +10,7 @@ export const store = new createStore({
         alphabetWords: {},
         quizInfo: {},
         selectedChapter: null,
+        isLoading: false
     },
     getters: {
         authenticated(state) {
@@ -40,6 +37,9 @@ export const store = new createStore({
         selectedChapter(state) {
             return state.selectedChapter;
         },
+        isLoading(state) {
+            return state.isLoading
+        }
     },
     mutations: {
         SET_AUTHENTICATED(state, value) {
@@ -66,6 +66,9 @@ export const store = new createStore({
         SET_SELECTED_CHAPTER(state, data) {
             state.selectedChapter = data;
         },
+        SET_ISLOADING(state, data) {
+            state.isLoading = data
+        }
     },
     actions: {
         login(context, { users }) {
@@ -80,97 +83,84 @@ export const store = new createStore({
             context.commit("SET_MENU_FLAG", menuFlag);
         },
         async setAlphabetLetters(context, flag) {
-            const alphabets = await axios.get(`/api/alphabets-letters/get?user=${'student'}&chapter=1`);
-            const flags = await axios.get(`/api/flags/alphabet-letters`);
-            let data = [];
-            for (let i = 0; i <= alphabets.data.length - 1; i++) {
-                const letter1 = alphabets.data[i].letter;
-                const letter2 = JSON.parse(flags.data.attributes);
-                alphabets.data[i]["isDone"] = letter2[letter1];
-            }
-            for (let i = 0; i < alphabets.data.length; i += 5) {
-                if (i <= 15) {
-                    const chunk = alphabets.data.slice(i, i + 5);
-                    data.push(chunk);
-                } else {
-                    const chunk = alphabets.data.slice(i, i + 6);
-                    data.push(chunk);
-                    break;
-                }
-            }
-            context.commit("SET_ALPHABET_LETTERS_DATA", data);
-        },
-        async setVowelConsonants(context, { isConsonant, pageFlag, counter }) {
-            if (counter == 0) {
-                alphabets = [];
-                flags = [];
-                data = [];
-                newData = [];
-                alphabets = await axios.get(`/api/vowels-consonants/get?user=${'student'}&chapter=1`);
-                flags = await axios.get(`/api/flags/vowel-consonants`);
-            }
-            alphabets.data.forEach((element) => {
-                for (let i = 0; i <= element.length - 1; i++) {
-                    const letter1 = element[i].letter;
+            try {
+                context.commit("SET_ISLOADING", true);
+                const alphabets = await axios.get(`/api/alphabets-letters/get?user=${'student'}&chapter=1`);
+                const flags = await axios.get(`/api/flags/alphabet-letters`);
+                for (let i = 0; i <= alphabets.data.length - 1; i++) {
+                    const letter1 = alphabets.data[i].letter;
                     const letter2 = JSON.parse(flags.data.attributes);
-                    element[i]["isDone"] = letter2[letter1];
+                    alphabets.data[i]["isDone"] = letter2[letter1];
                 }
-                newData.push(element);
-            });
-            if (isConsonant) {
-                data = [];
-                for (let i = 0; i < newData[1].length; i += 5) {
-                    if (i <= 10) {
-                        const chunk = newData[1].slice(i, i + 5);
-                        data.push(chunk);
-                    } else {
-                        const chunk = newData[1].slice(i, i + 6);
-                        data.push(chunk);
-                        break;
-                    }
-                }
-                data = data[pageFlag];
-            } else {
-                data = [];
-                data.push(newData[0]);
-                data = data[0];
+                context.commit("SET_ALPHABET_LETTERS_DATA", alphabets.data);
+            } catch (error) {
+                console.log(error)
+            } finally {
+                context.commit("SET_ISLOADING", false);
             }
-            context.commit("SET_VOWEL_CONSONANTS_DATA", data);
+        },
+        async setVowelConsonants(context, flag) {
+            try {
+                context.commit("SET_ISLOADING", true);
+                let newData = []
+                const alphabets = await axios.get(`/api/vowels-consonants/get?user=${'student'}&chapter=1`);
+                const flags = await axios.get(`/api/flags/vowel-consonants`);
+                alphabets.data.forEach((element) => {
+                    for (let i = 0; i <= element.length - 1; i++) {
+                        const letter1 = element[i].letter;
+                        const letter2 = JSON.parse(flags.data.attributes);
+                        element[i]["isDone"] = letter2[letter1];
+                    }
+                    newData.push(element);
+                });
+                context.commit("SET_VOWEL_CONSONANTS_DATA", newData);
+            } catch (error) {
+                console.log(error)
+            } finally {
+                context.commit("SET_ISLOADING", false);
+            }
         },
         async setAlphabetWords(context) {
-            let alphabets = await axios.get(
-                `/api/alphabets-words/get?user=${'student'}&chapter=1`
-            );
-            let newData = []
-            alphabets.data.forEach(element => {
-                var variableName = element.letter;
-                var value = element.attributes;
+            try {
+                context.commit("SET_ISLOADING", true);
+                let alphabets = await axios.get(
+                    `/api/alphabets-words/get?user=${'student'}&chapter=1`
+                );
+                let newData = []
+                alphabets.data.forEach(element => {
+                    var variableName = element.letter;
+                    var value = element.attributes;
 
-                var obj = {};
-                obj[variableName] = value;
-                newData.push(obj);
-            });
-            let flags = await axios.get(`/api/flags/alphabet-words`);
-            let data = [];
-            let attributes = JSON.parse(flags.data.attributes);
-            newData.forEach(function (element, index) {
-                let key = Object.keys(element);
-                let flagData = attributes[key];
-                Object.values(element).forEach((element) => {
-                    element.forEach((element2, index) => {
-                        if (flagData.includes(index)) {
-                            element2.isDone = true;
-                        } else {
-                            element2.isDone = false;
-                        }
-                        element[index] = element2;
-                    });
-                    let obj = {};
-                    obj[key] = element; // Using computed property names
-                    data.push(obj);
+                    var obj = {};
+                    obj[variableName] = value;
+                    newData.push(obj);
                 });
-            });
-            context.commit("SET_ALPHABET_WORDS_DATA", data);
+                let flags = await axios.get(`/api/flags/alphabet-words`);
+                let data = [];
+                let attributes = JSON.parse(flags.data.attributes);
+                newData.forEach(function (element, index) {
+                    let key = Object.keys(element);
+                    let flagData = attributes[key];
+                    Object.values(element).forEach((element) => {
+                        element.forEach((element2, index) => {
+                            if (flagData.includes(index)) {
+                                element2.isDone = true;
+                            } else {
+                                element2.isDone = false;
+                            }
+                            element[index] = element2;
+                        });
+                        let obj = {};
+                        obj[key] = element; // Using computed property names
+                        data.push(obj);
+                    });
+                });
+                context.commit("SET_ALPHABET_WORDS_DATA", data);
+            } catch (error) {
+                console.log(error)
+            } finally {
+                context.commit("SET_ISLOADING", false);
+            }
         },
         async getQuizInfo(context, tutorial) {
             let data = [];

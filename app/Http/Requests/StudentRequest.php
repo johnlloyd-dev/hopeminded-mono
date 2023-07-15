@@ -22,10 +22,13 @@ class StudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'firstName' =>'required',
-            'middleName' =>'required',
-            'lastName' =>'required',
-            'accessId' =>'required|unique:students,access_id',
+            'firstName' => 'required',
+            'middleName' => 'required',
+            'lastName' => 'required',
+            'gender' => 'required',
+            'email' => 'required|unique:students,email',
+            'username' => 'required|unique:users,username',
+            'password' => 'required'
         ];
     }
 }

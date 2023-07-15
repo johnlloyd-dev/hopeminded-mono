@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-4">
-                                        <div class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/alphabets.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Alphabets/Letters</h5>
@@ -45,7 +45,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.length < 5 || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/vc.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Vowels/Consonants</h5>
@@ -58,7 +58,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': skillTestVC.length < 5 || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/words.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Alphabets/Words</h5>
@@ -105,7 +105,11 @@ export default {
             pageFlag: 1,
             selectedChapter: 1,
             imgSrc: null,
-            isSwitching: false
+            isSwitching: false,
+            isProcessing: false,
+            skillTestAL: [],
+            skillTestAW: [],
+            skillTestVC: [],
         };
     },
     mounted() {
@@ -114,6 +118,7 @@ export default {
         } else {
             this.selectedChapter = localStorage.getItem('selectedChapter')
         }
+        this.getSkillTest()
     },
     methods: {
         selectChapter(value) {
@@ -138,6 +143,24 @@ export default {
                 }
             } else {
                 this.pageFlag--
+            }
+        },
+        async getSkillTest() {
+            this.isProcessing = true
+            try {
+                const data1 = await axios.get(`/api/skill-test/fetch/${null}/alphabet-letters?flag=student`)
+                const data2 = await axios.get(`/api/skill-test/fetch/${null}/vowel-consonants?flag=student`)
+                const data3 = await axios.get(`/api/skill-test/fetch/${null}/alphabet-words?flag=student`)
+
+                if(data1.status === 200 && data2.status === 200 && data3.status === 200) {
+                    this.skillTestAL = data1.data
+                    this.skillTestVC = data2.data
+                    this.skillTestAW = data3.data
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.isProcessing = false
             }
         },
         selectSubject(subject) {

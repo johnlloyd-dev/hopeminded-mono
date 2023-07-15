@@ -91,7 +91,7 @@ export default {
     },
     beforeUnmount() {
         window.removeEventListener("keyup", this.handleKeyUp, true); // Succeeds
-        this.$router.push('/student-quiz')
+        this.$router.push('/student-textbook')
     },
     methods: {
         ...mapActions({
@@ -410,7 +410,7 @@ export default {
         cancelExit() {
             this.show = false
             window.removeEventListener("keyup", this.handleKeyUp, true); // Succeeds
-            this.$router.push('/student-quiz')
+            this.$router.push('/student-textbook')
         }
     }
 };

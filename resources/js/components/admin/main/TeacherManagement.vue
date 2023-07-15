@@ -10,23 +10,19 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
+                                <th scope="col">Access ID</th>
                                 <th scope="col">First Name</th>
                                 <th scope="col">Middle Name</th>
                                 <th scope="col">Last Name</th>
-                                <th scope="col">Username</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Password</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody v-if="teachers.length !== 0">
                             <tr v-for="teacher in teachers" :key="teacher.id">
+                                <td>{{ teacher.access_id }}</td>
                                 <td>{{ teacher.first_name }}</td>
                                 <td>{{ teacher.middle_name }}</td>
                                 <td>{{ teacher.last_name }}</td>
-                                <td>{{ teacher.username }}</td>
-                                <td>{{ teacher.email }}</td>
-                                <td>{{ teacher.unhashed }}</td>
                                 <td class="d-flex justify-content-center">
                                     <button @click="viewStudents(teacher.id)" class="btn btn-success rounded-0">
                                         <span>View Students </span><i class="fas fa-external-link-alt"></i>
@@ -64,6 +60,20 @@
                     <div class="modal-body">
                         <form>
                             <div class="mb-3">
+                                <label for="accessId" class="form-label">Teacher Access ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" id="basic-addon1">HM-</span>
+                                    <input v-model="auth.accessId" disabled type="text" class="form-control" id="accessId"
+                                        aria-describedby="accessId">
+                                </div>
+                                <small class="text-danger font-weight-bold" v-if="errors && errors.accessId">{{
+                                    errors.accessId[0] }}</small>
+                                <div class="access-id-button mt-3">
+                                    <button class="btn btn-success rounded-0" type="button"
+                                        @click="generateAccessID">Generate Teacher Access ID</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
                                 <label for="firstname" class="form-label">First Name</label>
                                 <input v-model="auth.firstName" type="text" class="form-control" id="firstname"
                                     aria-describedby="firstname">
@@ -87,18 +97,6 @@
                                 <input v-model="auth.email" type="email" class="form-control" id="email">
                                 <small class="text-danger font-weight-bold" v-if="errors && errors.email">{{
                                     errors.email[0] }}</small>
-                            </div>
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input v-model="auth.username" type="text" class="form-control" id="username">
-                                <small class="text-danger font-weight-bold" v-if="errors && errors.username">{{
-                                    errors.username[0] }}</small>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input v-model="auth.password" type="text" class="form-control" id="password">
-                                <small class="text-danger font-weight-bold" v-if="errors && errors.password">{{
-                                    errors.password[0] }}</small>
                             </div>
                         </form>
                     </div>
@@ -128,6 +126,7 @@ export default {
             teachers: [],
             errors: [],
             auth: {
+                accessId: null,
                 firstName: null,
                 middleName: null,
                 lastName: null,
@@ -168,6 +167,7 @@ export default {
                 .then(response => {
                     $('#addTeacherModal').modal('hide')
                     this.getTeachers()
+                    this.auth.accessId = null
                     this.auth.firstName = null
                     this.auth.middleName = null
                     this.auth.lastName = null
@@ -184,7 +184,19 @@ export default {
             this.$router.push({
                 path: `/teacher-management/${teacherId}`
             });
-        }
+        },
+        generateAccessID() {
+            var characters = '0123456789';
+            var accessID = '';
+
+            for (var i = 0; i < 7; i++) {
+                var randomIndex = Math.floor(Math.random() * characters.length);
+                accessID += characters.charAt(randomIndex);
+            }
+
+            this.auth.accessId = accessID;
+
+        },
     }
 }
 </script>

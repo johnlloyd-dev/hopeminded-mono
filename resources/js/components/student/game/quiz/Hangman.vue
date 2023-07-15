@@ -378,7 +378,7 @@ export default {
                             if (result.value) {
                                 this.nextTest()
                             } else if (result.dismiss === swal.DismissReason.cancel) {
-                                window.location.href = '/student-quiz'
+                                window.location.href = '/student-textbook'
                                 return
                             }
                         })
@@ -424,7 +424,7 @@ export default {
         },
         cancelExit() {
             this.show = false
-            this.$router.push('/student-quiz')
+            this.$router.push('/student-textbook')
         },
         setMainScore() {
             if ((this.flag + 1) == 1) {

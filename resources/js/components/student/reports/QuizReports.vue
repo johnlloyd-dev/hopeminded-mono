@@ -25,7 +25,7 @@
                                 <tbody v-else>
                                     <tr v-for="item in data" :key="item.id">
                                         <td>{{ new Date(item.created_at).toLocaleString() }}</td>
-                                        <td>{{ item.total_score }}</td>
+                                        <td>{{ percentage(item.total_score) }}%</td>
                                         <td>{{ item.mark }}</td>
                                     </tr>
                                 </tbody>
@@ -67,6 +67,15 @@ export default {
     methods: {
         navigate() {
             this.$router.push('/student-report')
+        },
+        percentage(score) {
+            if (this.gameId == 1) {
+                return Math.round((score/18) * 100);
+            } else if (this.gameId == 2) {
+                return Math.round((score/51) * 100);
+            } else if (this.gameId == 3) {
+                return Math.round((score/59) * 100);
+            }
         },
         async getQuizReports() {
             this.isProcessing = true;

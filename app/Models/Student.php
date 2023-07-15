@@ -15,8 +15,8 @@ class Student extends Model
         'gender',
         'email',
         'is_registered',
-        'access_id',
         'teacher_id',
-        'user_id'
+        'user_id',
+        'unhashed'
     ];
 }

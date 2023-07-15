@@ -22,12 +22,13 @@ class TeacherRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'firstName' =>'required',
-            'middleName' =>'required',
-            'lastName' =>'required',
-            'email' =>'required|unique:teachers,email',
-            'username' =>'required|unique:users,username',
-            'password' =>'required',
+            'accessId' => 'required|unique:teachers,access_id',
+            'firstName' => 'required',
+            'middleName' => 'required',
+            'lastName' => 'required'
+            // 'email' => 'required|unique:teachers,email',
+            // 'username' => 'required|unique:users,username',
+            // 'password' => 'required',1
         ];
     }
 }

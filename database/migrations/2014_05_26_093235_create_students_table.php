@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->foreignId('teacher_id')->constrained('teachers');
-            $table->string('access_id')->nullable();
             $table->string('first_name');
             $table->string('middle_name');
             $table->string('last_name');
             $table->string('gender')->nullable();
             $table->string('email')->unique()->nullable();
+            $table->string('unhashed')->nullable();
             $table->integer('is_registered')->default(0);
             $table->timestamps();
         });

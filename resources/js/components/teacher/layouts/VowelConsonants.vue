@@ -297,7 +297,6 @@ export default {
                     headers: { 'content-type': 'multipart/form-data' }
                 })
                 if (response.status === 200) {
-                    this.alphabetContent.flag = null
                     this.alphabetContent.letter = null
                     this.alphabetContent.objectName = null
                     this.alphabetContent.image = null

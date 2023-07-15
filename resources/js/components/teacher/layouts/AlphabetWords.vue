@@ -384,7 +384,6 @@ export default {
             try {
                 const response = await axios.post(`/api/textbook/alphabets-words/add?chapter=${this.selectedChapter}`, data, {headers})
                 if (response.status === 200) {
-                    this.alphabetContent.flag = null
                     this.alphabetContent.letter = null
                     this.alphabetContent.objectName = ['']
                     this.alphabetContent.image = [null]

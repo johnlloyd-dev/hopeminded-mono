@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckAccessIdController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\QuizReportController;
+use App\Http\Controllers\SkillTestController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TextbookController;
@@ -158,11 +159,16 @@ Route::middleware('auth:sanctum')->group(function () {
             'message' => 'Textbooks are successfully inserted.'
         ]);
     });
+
+    Route::post('/skill-test/upload', [SkillTestController::class, 'addSkillTest']);
+    Route::get('/skill-test/fetch/{studentId}/{flag}', [SkillTestController::class, 'getSkillTest']);
+    Route::put('/skill-test/update/{skillTestId}', [SkillTestController::class, 'updateSkillTest']);
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);
 Route::get('/reset-password/form', function() {
     return redirect('/reset-password');
 });
+
 
 Route::post('/reset-password', [EmailController::class, 'resetPassword']);

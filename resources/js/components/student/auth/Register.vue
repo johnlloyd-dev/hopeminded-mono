@@ -7,13 +7,13 @@
             <div class="text-center">
                 <img width="150" src="/images/main-logo.png" class="circle-image my-3" alt="Hopeminded Logo">
             </div>
-            <h4 class="text-center mb-2 font-weight-bold title-header mt-3">Student Register</h4>
+            <h4 class="text-center mb-2 font-weight-bold title-header mt-3">Teacher Register</h4>
             <div :class="{ 'card-body': canAccess }">
                 <form>
                     <div v-if="!canAccess">
                         <div class="row mb-2">
                             <div class="col-lg-12">
-                                <h5 class="text-center">Please enter the Access ID provided by your teacher.</h5>
+                                <h5 class="text-center">Please enter your Access ID.</h5>
                                 <label for="accessId" style="font-weight: bold;" class="form-label">Access ID:</label>
                                 <div class="input-group">
                                     <span class="input-group-text" id="basic-addon1">HM-</span>
@@ -125,11 +125,11 @@ export default {
                 lastName: "",
                 email: "",
                 password: "",
-                userFlag: 'student',
+                userFlag: 'teacher',
                 gender: null,
                 password_confirmation: "",
                 username: "",
-                studentId: null
+                teacherId: null
             },
             canAccess: false,
             accessId: '',
@@ -171,7 +171,7 @@ export default {
                     this.auth.firstName = data.first_name;
                     this.auth.middleName = data.middle_name;
                     this.auth.lastName = data.last_name;
-                    this.auth.studentId = data.id;
+                    this.auth.teacherId = data.id;
                     this.canAccess = true
                 }).catch((error) => {
                     this.errors = error.response.data.errors

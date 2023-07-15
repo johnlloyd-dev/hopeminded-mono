@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Teacher extends Model
+class SkillTest extends Model
 {
     use HasFactory;
-    protected $fillable = ['first_name', 'middle_name', 'last_name', 'email', 'user_id', 'unhashed', 'access_id'];
+    protected $fillable = ['student_id', 'letter', 'flag', 'file_url', 'object', 'status'];
 }

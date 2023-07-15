@@ -10,11 +10,11 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th scope="col">Student Access ID</th>
                                 <th scope="col">First Name</th>
                                 <th scope="col">Middle Name</th>
                                 <th scope="col">Last Name</th>
-                                <th scope="col">Status</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Password</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -25,14 +25,11 @@
                         </tbody>
                         <tbody v-else-if="!isLoading && students.length !== 0">
                             <tr v-for="student in students" :key="student.id">
-                                <th scope="row">{{ student.access_id }}</th>
                                 <td>{{ student.first_name }}</td>
                                 <td>{{ student.middle_name }}</td>
                                 <td>{{ student.last_name }}</td>
-                                <td>
-                                    <span v-if="student.is_registered == 0">Pending</span>
-                                    <span v-else>Registered</span>
-                                </td>
+                                <td>{{ student.username }}</td>
+                                <td>{{ student.unhashed }}</td>
                                 <td class="d-flex justify-content-center">
                                     <button @click="viewReport(student.id)" class="btn btn-success rounded-0">
                                         <span>Student Report </span><i class="fas fa-external-link-alt"></i>
@@ -63,26 +60,13 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%" class="logo" alt="Hopeminded Logo">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%"
+                            class="logo" alt="Hopeminded Logo">
                         <h5 class="modal-title" id="addStudentModalLabel">Add Student</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form>
-                            <div class="mb-3">
-                                <label for="accessId" class="form-label">Student Access ID</label>
-                                <div class="input-group">
-                                    <span class="input-group-text" id="basic-addon1">HM-</span>
-                                    <input v-model="auth.accessId" disabled type="text" class="form-control" id="accessId"
-                                        aria-describedby="accessId">
-                                </div>
-                                <small class="text-danger font-weight-bold" v-if="errors && errors.accessId">{{
-                                    errors.accessId[0] }}</small>
-                                <div class="access-id-button mt-3">
-                                    <button class="btn btn-success rounded-0" type="button"
-                                        @click="generateAccessID">Generate Student Access ID</button>
-                                </div>
-                            </div>
                             <div class="mb-3">
                                 <label for="firstname" class="form-label">First Name</label>
                                 <input v-model="auth.firstName" type="text" class="form-control" id="firstname"
@@ -101,6 +85,34 @@
                                 <input v-model="auth.lastName" type="text" class="form-control" id="lastname">
                                 <small class="text-danger font-weight-bold" v-if="errors && errors.lastName">{{
                                     errors.lastName[0] }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Gender:</label>
+                                <select v-model="auth.gender" class="form-select">
+                                    <option :value="null" selected disabled>Select Gender:</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                                <small class="text-danger font-weight-bold" v-if="errors && errors.gender">{{
+                                    errors.gender[0] }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input v-model="auth.email" type="email" class="form-control" id="email">
+                                <small class="text-danger font-weight-bold" v-if="errors && errors.email">{{
+                                    errors.email[0] }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input v-model="auth.username" type="text" class="form-control" id="username">
+                                <small class="text-danger font-weight-bold" v-if="errors && errors.username">{{
+                                    errors.username[0] }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input v-model="auth.password" type="text" class="form-control" id="password">
+                                <small class="text-danger font-weight-bold" v-if="errors && errors.password">{{
+                                    errors.password[0] }}</small>
                             </div>
                         </form>
                     </div>
@@ -134,7 +146,10 @@ export default {
                 firstName: null,
                 middleName: null,
                 lastName: null,
-                accessId: null
+                gender: null,
+                email: null,
+                username: null,
+                password: null
             }
         }
     },
@@ -163,7 +178,7 @@ export default {
                 })
                 .catch(error => {
                     console.log(error)
-                }) .finally(() => {
+                }).finally(() => {
                     this.isLoading = false
                 })
 
@@ -192,10 +207,13 @@ export default {
                 .then(response => {
                     $('#addStudentModal').modal('hide')
                     this.getStudents()
-                    this.auth.accessId = null
+                    this.auth.email = null
                     this.auth.firstName = null
                     this.auth.middleName = null
                     this.auth.lastName = null
+                    this.auth.gender = null
+                    this.auth.username = null
+                    this.auth.password = null
                     swal.fire('Success', response.data.message, 'success')
                 })
                 .catch(error => {

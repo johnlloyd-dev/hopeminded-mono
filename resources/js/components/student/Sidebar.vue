@@ -38,11 +38,11 @@ export default {
                     title: 'Textbook',
                     icon: 'fa-solid fa-book-open-reader',
                 },
-                {
-                    href: '/student-quiz',
-                    title: 'Quiz',
-                    icon: 'fa-solid fa-pen-to-square',
-                },
+                // {
+                //     href: '/student-quiz',
+                //     title: 'Quiz',
+                //     icon: 'fa-solid fa-pen-to-square',
+                // },
                 {
                     href: '/student-report',
                     title: 'Report',

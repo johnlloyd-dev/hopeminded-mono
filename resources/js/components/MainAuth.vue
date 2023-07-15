@@ -35,7 +35,7 @@
                                     password?</a></span>
                         </div>
                         <hr>
-                        <h6 class="text-dark fw-bold">FOR STUDENTS</h6>
+                        <h6 class="text-dark fw-bold">FOR TEACHERS</h6>
                         <span style="font-weight: bold" class="text-dark">Don't have an account yet? <a
                                 class="cursor-pointer" style="font-weight: bold"
                                 @click="redirectRegister">Register</a></span>
@@ -116,7 +116,7 @@ export default {
     },
     methods: {
         redirectRegister() {
-            this.$router.push({ path: '/student-register' })
+            this.$router.push({ path: '/teacher-register' })
         },
         forgotPassword() {
             $('#forgotPasswordModal').modal('show')

@@ -6,7 +6,7 @@
                 <div class="d-flex justify-content-center">
                     <div class="card rounded-0 py-5 px-5" style="width: 100%;">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h4 class="card-title">Play Tutorial</h4>
+                            <h4 class="card-title">Play Trial</h4>
                             <img src="/images/kids.png" alt="Kids" width="150">
                         </div>
 

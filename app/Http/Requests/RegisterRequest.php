@@ -26,12 +26,12 @@ class RegisterRequest extends FormRequest
             'middleName' => 'required',
             'lastName' => 'required',
             'userFlag' => 'required',
-            'gender' => 'required_if:userFlag,student',
+            // 'gender' => 'required_if:userFlag,student',
             'email' => 'required|email|unique:students,email',
             'username' => 'required|unique:users,username',
             'password' => 'required|min:8|confirmed',
             'password_confirmation' => 'required|min:8',
-            'studentId' => 'nullable'
+            'teacherId' => 'nullable'
         ];
     }
 

@@ -63,6 +63,10 @@ class GameController extends Controller
         $balloonPassingScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 20 : 38;
         $memoryPassingScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 9 : 44;
 
+        $hangmanPerfectScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 8 : 18;
+        $balloonPerfectScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 26 : 51;
+        $memoryPerfectScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 12 : 59;
+
         if($request->get('gameId') == 1) {
             if ($request->score < $hangmanPassingScore) {
                 $mark = 'failed';

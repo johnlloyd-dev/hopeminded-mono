@@ -28,5 +28,27 @@ body {
     height: 150px; /* adjust the size as needed */
     border-radius: 50%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.4);
-  }
+}
+
+.scrollbar {
+    height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/*       ScrollBar 1        */
+#scrollbar1::-webkit-scrollbar {
+    width: 10px;
+}
+
+#scrollbar1::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: #e7e7e7;
+    border: 1px solid #cacaca;
+}
+
+#scrollbar1::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #d55959;
+}
 

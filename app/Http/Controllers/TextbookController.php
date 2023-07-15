@@ -29,6 +29,7 @@ class TextbookController extends Controller
         $textbooks = Textbook::where('teacher_id', $teacherId)
             ->where('flag', 'vowel-consonants')
             ->where('chapter', $request->get('chapter'))
+            ->orderBy('letter', 'ASC')
             ->get()
             ->map(function ($textbooks) {
                 $textbooks->image_url = Storage::url(json_decode($textbooks->image));
@@ -61,6 +62,7 @@ class TextbookController extends Controller
         return Textbook::where('teacher_id', $teacherId)
             ->where('flag', 'alphabet-letters')
             ->where('chapter', $request->get('chapter'))
+            ->orderBy('letter', 'ASC')
             ->get()
             ->map(function ($textbooks) {
                 $textbooks->image_url = Storage::url(json_decode($textbooks->image));
@@ -78,6 +80,7 @@ class TextbookController extends Controller
         return Textbook::where('teacher_id', $teacherId)
             ->where('flag', 'alphabet-words')
             ->where('chapter', $request->get('chapter'))
+            ->orderBy('letter', 'ASC')
             ->get()
             ->map(function ($textbooks) {
                 $images = json_decode($textbooks->image);
@@ -112,18 +115,22 @@ class TextbookController extends Controller
         }
 
         if ($request->has('image') && $request->has('video')) {
+            $storagePath = null;
             if ($request->flag == 'alphabet-letters') {
                 $storagePath = 'alphabets-letters';
             } else if ($request->flag == 'vowel-consonants') {
                 $storagePath = 'vowels-consonants';
             }
+
+            // return $storagePath;
+
             $imageFile = $request->file('image');
             $imageFileName = $imageFile->getClientOriginalName();
-            $imagePath = $imageFile->storeAs(`{$storagePath}/images`, $imageFileName, 'public');
+            $imagePath = $imageFile->storeAs($storagePath . '/images', $imageFileName, 'public');
 
             $videoFile = $request->file('video');
             $videoFileName = $videoFile->getClientOriginalName();
-            $videoPath = $videoFile->storeAs(`{$storagePath}/videos`, $videoFileName, 'public');
+            $videoPath = $videoFile->storeAs($storagePath . '/videos', $videoFileName, 'public');
 
             $alphabetType = in_array($request->letter, ['a', 'e', 'i', 'o', 'u']) ? 'vowel' : 'consonant';
 

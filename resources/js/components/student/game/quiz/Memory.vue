@@ -9,7 +9,7 @@
                 <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
                 <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
             </h3>
-            <h3 class="fw-bold text-center w-100 mt-3">Timer: 00:{{ time }}</h3>
+            <!-- <h3 class="fw-bold text-center w-100 mt-3">Timer: 00:{{ time }}</h3> -->
             <div class="row w-100">
                 <div class="col-6">
                     <h4 class="text-left">Highest Score: {{ highestScore }}</h4>
@@ -45,6 +45,37 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="alphabetChoiceModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="alphabetChoiceModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h5 class="text-center">What sign represents the matched object?</h5>
+                        <div class="row">
+                            <div class="col-6 d-flex justify-content-center align-items-center">
+                                <h1 style="font-size: 70px" v-if="Object.keys(matchedObject).length" class="fw-bold fst-italic">{{ matchedObject.icon.toUpperCase() }}</h1>
+                            </div>
+                            <div class="col-6">
+                                <img v-if="Object.keys(matchedObject).length" style="width: 150px" :src="matchedObject.image" alt="">
+                            </div>
+                        </div>
+                        <hr>
+                        <div v-if="matched" class="row text-center">
+                            <div class="status">
+                                <h2>Strikes:</h2>
+                                <ul class="status">
+                                    <li v-for="strike in strikes" :key="strike">{{ strike.icon }}</li>
+                                </ul>
+                            </div>
+                            <div v-for="option in alphabetOptions" :key="option.letter" class="col-6 mb-3">
+                                <button :class="{'vibrating-element bg-danger': !letter_selection.mark && option.letter === letter_selection.letter, 'bg-success': letter_selection.mark && option.letter === letter_selection.letter}" @click="handleMatched(option.letter)" style="height: 200px; width: 200px" class="btn border">
+                                    <img style="width: 100px;" :src="option.image">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -59,10 +90,24 @@ const duplicate = (arr) => {
 // Check if two cards are a match
 const checkMatch = (icons) => {
     if (icons[0] === icons[1]) {
-        console.log("it's a match");
         return true;
     }
 };
+
+//Change this if you want more or fewer strikes allowed
+const allowedStrikes = 3 //If you set this and maxLength both too high, the puzzle will be impossible to lose.
+
+const defaultStrikes = [];
+
+for (let i = 0; i < allowedStrikes; i++) {
+    const key = Math.floor(Math.random() * 100); // Generate a random number between 0 and 99
+
+    defaultStrikes.push({
+        key: key,
+        icon: '⚪',
+        guess: ''
+    });
+}
 
 export default {
     data() {
@@ -73,6 +118,12 @@ export default {
             show: false,
             runing: false,
             score: 0,
+            matched: false,
+            letter_selection: {},
+            strikes: [...defaultStrikes],
+            matchedObject: {},
+            matchedData: [],
+            alphabets: [],
             previousScore: 0,
             chances: null,
             disabledGame: false,
@@ -114,6 +165,15 @@ export default {
                     console.log(error);
                 })
         },
+        fetchAlphabets() {
+            axios.get('storage/json/balloon-game.json')
+                .then(response => {
+                    this.alphabets = response.data
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+        },
         async initQuizInfo() {
             this.disabledGame = true
             const data = await axios.get(`/api/quiz-reports/get?gameId=${3}`)
@@ -139,9 +199,10 @@ export default {
                         `
                     }).then((result) => {
                         if (result.value) {
-                            this.startTimer();
+                            // this.startTimer();
                             this.disabledGame = false
                             this.storeQuizInfo()
+                            this.fetchAlphabets()
                             this.fetchData();
                         }
                     })
@@ -172,7 +233,7 @@ export default {
                             `
                         }).then((result) => {
                             if (result.value) {
-                                this.startTimer();
+                                // this.startTimer();
                                 this.disabledGame = false
                                 this.storeQuizInfo()
                                 this.fetchData();
@@ -192,7 +253,7 @@ export default {
                         this.text = `Sorry. You already used up your play chances.`
                         this.cancelButtonText = 'Exit'
                     } else {
-                        this.startTimer();
+                        // this.startTimer();
                         this.disabledGame = false
                         this.storeQuizInfo()
                         this.fetchData();
@@ -255,32 +316,72 @@ export default {
                             }
                         });
                         if (match) {
-                            if (this.flag == 0) {
-                                this.memoryGame.score += 1;
-                            } else if (this.flag == 1) {
-                                this.memoryGame.score += 2;
-                            } else if (this.flag == 2) {
-                                this.memoryGame.score += 3;
-                            }
-                            if (this.memoryGame.score == 5 || this.memoryGame.score == 23) {
-                                clearInterval(this.timer);
-                                this.show = true
-                                this.text = `You finished level ${this.flag + 1}. Proceed to level ${this.flag + 2}.`
-                                this.nextButtonText = `Level ${this.flag + 2}`
-                            } else if (this.memoryGame.score == 59) {
-                                clearInterval(this.timer);
-                                this.show = true
-                                this.text = `Congratulations! You finished all 3 levels. Your score is ${this.memoryGame.score}.`
-                                this.nextButtonText = 'Replay'
-                                this.cancelButtonText = 'Exit'
-                            }
-
-                            this.updateQuizInfo()
+                            this.matched = true
+                            this.matchedData = cardClicked
+                            this.matchedObject = this.matchedData
+                            $('#alphabetChoiceModal').modal('show')
+                        } else {
+                            this.matched = false
                         }
                         this.runing = false;
                     }, 1000);
                 }
             }
+        },
+        handleMatched(letter) {
+            if(letter.toLowerCase() !== this.matchedData.icon.toLowerCase()) {
+                this.strikes.pop()
+                this.strikes = [{ key: Math.floor(Math.random() * 100), icon: '🚫', guess: letter }, ...this.strikes]
+                this.letter_selection = { mark: 0, letter: letter }
+            }
+
+            if (this.strikeout) {
+                $('#alphabetChoiceModal').modal('hide')
+                this.show = true
+                this.text = `Game Over. Your score is ${this.memoryGame.score}.`
+                this.nextButtonText = 'Replay'
+                this.cancelButtonText = 'Exit'
+            } else {
+                if (letter.toLowerCase() === this.matchedData.icon.toLowerCase()) {
+                    this.letter_selection = { mark: 1, letter: letter }
+                    this.cards.forEach((card) => {
+                        if (this.matched && !card.down && !card.matched) {
+                            card.matched = true;
+                        } else {
+                            card.down = true;
+                        }
+                    });
+                    setTimeout(() => {
+                        $('#alphabetChoiceModal').modal('hide')
+                        this.matchedData = []
+                        this.matched = false
+                        this.letter_selection = {}
+                        this.matchedObject = {}
+                    }, 1000)
+                    if (this.flag == 0) {
+                        this.memoryGame.score += 1;
+                    } else if (this.flag == 1) {
+                        this.memoryGame.score += 2;
+                    } else if (this.flag == 2) {
+                        this.memoryGame.score += 3;
+                    }
+                    if (this.memoryGame.score == 5 || this.memoryGame.score == 23) {
+                        clearInterval(this.timer);
+                        this.show = true
+                        this.text = `You finished level ${this.flag + 1}. Proceed to level ${this.flag + 2}.`
+                        this.nextButtonText = `Level ${this.flag + 2}`
+                    } else if (this.memoryGame.score == 59) {
+                        clearInterval(this.timer);
+                        this.show = true
+                        this.text = `Congratulations! You finished all 3 levels. Your score is ${this.memoryGame.score}.`
+                        this.nextButtonText = 'Replay'
+                        this.cancelButtonText = 'Exit'
+                    }
+
+                    this.updateQuizInfo()
+                }
+            }
+
         },
         storeQuizInfo() {
             axios.post(`/api/quiz/info/store/memory-game`, this.memoryGame)
@@ -313,7 +414,7 @@ export default {
         },
         cancelExit() {
             this.show = false
-            this.$router.push('/student-quiz')
+            this.$router.push('/student-textbook')
         },
         startTimer() {
             this.timer = setInterval(() => {
@@ -359,6 +460,28 @@ export default {
                 icons: icons
             }
         },
+        badGuesses() {
+            return this.strikes.filter(s => s.guess).map(s => s.guess)
+        },
+        strikeout() {
+            return this.badGuesses.length >= allowedStrikes
+        },
+        alphabetOptions() {
+            if (this.matched) {
+                let data = []
+                let matchedLetter = this.matchedData.icon.toLowerCase()
+                let selectedObject = this.alphabets.find((data) => { return data.letter === matchedLetter })
+                let filterObjects = this.alphabets.filter((data) => { return data.letter !== matchedLetter })
+                let newData = _.sampleSize(filterObjects, 3);
+                data.push(selectedObject)
+                newData.forEach((item) => {
+                    data.push(item)
+                })
+                return _.shuffle(data)
+            } else {
+                return []
+            }
+        }
     }
 }
 </script>
@@ -407,6 +530,21 @@ body {
 
 img {
     width: 100%;
+}
+
+@keyframes vibrate {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-2px) rotate(-1deg); }
+  40% { transform: translateX(2px) rotate(1deg); }
+  60% { transform: translateX(-2px) rotate(-1deg); }
+  80% { transform: translateX(2px) rotate(1deg); }
+  100% { transform: translateX(0); }
+}
+
+.vibrating-element {
+  animation: vibrate 1s;
+  animation-iteration-count: 1;
+  transition: opacity 1s;
 }
 
 .victoryState {
@@ -632,6 +770,35 @@ img {
                     inset 2px 2px 10px 3px #822828;
             }
         }
+    }
+}
+
+.status {
+    display: flex;
+    flex-wrap: wrap;
+    list-style-type: none;
+    align-items: center;
+    margin: 1rem 0;
+
+    h2 {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    ul {
+        display: flex;
+        margin: 0;
+        padding: 0;
+
+        li {
+            margin-left: 0.25em;
+        }
+    }
+
+    p {
+        font-size: 1rem;
+        width: 100%;
+        margin: 0;
     }
 }
 </style>

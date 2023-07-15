@@ -13,15 +13,6 @@
                                 <div class="col-4">
                                     <div class="card">
                                         <div class="card-body d-flex justify-content-center">
-                                            <button @click="navigate('alphabet-words')" class="btn btn-secondary">
-                                                Alphabets/Words
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="card">
-                                        <div class="card-body d-flex justify-content-center">
                                             <button @click="navigate('alphabet-letters')" class="btn btn-primary">
                                                 Alphabets/Letters
                                             </button>
@@ -33,6 +24,15 @@
                                         <div class="card-body d-flex justify-content-center">
                                             <button @click="navigate('vowel-consonants')" class="btn btn-success">
                                                 Vowel/Consonants
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card">
+                                        <div class="card-body d-flex justify-content-center">
+                                            <button @click="navigate('alphabet-words')" class="btn btn-secondary">
+                                                Alphabets/Words
                                             </button>
                                         </div>
                                     </div>
