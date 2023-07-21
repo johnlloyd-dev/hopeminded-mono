@@ -19,7 +19,10 @@
             </div>
             <div class="row">
                 <div class="col-6 text-center">
-                    <button type="button" class="btn btn-primary rounded-0" @click="saveVideo">Save Video</button>
+                    <button style="font-weight: bold; width: 150px;" v-if="!isLoading" type="button" class="btn btn-primary rounded-0" @click="saveVideo">Submit Video</button>
+                    <button style="font-weight: bold; width: 150px;" v-else type="button" class="btn btn-primary rounded-0" @click="saveVideo">
+                        <Loading/>
+                    </button>
                 </div>
                 <div class="col-6 text-center">
                     <button type="button" class="btn btn-primary rounded-0" @click="retake">Retake</button>
@@ -30,14 +33,19 @@
 </template>
 
 <script>
+import Loading from '../../loading/Loading.vue'
 export default {
     props: ['active'],
+    components: {
+        Loading
+    },
     data() {
         return {
             videoStream: null,
             mediaRecorder: null,
             chunks: [],
             recording: false,
+            isLoading: false,
             recordedVideoURL: ''
         };
     },
@@ -101,6 +109,7 @@ export default {
             this.$refs.previewElement.src = this.recordedVideoURL;
         },
         async saveVideo() {
+            this.isLoading = true
             const blob = new Blob(this.chunks, { type: 'video/webm' });
             const formData = new FormData();
             var currentTime = new Date();
@@ -123,6 +132,8 @@ export default {
                 }
             } catch (error) {
                 console.log(error)
+            } finally {
+                this.isLoading = false
             }
         },
     },

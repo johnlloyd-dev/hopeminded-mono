@@ -39,15 +39,17 @@
                                     <div v-for="(item, index) in newData[0]" :key="item.image"
                                         class="col-lg-4 col-md-6 text-center mb-4">
                                         <div class="position-relative badge-overlay">
-                                            <img width="300" height="200" class="rounded box-shadow" :src="item.image"
+                                            <img width="250" height="150" class="rounded box-shadow" :src="item.image"
                                                 alt="" />
                                             <!-- <span v-if="item.isDone"
                                                 class="img-badge">
                                                 <i class="fas fa-check-circle fa-2xl text-black"></i>
                                             </span> -->
                                         </div>
-                                        <div class="d-flex justify-content-center mt-3">
-                                            <div style="width: 60%" class="d-grid gap-2">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <div style="width: 75%" v-if="!hasSubmitted(item.object).length" class="alert alert-danger rounded-0 mb-0 mt-3 fw-bold text-center" role="alert">No skill test submitted.</div>
+                                            <div style="width: 75%" v-else class="alert alert-success mb-0 fw-bold text-center rounded-0 mt-3" role="alert">Uploaded Skill Test: {{ hasSubmitted(item.object).length }}</div>
+                                            <div style="width: 75%" class="d-grid gap-2">
                                                 <button type="button" @click="setVideo(index)"
                                                     class="btn btn-primary btn-lg rounded-0 fw-bold mt-3">
                                                     Play <i class="fas fa-play-circle"></i>
@@ -58,7 +60,7 @@
                                     <div data-bs-toggle="modal" data-bs-target="#skillTestModal"
                                         class="col-lg-4 col-md-6 text-center mb-4 position-relative">
                                         <button type="button"
-                                            class="btn btn btn-success position-absolute start-50 top-50 translate-middle">
+                                            class="btn btn btn-success position-absolute start-50 top-50 translate-middle rounded-0">
                                             View Submitted Skill Test <i class="fas fa-external-link-alt"></i>
                                         </button>
                                     </div>
@@ -253,6 +255,11 @@ export default {
         }),
         navigate() {
             this.$router.push('/student-textbook')
+        },
+        hasSubmitted(object) {
+            return this.selectedSkillTest.filter((data) => {
+                return data.object === object
+            })
         },
         setVideo(index) {
             this.video = this.newData[0][index].video;

@@ -23,7 +23,7 @@
                 <div v-for="(card, index) in cards" :key="index"
                     :class="[{ 'down': card.down && !card.matched, 'up': !card.down, 'matched': card.matched }, ' card']"
                     v-on:click="handleClick(card)">
-                    <img :src="card.image" />
+                    <img draggable="false" :src="card.image" />
                 </div>
             </div>
         </div>

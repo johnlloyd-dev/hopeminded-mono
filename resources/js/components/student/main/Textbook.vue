@@ -45,7 +45,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.length < 5 || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.length < 0 || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/vc.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Vowels/Consonants</h5>
@@ -58,7 +58,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div :class="{ 'opacity-75 pe-none': skillTestVC.length < 5 || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': skillTestVC.length < 0 || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/words.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Alphabets/Words</h5>

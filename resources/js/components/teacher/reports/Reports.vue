@@ -24,6 +24,69 @@
                         <label class="btn btn-outline-dark fw-bold rounded-0"
                             :class="gameId == 3 ? 'text-white' : 'text-black'" for="btnradio3">Memory Game</label>
                     </div>
+                </div>
+                <AlphabetLettersReports :student-id="studentId" :flag="flag" :game-name="gameName"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <!-- <div class="d-flex justify-content-between">
+                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" v-model="gameId" :value="1" id="btnradio1" autocomplete="off"
+                            :checked="gameId == 1">
+                        <label class="btn btn-outline-dark fw-bold rounded-0"
+                            :class="gameId == 1 ? 'text-white' : 'text-black'" for="btnradio1">Hangman Game</label>
+
+                        <input type="radio" class="btn-check" v-model="gameId" :value="2" id="btnradio2" autocomplete="off"
+                            :checked="gameId == 2">
+                        <label class="btn btn-outline-dark fw-bold rounded-0"
+                            :class="gameId == 2 ? 'text-white' : 'text-black'" for="btnradio2">Typing Balloon</label>
+
+                        <input type="radio" class="btn-check" v-model="gameId" :value="3" id="btnradio3" autocomplete="off"
+                            :checked="gameId == 3">
+                        <label class="btn btn-outline-dark fw-bold rounded-0"
+                            :class="gameId == 3 ? 'text-white' : 'text-black'" for="btnradio3">Memory Game</label>
+                    </div>
                     <div>
                         <button data-bs-toggle="modal" data-bs-target="#skillTestModal"
                             class="btn btn-secondary rounded-0 fw-bold">Check Skill Test</button>
@@ -99,9 +162,9 @@
                             </li>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
-            <div class="modal fade" id="skillTestModal" aria-hidden="true" data-bs-backdrop="static"
+            <!-- <div class="modal fade" id="skillTestModal" aria-hidden="true" data-bs-backdrop="static"
                 aria-labelledby="skillTestModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered modal-fullscreen">
                     <div class="modal-content">
@@ -170,14 +233,17 @@
                                                                 <video class="video-width" ref="previewElement"
                                                                     :src="item.file_url" controls></video>
                                                             </div>
-                                                            <h5 class="text-center fw-bold text-danger">Status: {{ item.status.toUpperCase() }}</h5>
+                                                            <h5 class="text-center fw-bold text-danger">Status: {{
+                                                                item.status.toUpperCase() }}</h5>
                                                             <div class="mt-3">
                                                                 <div class="d-flex justify-content-around px-0">
-                                                                    <button type="button" @click="updateSkillTest('correct', item.id)"
+                                                                    <button type="button"
+                                                                        @click="updateSkillTest('correct', item.id)"
                                                                         class="btn btn-success btn-lg rounded-0 fw-bold">
                                                                         Correct <i class="fas fa-check"></i>
                                                                     </button>
-                                                                    <button type="button" @click="updateSkillTest('wrong', item.id)"
+                                                                    <button type="button"
+                                                                        @click="updateSkillTest('wrong', item.id)"
                                                                         class="btn btn-danger btn-lg rounded-0 fw-bold">
                                                                         Wrong <i class="fas fa-times"></i>
                                                                     </button>
@@ -205,7 +271,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -213,8 +279,11 @@
 <script>
 import swal from 'sweetalert2'
 import Loading from '../../loading/Loading.vue'
+import AlphabetLettersReports from '../reports/AlphabetLetters.vue'
+
 export default {
     components: {
+        AlphabetLettersReports,
         Loading
     },
     data() {
@@ -251,7 +320,13 @@ export default {
         $('#skillTestModal').modal('hide')
     },
     watch: {
-        gameId() {
+        gameId(value) {
+            if (value === 1)
+                this.flag = 'alphabet-words'
+            else if (value === 2)
+                this.flag = 'vowel-consonants'
+            else
+                this.flag = 'alphabet-letters'
             this.certificates = []
             this.isLoading = true
             this.filterReports()
@@ -388,7 +463,7 @@ export default {
         async updateSkillTest(status, id) {
             try {
                 const response = await axios.put(`/api/skill-test/update/${id}?status=${status}`)
-                if(response.status === 200) {
+                if (response.status === 200) {
                     swal.fire('Sucess', response.data.message, 'success')
                     this.getSkillTest();
                 }

@@ -33,16 +33,18 @@
                     <template v-if="!isLoading">
                         <div v-if="selectedAlphabet">
                             <div class="text-center">
-                                <img style="width: 60%" class="rounded box-shadow" :src="selectedAlphabet.image_url" alt="" />
+                                <img style="width: 40%" class="rounded box-shadow" :src="selectedAlphabet.image_url" alt="" />
                             </div>
                             <div class="d-flex justify-content-center mt-3">
-                                <div style="width: 60%" class="d-grid gap-2">
+                                <div style="width: 40%" class="d-grid gap-2">
                                     <button type="button" @click="setVideo()"
                                         class="btn btn-primary btn-lg rounded-0 fw-bold mt-3">
                                         Play <i class="fas fa-play-circle"></i>
                                     </button>
-                                    <button data-bs-toggle="modal" data-bs-target="#skillTestModal" type="button"
-                                        class="btn btn-success btn-lg rounded-0 fw-bold mt-3">
+                                    <div v-if="selectedSkillTest && !selectedSkillTest.length" class="alert alert-danger mb-0 mt-3 fw-bold text-center" role="alert">No skill test submitted for this alphabet yet.</div>
+                                    <div v-else class="alert alert-success mb-0 mt-3 fw-bold text-center" role="alert">Uploaded Skill Test: {{ selectedSkillTest.length }}</div>
+                                    <button :disabled="selectedSkillTest && !selectedSkillTest.length" data-bs-toggle="modal" data-bs-target="#skillTestModal" type="button"
+                                        class="btn btn-success btn-lg rounded-0 fw-bold">
                                         View Submitted Skill Test <i class="fas fa-external-link-alt"></i>
                                     </button>
                                 </div>
@@ -81,7 +83,7 @@
                         </button>
                         <button @click="active = true" type="button" class="btn btn-primary rounded-0" data-bs-target="#recordVideoModal"
                             data-bs-toggle="modal" data-bs-dismiss="modal">
-                            Record a Video
+                            Record a skill test
                         </button>
                     </div>
                 </div>
