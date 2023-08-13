@@ -1,7 +1,11 @@
 <template>
     <sidebar-menu :menu="menu" :theme="theme" :collapsed="collapsed" @update:collapsed="onCollapse" @item-click="onItemClick">
         <template v-slot:header>
-            <div class="d-flex align-items-center justify-content-center flex-column pt-3" style="height: 110px;">
+            <div class="d-flex align-items-center justify-content-center flex-column pt-3 position-relative" style="height: 110px;">
+                <button style="right: 20px" type="button" class="icon-button mt-3 position-absolute top-0">
+                    <i class="far fa-bell fa-lg"></i>
+                    <span class="icon-button__badge">2</span>
+                </button>
                 <div class="profile-image" :class="{ 'mb-3' : !collapsed }">
                     <img src="/images/user-icon.png" alt="User profile image">
                 </div>

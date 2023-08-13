@@ -7,7 +7,7 @@
                         Back
                     </button>
                 </div>
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between mb-3">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                         <input type="radio" class="btn-check" v-model="gameId" :value="1" id="btnradio1" autocomplete="off"
                             :checked="gameId == 1">
@@ -25,7 +25,32 @@
                             :class="gameId == 3 ? 'text-white' : 'text-black'" for="btnradio3">Memory Game</label>
                     </div>
                 </div>
-                <AlphabetLettersReports :student-id="studentId" :flag="flag" :game-name="gameName"/>
+                <div class="perfect-score-handler">
+                    <div class="card rounded-0" style="width: 400px">
+                        <div class="card-body">
+                            <h5 class="fw-bold">Set Skill Test Perfect Score</h5>
+                            <div v-if="!isModifyPerfectScore">
+                                Perfect Score: <span class="fw-bold text-danger">{{ perfect_score.score }} <small class="text-danger" v-if="!perfect_score.id">{{ '(default)' }}</small></span>
+                                <span class="ms-3">
+                                    <button class="btn btn-primary rounded-0 btn-sm" @click="isModifyPerfectScore = !isModifyPerfectScore">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <div v-else>
+                                <form @submit.prevent="modifyPerfectScore()">
+                                    <div class="mb-3">
+                                        <label for="scoreInput" class="form-label">Perfect Score:</label>
+                                        <input type="text" v-model="setScore.score" class="form-control rounded-0" id="scoreInput" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-0 me-3">Save</button>
+                                    <button @click="isModifyPerfectScore = !isModifyPerfectScore" class="btn btn-secondary btn-sm rounded-0">Back</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <AlphabetReports ref="AlphabetReports" :reports="reports" :student-id="studentId" :flag="flag" :game-name="gameName" :quiz-report-average="quizReportAverage" />
 
 
 
@@ -279,11 +304,11 @@
 <script>
 import swal from 'sweetalert2'
 import Loading from '../../loading/Loading.vue'
-import AlphabetLettersReports from '../reports/AlphabetLetters.vue'
+import AlphabetReports from '../reports/AlphabetReports.vue'
 
 export default {
     components: {
-        AlphabetLettersReports,
+        AlphabetReports,
         Loading
     },
     data() {
@@ -295,10 +320,19 @@ export default {
             studentId: null,
             file: '',
             certificates: [],
+            quizReportAverage: 0,
+            isModifyPerfectScore: false,
             isProcessing: false,
             isLoading: false,
+            perfectScoreMessage: null,
             errors: [],
-            flag: 'alphabet-letters',
+            perfect_score: {},
+            default_perfect_score: 10,
+            flag: 'alphabet-words',
+            setScore: {
+                score: null,
+                perfect_score_id: null
+            },
             formData: {
                 statusMark: 'correct'
             },
@@ -314,7 +348,8 @@ export default {
         this.studentId = this.$route.params.studentId
         this.getReports()
         this.getCertificates()
-        this.getSkillTest()
+        // this.getSkillTest()
+        this.getPerfectScore()
     },
     beforeUnmount() {
         $('#skillTestModal').modal('hide')
@@ -335,7 +370,7 @@ export default {
         flag() {
             this.skillTest = []
             this.isLoading = true
-            this.getSkillTest()
+            // this.getSkillTest()
         }
     },
     computed: {
@@ -376,6 +411,15 @@ export default {
                 this.isLoading = false
             }
         },
+        async getPerfectScore() {
+           try {
+                const response = await axios.get(`/api/perfect-score/get`)
+                this.perfect_score = response.data
+                this.setScore.score = response.data.score ?? this.default_perfect_score
+            } catch (error) {
+                console.log(error)
+            }
+        },
         async getSkillTest() {
             this.isLoading = true
             try {
@@ -400,6 +444,22 @@ export default {
                 this.isLoading = false
             }
         },
+        async modifyPerfectScore() {
+            if (this.perfect_score.id)
+                this.setScore.perfect_score_id = this.perfect_score.id
+                this.setScore.score = parseInt(this.setScore.score)
+
+            try {
+                const response = await axios.post(`/api/perfect-score/modify?flag=${this.flag}`, this.setScore)
+                this.perfectScoreMessage = response.data.message
+                this.getPerfectScore()
+                this.$refs.AlphabetReports.getSkillTest()
+                swal.fire('Success', response.data.message, 'success')
+                this.isModifyPerfectScore = !this.isModifyPerfectScore
+            } catch (error) {
+                console.log(error)
+            }
+        },
         percentage(score) {
             if (this.gameId == 1) {
                 return Math.round((score / 18) * 100);
@@ -410,9 +470,11 @@ export default {
             }
         },
         filterReports() {
-            this.reports = this.data.filter((data) => {
+            this.reports = this.data.data.filter((data) => {
                 return data.game_id == this.gameId
             })
+            if (Object.keys(this.reports).length)
+                this.quizReportAverage = this.data.average ?? 0
         },
         alphabetHandler(letter) {
             this.indexes.skillTest = letter

@@ -43,13 +43,11 @@ class TextbookController extends Controller
         $consonants = array_filter($textbooks, function ($textbook) {
             return $textbook["type"] == 'consonant';
         });
-        if(count($vowels) || count($vowels)) {
+        if (count($vowels) || count($vowels)) {
             return [array_values($vowels), array_values($consonants)];
         } else {
             return [];
         }
-
-
     }
 
     public function getAlphabetsLetters(Request $request)
@@ -71,7 +69,8 @@ class TextbookController extends Controller
             })->toArray();
     }
 
-    public function getAlphabetsWords(Request $request) {
+    public function getAlphabetsWords(Request $request)
+    {
         if ($request->get('user') == 'student') {
             $teacherId = Student::where('user_id', Auth::user()->id)->first()->teacher_id;
         } else {
@@ -83,17 +82,8 @@ class TextbookController extends Controller
             ->orderBy('letter', 'ASC')
             ->get()
             ->map(function ($textbooks) {
-                $images = json_decode($textbooks->image);
-                $videos = json_decode($textbooks->video);
-                $objectNames = json_decode($textbooks->object);
-                foreach ($objectNames as $key => $value) {
-                    $data[] = [
-                        "object" => $value,
-                        "image" => Storage::url($images[$key]),
-                        "video" => Storage::url($videos[$key]),
-                    ];
-                }
-                $textbooks['attributes'] = $data;
+                $textbooks->image_url = Storage::url(json_decode($textbooks->image));
+                $textbooks->video_url = Storage::url(json_decode($textbooks->video));
                 return $textbooks;
             })->toArray();
     }
@@ -220,7 +210,8 @@ class TextbookController extends Controller
         return response()->json(['message' => 'An alphabet is added successfully.']);
     }
 
-    public function deleteTextbook($textbookId) {
+    public function deleteTextbook($textbookId)
+    {
         Textbook::find($textbookId)->delete();
         return response()->json(['message' => 'An alphabet is deleted successfully.']);
     }
@@ -239,10 +230,8 @@ class TextbookController extends Controller
 
     public function isFirstLetterMatch($flag)
     {
-        if ($flag != 'alphabet-words') {
-            $letter = request()->letter;
-            $firstLetter = request()->objectName[0];
-            return $firstLetter === $letter;
-        }
+        $letter = request()->letter;
+        $firstLetter = request()->objectName[0];
+        return $firstLetter === $letter;
     }
 }

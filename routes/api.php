@@ -7,6 +7,7 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CheckAccessIdController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\PerfectScoreController;
 use App\Http\Controllers\QuizReportController;
 use App\Http\Controllers\SkillTestController;
 use App\Http\Controllers\StudentController;
@@ -77,6 +78,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile/get', [StudentController::class, 'getProfile']);
     Route::post('profile/update', [StudentController::class, 'updateProfile']);
 
+    Route::get('perfect-score/get', [PerfectScoreController::class, 'getPerfectScore']);
+    Route::post('perfect-score/modify', [PerfectScoreController::class, 'modifyPerfectScore']);
+
+    Route::post('skill-test-score/modify', [SkillTestController::class, 'updateScore']);
+
     Route::post('/logout', [LogoutController::class, 'logout']);
 
     Route::post('seed', function () {
@@ -128,31 +134,23 @@ Route::middleware('auth:sanctum')->group(function () {
 
         $jsonFile = Storage::path('public/json/alphabets-with-words.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
-        foreach ($jsonData as $json) {
-            foreach ($json as $key => $data) {
-                $object = [];
-                $image = [];
-                $video = [];
-                foreach ($data as $key2 => $data2) {
-                    $object[] = $data2['object'];
-                    $image[] = $data2['image'];
-                    $video[] = $data2['video'];
-                }
-                if (in_array($key, ['a', 'e', 'i', 'o', 'u']))
-                    $type = 'vowel';
-                else
-                    $type = 'consonant';
-                Textbook::updateOrCreate([
-                    'flag' => 'alphabet-words',
-                    'type' => $type,
-                    'teacher_id' => $teacherId,
-                    'letter' => $key,
-                    'object' => json_encode($object),
-                    'image' => json_encode($image),
-                    'video' => json_encode($video),
-                    'chapter' => 1
-                ]);
-            }
+
+        foreach ($jsonData as $data) {
+            if (in_array($data["letter"], ['a', 'e', 'i', 'o', 'u']))
+                $type = 'vowel';
+            else
+                $type = 'consonant';
+
+            Textbook::updateOrCreate([
+                'flag' => 'alphabet-words',
+                'type' => $type,
+                'teacher_id' => $teacherId,
+                'letter' => $data["letter"],
+                'object' => $data["object"],
+                'image' => json_encode($data["image"]),
+                'video' => json_encode($data["video"]),
+                'chapter' => 1
+            ]);
         }
 
         return response()->json([
@@ -166,7 +164,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);
-Route::get('/reset-password/form', function() {
+Route::get('/reset-password/form', function () {
     return redirect('/reset-password');
 });
 

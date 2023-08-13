@@ -123,18 +123,18 @@ export const store = new createStore({
         async setAlphabetWords(context) {
             try {
                 context.commit("SET_ISLOADING", true);
-                let alphabets = await axios.get(
+                const alphabets = await axios.get(
                     `/api/alphabets-words/get?user=${'student'}&chapter=1`
                 );
-                let newData = []
-                alphabets.data.forEach(element => {
-                    var variableName = element.letter;
-                    var value = element.attributes;
+                // let newData = []
+                // alphabets.data.forEach(element => {
+                //     var variableName = element.letter;
+                //     var value = element.attributes;
 
-                    var obj = {};
-                    obj[variableName] = value;
-                    newData.push(obj);
-                });
+                //     var obj = {};
+                //     obj[variableName] = value;
+                //     newData.push(obj);
+                // });
                 // let flags = await axios.get(`/api/flags/alphabet-words`);
                 // let data = [];
                 // let attributes = JSON.parse(flags.data.attributes);
@@ -155,7 +155,7 @@ export const store = new createStore({
                 //         data.push(obj);
                 //     });
                 // });
-                context.commit("SET_ALPHABET_WORDS_DATA", newData);
+                context.commit("SET_ALPHABET_WORDS_DATA", alphabets.data);
             } catch (error) {
                 console.log(error)
             } finally {

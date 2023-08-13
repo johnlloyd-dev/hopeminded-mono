@@ -10,125 +10,222 @@
                             <img src="/images/kids.png" alt="Kids" width="150">
                         </div>
                         <div class="card-body">
-                            <div class="row mt-5">
-                                <div class="col-4">
-                                    <button @click="$router.push({ name: 'quiz-report', params: { gameId: 3 } })"
-                                        type="button" class="btn btn-warning fw-bold rounded-0">
-                                        Memory Game
-                                    </button>
-                                </div>
-                                <div class="col-4">
-                                    <button @click="$router.push({ name: 'quiz-report', params: { gameId: 2 } })"
-                                        type="button" class="btn btn-success fw-bold rounded-0">
-                                        Typing Balloon
-                                    </button>
-                                </div>
-                                <div class="col-4">
-                                    <button @click="$router.push({ name: 'quiz-report', params: { gameId: 1 } })"
-                                        type="button" class="btn btn-primary fw-bold rounded-0">
-                                        Hangman Game
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="certificates mt-5">
-                                <div class="card rounded-0">
-                                    <div class="card-body">
-                                        <h5 class="fw-bold fst-italic">Certificates</h5>
-                                        <p>These are certicates given by your teacher once you completed each of the
-                                            textbook
-                                            lessons and able to pass each of the quizzes.</p>
-                                        <div class="accordion rounded-0" id="accordionExample">
-                                            <div class="accordion-item rounded-0">
-                                                <h2 class="accordion-header" id="headingOne">
-                                                    <button class="accordion-button collapsed" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                                                        aria-expanded="false" aria-controls="collapseOne">
-                                                        Alphabet-Letters/Memory Game
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseOne" class="accordion-collapse collapse bg-secondary rounded-0"
-                                                    aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                                                    <div class="accordion-body">
-                                                        <span class="text-white" v-if="certificates.memory.length === 0">No
-                                                            certificate/s found</span>
-                                                        <ul v-else v-for="item in certificates.memory" :key="item.id"
-                                                            class="list-group">
-                                                            <li class="list-group-item"><a :href="item.file_url" download>{{
-                                                                item.file }}</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="accordion-item rounded-0">
-                                                <h2 class="accordion-header" id="headingTwo">
-                                                    <button class="accordion-button collapsed" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseTwo"
-                                                        aria-expanded="false" aria-controls="collapseTwo">
-                                                        Vowels-Consonants/Typing Balloon
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseTwo" class="accordion-collapse collapse bg-secondary rounded-0"
-                                                    aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                                                    <div class="accordion-body">
-                                                        <span class="text-white" v-if="certificates.typing.length === 0">No
-                                                            certificate/s found</span>
-                                                        <ul v-else v-for="item in certificates.typing" :key="item.id"
-                                                            class="list-group">
-                                                            <li class="list-group-item"><a :href="item.file_url" download>{{
-                                                                item.file }}</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="accordion-item rounded-0">
-                                                <h2 class="accordion-header" id="headingThree">
-                                                    <button class="accordion-button collapsed" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseThree"
-                                                        aria-expanded="false" aria-controls="collapseThree">
-                                                        Alphabet-Words/Hangman Game
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseThree" class="accordion-collapse collapse bg-secondary rounded-0"
-                                                    aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                                                    <div class="accordion-body">
-                                                        <span class="text-white" v-if="certificates.hangman.length === 0">No
-                                                            certificate/s found</span>
-                                                        <ul v-else v-for="item in certificates.hangman" :key="item.id"
-                                                            class="list-group rounded-0">
-                                                            <li class="list-group-item">
-                                                                <a style="margin-right: 30px;" :href="item.file_url"
-                                                                    download>{{ item.file }}</a>
-                                                                <button type="button" @click="viewFile(item.file_url)"
-                                                                    class="btn btn-primary rounded-0 btn-sm">
-                                                                    View Certificate
-                                                                    <i class="fas fa-external-link-alt"></i>
-                                                                </button>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="hangman-game mb-3">
+                                        <button
+                                            class="btn btn-secondary d-block fw-bold rounded-0 w-100 d-flex justify-content-between align-items-center mb-1 fs-6 p-3"
+                                            type="button" data-bs-toggle="collapse" data-bs-target="#memoryGame"
+                                            aria-expanded="false" aria-controls="memoryGame">
+                                            <span class="rounded-0">Memory Game</span>
+                                            <i class="fas fa-chevron-circle-down"></i>
+                                        </button>
+                                        <div class="collapse rounded-0" id="memoryGame">
+                                            <div class="card card-body rounded-0">
+                                                <template v-if="isLoading">
+                                                    <ul class="o-vertical-spacing o-vertical-spacing--l">
+                                                        <li class="blog-post o-media">
+                                                            <div class="o-media__figure">
+                                                                <span class="skeleton-box"
+                                                                    style="width:100px;height:80px;"></span>
+                                                            </div>
+                                                            <div class="o-media__body">
+                                                                <div class="o-vertical-spacing">
+                                                                    <h3 class="blog-post__headline">
+                                                                        <span class="skeleton-box"
+                                                                            style="width:55%;"></span>
+                                                                    </h3>
+                                                                    <p>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:80%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:90%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:83%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:80%;"></span>
+                                                                    </p>
+                                                                    <div class="blog-post__meta">
+                                                                        <span class="skeleton-box"
+                                                                            style="width:70px;"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </template>
+                                                <template v-else>
+                                                    <h6 class="fw-bold">Perfect Score: {{ perfectScore.memory_game }}</h6>
+                                                    <table class="table table-bordered table-responsive">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Date/Time</th>
+                                                                <th scope="col">Score</th>
+                                                                <th scope="col">Percentage</th>
+                                                                <th scope="col">Mark</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody v-if="memoryGame.length === 0">
+                                                            <tr>
+                                                                <td colspan="4" class="text-center fw-bold">No data found
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tbody v-else>
+                                                            <tr v-for="item in memoryGame" :key="item.id">
+                                                                <td>{{ new Date(item.created_at).toLocaleString() }}</td>
+                                                                <td>{{ `${item.total_score} / ${perfectScore.memory_game}` }}</td>
+                                                                <td>{{ percentage(item.total_score, 'mg') }}%</td>
+                                                                <td>{{ item.mark }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <!-- Modal -->
-                            <div class="modal fade" id="fileViewer" data-bs-backdrop="static" tabindex="-1" aria-labelledby="fileViewerLabel"
-                                aria-hidden="true">
-                                <div class="modal-dialog modal-xl">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="fileViewerLabel">View Certificate</h5>
-                                            <button @click="activateObject = false" type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
+                                    <div class="typing-balloon mb-3">
+                                        <button
+                                            class="btn btn-secondary d-block fw-bold rounded-0 w-100 d-flex justify-content-between align-items-center mb-1 fs-6 p-3"
+                                            type="button" data-bs-toggle="collapse" data-bs-target="#typingBalloon"
+                                            aria-expanded="false" aria-controls="typingBalloon">
+                                            <span>Typing Balloon</span>
+                                            <i class="fas fa-chevron-circle-down"></i>
+                                        </button>
+                                        <div class="collapse rounded-0" id="typingBalloon">
+                                            <div class="card card-body rounded-0">
+                                                <template v-if="isLoading">
+                                                    <ul class="o-vertical-spacing o-vertical-spacing--l">
+                                                        <li class="blog-post o-media">
+                                                            <div class="o-media__figure">
+                                                                <span class="skeleton-box"
+                                                                    style="width:100px;height:80px;"></span>
+                                                            </div>
+                                                            <div class="o-media__body">
+                                                                <div class="o-vertical-spacing">
+                                                                    <h3 class="blog-post__headline">
+                                                                        <span class="skeleton-box"
+                                                                            style="width:55%;"></span>
+                                                                    </h3>
+                                                                    <p>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:80%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:90%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:83%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:80%;"></span>
+                                                                    </p>
+                                                                    <div class="blog-post__meta">
+                                                                        <span class="skeleton-box"
+                                                                            style="width:70px;"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </template>
+                                                <template v-else>
+                                                    <h6 class="fw-bold">Perfect Score: {{ perfectScore.typing_balloon }}</h6>
+                                                    <table class="table table-bordered table-responsive">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Date/Time</th>
+                                                                <th scope="col">Score</th>
+                                                                <th scope="col">Percentage</th>
+                                                                <th scope="col">Mark</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody v-if="typingBalloon.length === 0">
+                                                            <tr>
+                                                                <td colspan="4" class="text-center fw-bold">No data found
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tbody v-else>
+                                                            <tr v-for="item in typingBalloon" :key="item.id">
+                                                                <td>{{ new Date(item.created_at).toLocaleString() }}</td>
+                                                                <td>{{ `${item.total_score} / ${perfectScore.typing_balloon}` }}</td>
+                                                                <td>{{ percentage(item.total_score, 'tp') }}%</td>
+                                                                <td>{{ item.mark }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+                                            </div>
                                         </div>
-                                        <div class="modal-body text-center" style="height: 70vh;">
-                                            <object v-if="activateObject && documentFileExtensions.includes(fileExtension)" :data="fileUrl" :type="fileType" width="100%" height="100%">
-                                            </object>
-                                            <img v-if="activateObject && imageFileExtensions.includes(fileExtension)" :src="fileUrl" alt="Certificate Image">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a :href="fileUrl" download class="btn btn-primary">Download</a>
+                                    </div>
+                                    <div class="memory-game">
+                                        <button
+                                            class="btn btn-secondary d-block fw-bold rounded-0 w-100 d-flex justify-content-between align-items-center mb-1 fs-6 p-3"
+                                            type="button" data-bs-toggle="collapse" data-bs-target="#hangmanGame"
+                                            aria-expanded="false" aria-controls="hangmanGame">
+                                            <span>Hangman Game</span>
+                                            <i class="fas fa-chevron-circle-down"></i>
+                                        </button>
+                                        <div class="collapse rounded-0" id="hangmanGame">
+                                            <div class="card card-body rounded-0">
+                                                <template v-if="isLoading">
+                                                    <ul class="o-vertical-spacing o-vertical-spacing--l">
+                                                        <li class="blog-post o-media">
+                                                            <div class="o-media__figure">
+                                                                <span class="skeleton-box"
+                                                                    style="width:100px;height:80px;"></span>
+                                                            </div>
+                                                            <div class="o-media__body">
+                                                                <div class="o-vertical-spacing">
+                                                                    <h3 class="blog-post__headline">
+                                                                        <span class="skeleton-box"
+                                                                            style="width:55%;"></span>
+                                                                    </h3>
+                                                                    <p>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:80%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:90%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:83%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:80%;"></span>
+                                                                    </p>
+                                                                    <div class="blog-post__meta">
+                                                                        <span class="skeleton-box"
+                                                                            style="width:70px;"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </template>
+                                                <template v-else>
+                                                    <h6 class="fw-bold">Perfect Score: {{ perfectScore.hangman_game }}</h6>
+                                                    <table class="table table-bordered table-responsive">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Date/Time</th>
+                                                                <th scope="col">Score</th>
+                                                                <th scope="col">Percentage</th>
+                                                                <th scope="col">Mark</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody v-if="hangmanGame.length === 0">
+                                                            <tr>
+                                                                <td colspan="4" class="text-center fw-bold">No data found
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tbody v-else>
+                                                            <tr v-for="item in hangmanGame" :key="item.id">
+                                                                <td>{{ new Date(item.created_at).toLocaleString() }}</td>
+                                                                <td>{{ `${item.total_score} / ${perfectScore.hangman_game}` }}</td>
+                                                                <td>{{ percentage(item.total_score, 'hg') }}%</td>
+                                                                <td>{{ item.mark }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -142,26 +239,61 @@
 </template>
 
 <script>
-import { Tooltip } from 'bootstrap'
 export default {
     data() {
         return {
-            isProcessing: false,
             collapsed: false,
-            isMemoryGameNotAllowed: false,
-            isTypingBalloonNotAllowed: false,
-            isHangmanGameNotAllowed: false,
-            fileType: null,
-            fileUrl: null,
-            fileExtension: null,
-            imageFileExtensions: ['jpg', 'jpeg', 'png', 'gif', 'svg', 'bmp', 'tiff'],
-            documentFileExtensions: ['doc', 'docx', 'txt', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'csv'],
-            activateObject: false,
-            certificates: {
-                hangman: [],
-                memory: [],
-                typing: []
+            isProcessing: false,
+            isLoading: false,
+            data: [],
+        };
+    },
+    created() {
+        this.getQuizReports();
+    },
+    computed: {
+        gameId() {
+            return this.$route.params.gameId
+        },
+        cardTitle() {
+            if (this.gameId == 1) {
+                return 'Hangman Game Quiz Report'
+            } else if (this.gameId == 2) {
+                return 'Typing Balloon Quiz Report'
+            } else if (this.gameId == 3) {
+                return 'Memory Game Quiz Report'
             }
+        },
+        perfectScore() {
+            return {
+                memory_game: 59,
+                hangman_game: 18,
+                typing_balloon: 51
+            }
+        },
+        hangmanGame() {
+            if (this.data && this.data.length) {
+                return this.data.filter((data) => {
+                    return data.game_id === 1
+                })
+            }
+            return this.data
+        },
+        memoryGame() {
+            if (this.data && this.data.length) {
+                return this.data.filter((data) => {
+                    return data.game_id === 3
+                })
+            }
+            return this.data
+        },
+        typingBalloon() {
+            if (this.data && this.data.length) {
+                return this.data.filter((data) => {
+                    return data.game_id === 2
+                })
+            }
+            return this.data
         }
     },
     methods: {
@@ -172,79 +304,25 @@ export default {
                 this.collapsed = false
             }
         },
-        async getAlLeFlags() {
-            this.isProcessing = true
-            const flags = await axios.get(`/api/flags/alphabet-letters`)
-            const attributes = JSON.parse(flags.data.attributes)
-            this.isMemoryGameNotAllowed = Object.values(attributes).some(value => value === false);
+        percentage(score, flag) {
+            if (flag === 'hg')
+                return Math.round((score / this.perfectScore.hangman_game) * 100);
+            else if (flag === 'tp')
+                return Math.round((score / this.perfectScore.typing_balloon) * 100);
+            else
+                return Math.round((score / this.perfectScore.memory_game) * 100);
         },
-        async getVoCoFlags() {
-            const flags = await axios.get(`/api/flags/vowel-consonants`)
-            const attributes = JSON.parse(flags.data.attributes)
-            this.isTypingBalloonNotAllowed = Object.values(attributes).some(value => value === false);
-        },
-        async getAlWoFlags() {
-            const flags = await axios.get(`/api/flags/alphabet-words`)
-            const attributes = JSON.parse(flags.data.attributes)
-            this.isHangmanGameNotAllowed = Object.values(attributes).some(value => value.length === 0);
-            this.isProcessing = false
-        },
-        async getCertificates() {
-            this.isLoading = true
-            try {
-                const response = await axios.get(`/api/student-certificates/all`)
-                this.certificates.hangman = response.data.filter(data => {
-                    return data.game_flag == 'hangman-game'
-                })
-                this.certificates.memory = response.data.filter(data => {
-                    return data.game_flag == 'memory-game'
-                })
-                this.certificates.typing = response.data.filter(data => {
-                    return data.game_flag == 'typing-balloon'
-                })
-            } catch (error) {
-                console.log(error)
-            } finally {
-                this.isLoading = false
-            }
-        },
-        viewFile(url) {
-            this.fileExtension = this.getFileTypeFromURL(url);
-            this.fileType = null
-            this.fileUrl = url
-
-            if (this.imageFileExtensions.includes(this.fileExtension)) {
-                this.fileType = `image/${this.fileExtension}`
-            } else if (this.documentFileExtensions.includes(this.fileExtension)) {
-                this.fileType = `application/${this.fileExtension}`
-            }
-
-            this.activateObject = true
-
-            $('#fileViewer').modal('show');
-        },
-        getFileTypeFromURL(url) {
-            // Create a new URL object with the provided URL
-            const urlObj = new URL(`http://${url}`);
-
-            // Get the file extension from the pathname of the URL
-            const path = urlObj.pathname;
-            const extension = path.substring(path.lastIndexOf('.') + 1);
-
-            // Return the file extension
-            return extension;
+        async getQuizReports() {
+            this.isProcessing = true;
+            const data = await axios.get("/api/quiz/reports/get");
+            this.data = data.data
+            this.isProcessing = false;
         }
-    },
-    mounted() {
-        this.getAlLeFlags()
-        this.getVoCoFlags()
-        this.getAlWoFlags()
-        this.getCertificates()
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .body {
     background-image: url("/images/background.jpg");
     background-size: cover;
@@ -260,4 +338,76 @@ export default {
 .card {
     background-color: rgba(255, 255, 255, 0.5);
     border: none;
-}</style>
+}
+
+.help-ui {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.skeleton-box {
+    display: inline-block;
+    height: 1em;
+    position: relative;
+    overflow: hidden;
+    background-color: #DDDBDD;
+
+    &::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        transform: translateX(-100%);
+        background-image: linear-gradient(90deg,
+                rgba(#fff, 0) 0,
+                rgba(#fff, 0.2) 20%,
+                rgba(#fff, 0.5) 60%,
+                rgba(#fff, 0));
+        animation: shimmer 5s infinite;
+        content: '';
+    }
+
+    @keyframes shimmer {
+        100% {
+            transform: translateX(100%);
+        }
+    }
+}
+
+.blog-post {
+    &__headline {
+        font-size: 1.25em;
+        font-weight: bold;
+    }
+
+    &__meta {
+        font-size: 0.85em;
+        color: #6b6b6b;
+    }
+}
+
+// OBJECTS
+
+.o-media {
+    display: flex;
+
+    &__body {
+        flex-grow: 1;
+        margin-left: 1em;
+    }
+}
+
+.o-vertical-spacing {
+    >*+* {
+        margin-top: 0.75em;
+    }
+
+    &--l {
+        >*+* {
+            margin-top: 2em;
+        }
+    }
+}
+</style>

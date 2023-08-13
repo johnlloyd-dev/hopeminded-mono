@@ -10,11 +10,9 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th scope="col">First Name</th>
-                                <th scope="col">Middle Name</th>
-                                <th scope="col">Last Name</th>
-                                <th scope="col">Username</th>
-                                <th scope="col">Password</th>
+                                <th scope="col">Student</th>
+                                <th scope="col">Skill Test Report</th>
+                                <th scope="col">Quiz Report</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -24,13 +22,71 @@
                             </tr>
                         </tbody>
                         <tbody v-else-if="!isLoading && students.length !== 0">
-                            <tr v-for="student in students" :key="student.id">
-                                <td>{{ student.first_name }}</td>
-                                <td>{{ student.middle_name }}</td>
-                                <td>{{ student.last_name }}</td>
-                                <td>{{ student.username }}</td>
-                                <td>{{ student.unhashed }}</td>
-                                <td class="d-flex justify-content-center">
+                            <tr v-for="(student, index) in students" :key="student.id">
+                                <td class="w-25">
+                                    <span class="fw-bold">{{ `${student.last_name}, ${student.first_name}
+                                                                            ${student.middle_name ?
+                                            student.middle_name.charAt(0) + '.' : null}` }}</span>
+                                    <button class="btn border-0" type="button" data-bs-toggle="collapse"
+                                        :data-bs-target="`#personalInfoCollapse${index}`" aria-expanded="false"
+                                        aria-controls="personalInfoCollapse">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <div class="collapse" :id="`personalInfoCollapse${index}`">
+                                        <ul class="list-group">
+                                            <li class="list-group-item">First Name: <span class="fw-bold">{{
+                                                student.first_name }}</span></li>
+                                            <li class="list-group-item">Middle Name: <span class="fw-bold">{{
+                                                student.middle_name }}</span></li>
+                                            <li class="list-group-item">Last Name: <span class="fw-bold">{{
+                                                student.last_name }}</span></li>
+                                            <li class="list-group-item">Username: <span class="fw-bold">{{ student.username
+                                            }}</span></li>
+                                            <li class="list-group-item">Password: <span class="fw-bold">{{ student.unhashed
+                                            }}</span></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
+                                        student.skill_test.length }}/26</span></span>
+                                    <span class="vr"></span>
+                                    <span class="mb-0 ms-2">Lacking: <span class="fw-bold rounded-5 p-1">{{ 26 -
+                                        student.skill_test.length }}</span></span>
+                                </td>
+                                <td class="w-25">
+                                    <div>
+                                        <button class="btn rounded-0 btn-secondary btn-sm my-1 fw-bold" style="width: 200px" type="button"
+                                            data-bs-toggle="collapse" :data-bs-target="`#memoryGameCollapse${index}`"
+                                            aria-expanded="false" aria-controls="memoryGameCollapse">
+                                            Memory Game
+                                        </button>
+                                        <div class="collapse fw-bold" :id="`memoryGameCollapse${index}`">
+                                            Average Score: {{ student.memory_game }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn rounded-0 btn-warning btn-sm my-1 fw-bold" style="width: 200px" type="button"
+                                            data-bs-toggle="collapse" :data-bs-target="`#typingBalloonCollapse${index}`"
+                                            aria-expanded="false" aria-controls="typingBalloonCollapse">
+                                            Typing Balloon
+                                        </button>
+                                        <div class="collapse fw-bold" :id="`typingBalloonCollapse${index}`">
+                                            Average Score: {{ student.typing_balloon }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn rounded-0 btn-primary btn-sm my-1 fw-bold" style="width: 200px" type="button"
+                                            data-bs-toggle="collapse" :data-bs-target="`#hangmanGameCollapse${index}`"
+                                            aria-expanded="false" aria-controls="hangmanGameCollapse">
+                                            Hangman Game
+                                        </button>
+                                        <div class="collapse fw-bold" :id="`hangmanGameCollapse${index}`">
+                                            Average Score: {{ student.memory_game }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
                                     <button @click="viewReport(student.id)" class="btn btn-success rounded-0">
                                         <span>Student Report </span><i class="fas fa-external-link-alt"></i>
                                     </button>

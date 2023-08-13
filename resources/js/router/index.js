@@ -10,6 +10,7 @@ const teacherDashboard = () => import("../components/teacher/main/Dashboard.vue"
 const studentTextbook = () => import("../components/student/main/Textbook.vue");
 const studentQuiz = () => import("../components/student/main/Quiz.vue");
 const studentReport = () => import("../components/student/main/Report.vue");
+const certificates = () => import("../components/student/main/Certificates.vue");
 const contact = () => import("../components/student/main/Contact.vue");
 const review = () => import("../components/student/main/Review.vue");
 
@@ -104,6 +105,14 @@ const routes = [
         component: contact,
         meta: {
             title: `Contact Us`,
+        },
+    },
+    {
+        name: "student-certificates",
+        path: "/student-certificates",
+        component: certificates,
+        meta: {
+            title: `Certificates`,
         },
     },
     {

@@ -10,16 +10,16 @@
                         <template v-if="!isLoading">
                             <div v-if="data.length" class="row">
                                 <div class="col-12 mb-3" v-for="(item, index) in data" :key="index">
-                                    <button @click="alphabetHandler(index, item)" style="width: 100px" type="button"
+                                    <button @click="alphabetHandler(index, item.letter)" style="width: 100px" type="button"
                                         class="btn rounded-0 fw-bold me-3"
-                                        :class="indexes.letter === index ? 'btn-warning btn-lg' : 'btn-success'">
-                                        {{ Object.keys(item)[0].toUpperCase() }}
+                                        :class="[hasSkillTest(item.letter) ? 'btn-success' : 'btn-danger', { 'border border-white border-3 btn-lg': indexes.alphabet === index }]">
+                                        {{ item.letter.toUpperCase() }}
                                     </button>
-                                    <!-- <span v-if="item.isDone"><i class="fas fa-check fa-xl"></i></span> -->
+                                    <span v-if="item.isDone"><i class="fas fa-check fa-xl"></i></span>
                                 </div>
                                 <hr class="w-75">
                                 <button :disabled="Object.keys(skillTest).length < 5"
-                                    @click="$router.push('/quiz-hangman-game')"
+                                    @click="$router.push('/quiz-memory-game')"
                                     class="btn btn-danger btn-lg rounded-0 w-75 fw-bold">Take Quiz</button>
                             </div>
                             <div v-else>
@@ -33,37 +33,43 @@
                 </div>
                 <div class="col-10 position-relative">
                     <template v-if="!isLoading">
-                        <div v-if="data[indexes.letter]">
-                            <div class="text-center">
-                                <div class="row">
-                                    <div v-for="(item, index) in newData[0]" :key="item.image"
-                                        class="col-lg-4 col-md-6 text-center mb-4">
-                                        <div class="position-relative badge-overlay">
-                                            <img width="250" height="150" class="rounded box-shadow" :src="item.image"
-                                                alt="" />
-                                            <!-- <span v-if="item.isDone"
-                                                class="img-badge">
-                                                <i class="fas fa-check-circle fa-2xl text-black"></i>
-                                            </span> -->
-                                        </div>
-                                        <div class="d-flex flex-column align-items-center">
-                                            <div style="width: 75%" v-if="!hasSubmitted(item.object).length" class="alert alert-danger rounded-0 mb-0 mt-3 fw-bold text-center" role="alert">No skill test submitted.</div>
-                                            <div style="width: 75%" v-else class="alert alert-success mb-0 fw-bold text-center rounded-0 mt-3" role="alert">Uploaded Skill Test: {{ hasSubmitted(item.object).length }}</div>
-                                            <div style="width: 75%" class="d-grid gap-2">
-                                                <button type="button" @click="setVideo(index)"
-                                                    class="btn btn-primary btn-lg rounded-0 fw-bold mt-3">
-                                                    Play <i class="fas fa-play-circle"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                        <div v-if="selectedAlphabet">
+                            <div class="row">
+                                <div class="col-lg-12 col-xl-6">
+                                    <div class="text-center">
+                                        <h4 class="fw-bold">Alphabet Image</h4>
+                                        <img style="width: 70%" class="box-shadow" :src="selectedAlphabet.image_url"
+                                            alt="" />
                                     </div>
-                                    <div data-bs-toggle="modal" data-bs-target="#skillTestModal"
-                                        class="col-lg-4 col-md-6 text-center mb-4 position-relative">
-                                        <button type="button"
-                                            class="btn btn btn-success position-absolute start-50 top-50 translate-middle rounded-0">
-                                            View Submitted Skill Test <i class="fas fa-external-link-alt"></i>
-                                        </button>
+                                </div>
+                                <div class="col-lg-12 col-xl-6">
+                                    <div class="d-flex align-items-center flex-column">
+                                        <h4 class="fw-bold">Alphabet Video</h4>
+                                        <video id="myVideo" class="video-width box-shadow" autoplay muted controls loop>
+                                            <source type="video/mp4" />
+                                            Your browser does not support the video tag.
+                                        </video>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center mt-3">
+                                <div class="d-grid gap-2">
+                                    <button type="button" @click="recordSkillTest()"
+                                        class="btn btn-primary btn-lg rounded-0 fw-bold mt-3">
+                                        Submit Skill Test <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <a href="#" type="button" class="h5 text-dark text-center" data-bs-toggle="modal"
+                                        data-bs-target="#tutorialModal">View Skill Test Tutorial</a>
+                                    <div v-if="selectedSkillTest && !selectedSkillTest.length"
+                                        class="alert alert-danger mb-0 mt-3 fw-bold text-center" role="alert">No skill test
+                                        submitted for this alphabet yet.</div>
+                                    <div v-else class="alert alert-success mb-0 mt-3 fw-bold text-center" role="alert">
+                                        Uploaded Skill Test: {{ selectedSkillTest.length }}</div>
+                                    <button :disabled="selectedSkillTest && !selectedSkillTest.length"
+                                        data-bs-toggle="modal" data-bs-target="#skillTestModal" type="button"
+                                        class="btn btn-warning btn-lg rounded-0 fw-bold">
+                                        View Submitted Skill Test <i class="fas fa-external-link-alt"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -100,7 +106,7 @@
                         </button>
                         <button @click="active = true" type="button" class="btn btn-primary rounded-0"
                             data-bs-target="#recordVideoModal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                            Record a Video
+                            Record a skill test
                         </button>
                     </div>
                 </div>
@@ -112,7 +118,7 @@
             <div class="modal-dialog modal-dialog-centered modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalToggleLabel2">Modal 2</h5>
+                        <h5 class="modal-title" id="exampleModalToggleLabel2">Skill Test</h5>
                         <button @click="active = false" type="button" class="btn-close" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                     </div>
@@ -120,8 +126,8 @@
                         <video-recorder :active="active"></video-recorder>
                     </div>
                     <div class="modal-footer">
-                        <button @click="active = false" class="btn btn-primary rounded-0" data-bs-target="#alphabetsModal"
-                            data-bs-toggle="modal" data-bs-dismiss="modal">
+                        <button @click="active = false" class="btn btn-primary rounded-0" data-bs-toggle="dismiss"
+                            data-bs-dismiss="modal">
                             Back
                         </button>
                     </div>
@@ -135,8 +141,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="skillTestModal">Skill Test</h5>
-                        <button @click="active = false" type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="container mt-5">
@@ -144,13 +149,11 @@
                                 <div class="col-2 border-end border-secondary py-3">
                                     <div class="scrollbar position-relative" id="scrollbar1">
                                         <template v-if="!isProcessing">
-                                            <div v-if="Object.keys(skillTest).length" class="row">
-                                                <div class="col-12 mb-3">
-                                                    <button style="width: 100px" type="button"
-                                                        class="btn rounded-0 fw-bold me-3 btn-warning btn-lg">
-                                                        {{ indexes.skillTest.toUpperCase() }}
-                                                    </button>
-                                                </div>
+                                            <div v-if="skillTest && Object.keys(skillTest).length" class="row">
+                                                <button style="width: 100px" type="button"
+                                                    class="btn rounded-0 fw-bold me-3 btn-warning">
+                                                    {{ indexes.skillTest.toUpperCase() }}
+                                                </button>
                                             </div>
                                             <div v-else>
                                                 <h6 class="position-absolute start-50 top-50 translate-middle fw-bold">
@@ -175,8 +178,12 @@
                                                             <video class="st-width" ref="previewElement"
                                                                 :src="item.file_url" controls></video>
                                                         </div>
-                                                        <h5 class="text-center fw-bold text-danger">Status: {{
-                                                            item.status.toUpperCase() }}</h5>
+                                                        <span style="font-size: 20px">
+                                                            Status: <span
+                                                                :class="item.status.toUpperCase() === 'PENDING' ? 'text-warning' : (item.status.toUpperCase() === 'CORRECT' ? 'text-success' : 'text-danger')"
+                                                                class="text-center fw-bold">{{ item.status.toUpperCase()
+                                                                }}</span>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -193,57 +200,146 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button @click="active = false" class="btn btn-primary rounded-0" data-bs-dismiss="modal">
+                        <button class="btn btn-primary rounded-0" data-bs-dismiss="modal">
                             Back
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- </div> -->
+        <!-- Modal -->
+        <div v-show="tutorialModal" class="modal fade" id="tutorialModal" tabindex="-1" aria-labelledby="tutorialModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content rounded-0">
+                    <div class="modal-body position-relative">
+                        <div class="position-absolute top-0 end-0">
+                            <button type="button" class="btn-close border-0" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div id="carouselExampleIndicators" class="carousel slide" data-bs-touch="false"
+                            data-bs-interval="false">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active position-relative" style="height: 520px;">
+                                    <div class="position-absolute start-50 top-50 translate-middle">
+                                        <h3 class="text-center">Welcome to Skill Test tutorial.</h3>
+                                        <p class="text-center">This will help and guide you on how to record and submit your
+                                            skill test.</p>
+                                    </div>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-1.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3"><span class="text-danger fst-italic">First,
+                                        </span>select any of the alphabet ang click the "Submit Skill Test" button as shown
+                                        in the picture inside the red box.</p>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-2.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3"><span class="text-danger fst-italic">Second, </span>the
+                                        recorder modal will popup and you can start recording by clicking the "Start
+                                        Recording" button.</p>
+                                    <p class="fw-bold h5 px-3 mt-3">Once you're finished recording, you can stop it by
+                                        clicking the "Stop Recording" button.</p>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-3.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3"><span class="text-danger fst-italic">Third, </span>you
+                                        will be given options to either retake or submit your recorded video.</p>
+                                    <p class="fw-bold h5 px-3 mt-3">Clicking the "Retake" button let you record another
+                                        video.</p>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-4.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3"><span class="text-danger fst-italic">Lastly, </span>once
+                                        your skill test video submission is completed, a success message popup will appear.
+                                    </p>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-5.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3">Once the overall process is successful, the alphabet
+                                        button with submitted skill test will have a green background.</p>
+                                    <p class="fw-bold h5 px-3 mt-3">You can also view/watch your skill test video.</p>
+                                    <p class="fw-bold h2 px-3 mt-3 fst-italic">Thank You.</p>
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+                                data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon bg-secondary rounded" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+                                data-bs-slide="next">
+                                <span class="carousel-control-next-icon bg-secondary rounded" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
-import swal from 'sweetalert2'
+import swal from "sweetalert2";
 import VideoRecorder from "../layouts/VideoRecorder.vue";
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from "vuex";
 export default {
     components: {
         VideoRecorder,
     },
     data() {
         return {
-            active: false,
-            items: [],
             skillTest: [],
+            active: false,
+            tutorialModal: false,
             images: [],
-            isProcessing: false,
-            pageFlag: 0,
-            letter: "",
+            items: [],
             video: null,
+            pageFlag: 0,
+            isProcessing: false,
+            letter: null,
             indexes: {
-                letter: 0,
+                alphabet: 0,
                 skillTest: 'a'
             },
             selected: {
-                letter: null,
-                object: null
+                object: null,
+                letter: null
             },
-            flag: 'alphabet-words'
+            index: {
+                letter: null,
+            },
+            flag: "alphabet-words",
+        };
+    },
+    async created() {
+        await this.getFlags();
+        await this.getSkillTest()
+        this.setVideo()
+    },
+    mounted() {
+        const isTutorialDone = localStorage.getItem('tutorialFlag')
+        if (!isTutorialDone) {
+            this.tutorialModal = true
+            $('#tutorialModal').modal('show')
+            localStorage.setItem('tutorialFlag', true)
         }
     },
-    created() {
-        this.getFlags()
-        this.getSkillTest()
+    beforeUnmount() {
+        $('#skillTestModal').modal('hide')
+        this.tutorialModal = false
     },
     computed: {
         ...mapGetters({
-            data: 'alphabetWords',
+            data: "alphabetWords",
             isLoading: "isLoading"
         }),
-        newData() {
-            return Object.values(this.data[this.indexes.letter])
+        count() {
+            return this.data.length;
+        },
+        selectedAlphabet() {
+            return this.data[this.indexes.alphabet];
         },
         selectedSkillTest() {
             return this.skillTest[this.indexes.skillTest] ?? []
@@ -251,35 +347,27 @@ export default {
     },
     methods: {
         ...mapActions({
-            getFlags: 'setAlphabetWords'
+            getFlags: "setAlphabetWords",
         }),
         navigate() {
-            this.$router.push('/student-textbook')
+            this.$router.push("/student-textbook");
         },
-        hasSubmitted(object) {
-            return this.selectedSkillTest.filter((data) => {
-                return data.object === object
-            })
+        showTutorial() {
+            this.tutorialModal = true
+            $('#tutorialModal').modal('show')
         },
-        setVideo(index) {
-            this.video = this.newData[0][index].video;
+        setVideo() {
+            this.video = this.selectedAlphabet.video_url;
             var video = document.getElementById("myVideo");
             video.setAttribute("src", this.video); // set the new video src
             video.load(); // load the new video
             video.play(); // play the new video
-            this.selected.letter = Object.keys(this.data[this.indexes.letter])[0]
-            this.selected.object = this.newData[0][index].object
-            $("#alphabetsModal").modal("show");
-            // if (!this.newData[0][index].isDone) {
-            //     this.updateFlag()
-            // }
+            this.selected.letter = this.selectedAlphabet.letter;
+            this.selected.object = this.selectedAlphabet.object;
         },
-        alphabetHandler(index, item) {
-            this.indexes.letter = index;
-            this.indexes.skillTest = Object.keys(item)[0]
-        },
-        letterHandler(letter) {
-            this.indexes.skillTest = letter
+        recordSkillTest() {
+            this.active = true
+            $('#recordVideoModal').modal('show')
         },
         async getSkillTest() {
             this.isProcessing = true
@@ -304,6 +392,17 @@ export default {
                 this.isProcessing = false
             }
         },
+        hasSkillTest(alphabet) {
+            return this.skillTest.hasOwnProperty(alphabet)
+        },
+        alphabetHandler(index, letter) {
+            this.indexes.skillTest = letter
+            this.indexes.alphabet = index;
+            this.setVideo()
+        },
+        letterHandler(letter) {
+            this.indexes.skillTest = letter
+        },
         setUploadSuccess() {
             $("#alphabetsModal").modal("hide");
             $("#recordVideoModal").modal("hide");
@@ -311,19 +410,20 @@ export default {
             this.getSkillTest()
         },
         async updateFlag() {
-            await axios.put(`/api/update-flag/alphabet-words`, this.selected)
-                .then(response => {
-                    this.getFlags()
+            await axios
+                .put(`/api/update-flag/alphabet-words`, this.index)
+                .then((response) => {
+                    this.getFlags();
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.log(error);
                 })
                 .finally(() => {
-                    this.isProcessing = false
+                    this.isProcessing = false;
                 });
         },
-    }
-}
+    },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -335,12 +435,12 @@ export default {
     color: #333;
     padding: 0;
     margin: 0;
-    overflow: hidden;
+    overflow-x: hidden;
     height: 100vh;
 }
 
 .image-button {
-    transition: transform .2s ease-in-out;
+    transition: transform 0.2s ease-in-out;
 }
 
 .image-button:hover {
@@ -349,17 +449,16 @@ export default {
 }
 
 .title-header {
-    font-family: 'Bangers', cursive;
+    font-family: "Bangers", cursive;
     font-size: 50px;
 }
 
 .box-shadow {
-    box-shadow: 10px 10px 5px gray;
+    box-shadow: 3px 3px rgb(0, 0, 0);
 }
 
-
 .video-width {
-    width: 900px;
+    width: 90%;
 }
 
 @media screen and (max-width: 994px) {
@@ -378,12 +477,6 @@ export default {
     .video-width {
         width: 450px;
     }
-}
-
-.badge-overlay .img-badge {
-    position: absolute;
-    top: 0;
-    right: 5px;
 }
 
 .st-width {

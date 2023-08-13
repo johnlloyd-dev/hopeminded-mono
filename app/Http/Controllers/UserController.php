@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StudentRequest;
+use App\Models\Game;
+use App\Models\QuizReport;
+use App\Models\SkillTest;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
@@ -20,11 +23,35 @@ class UserController extends Controller
 
     public function getStudents()
     {
+        $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         return User::join('students', function (JoinClause $join) {
             $join->on('users.id', '=', 'students.user_id');
         })
             ->select('users.*', 'students.*')
-            ->get();
+            ->where('students.teacher_id', $teacherId)
+            ->get()
+            ->map(function ($student) {
+                $student->skill_test = SkillTest::where('student_id', $student->id)
+                    ->orderBy('letter')
+                    ->distinct('letter')
+                    ->get();
+                $quiz_reports = QuizReport::where('student_id', $student->id);
+                // Memory Game
+                $memory_game = $quiz_reports->where('game_id', 3)->avg('total_score');
+                $memory_game_perfect_score = Game::where('id', 3)->first()->perfect_score;
+                $student->memory_game = ($memory_game ?? 0) . '/' . $memory_game_perfect_score;
+                // Typing Balloon
+                $typing_balloon = $quiz_reports->where('game_id', 2)->avg('total_score');
+                $typing_balloon_perfect_score = Game::where('id', 2)->first()->perfect_score;
+                $student->typing_balloon = ($typing_balloon ?? 0) . '/' . $typing_balloon_perfect_score;
+                // Hangman Game
+                $hangman_game = $quiz_reports->where('game_id', 1)->avg('total_score');
+                $hangman_game_perfect_score = Game::where('id', 1)->first()->perfect_score;
+                $student->hangman_game = ($hangman_game  ?? 0) . '/' . $hangman_game_perfect_score;
+
+                return $student;
+            })
+            ->toArray();
     }
 
     public function addStudent(StudentRequest $request)

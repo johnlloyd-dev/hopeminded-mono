@@ -14,10 +14,9 @@
                                     <div class="col-12 mb-3" v-for="(item, index) in data[0]" :key="index">
                                         <button @click="alphabetHandler(index, 'vowel', item.letter)" style="width: 100px" type="button"
                                             class="btn rounded-0 fw-bold me-3"
-                                            :class="indexes.vowel === index ? 'btn-warning btn-lg' : 'btn-success'">
+                                            :class="[hasSkillTest(item.letter) ? 'btn-success' : 'btn-danger', {'border border-white border-3 btn-lg': indexes.vowel === index}]">
                                             {{ item.letter.toUpperCase() }}
                                         </button>
-                                        <!-- <span v-if="item.isDone"><i class="fas fa-check fa-xl"></i></span> -->
                                     </div>
                                 </template>
                                 <div v-else>
@@ -29,10 +28,9 @@
                                     <div class="col-12 mb-3" v-for="(item, index) in data[1]" :key="index">
                                         <button @click="alphabetHandler(index, 'consonant', item.letter)" style="width: 100px"
                                             type="button" class="btn rounded-0 fw-bold me-3"
-                                            :class="indexes.consonant === index ? 'btn-warning btn-lg' : 'btn-success'">
+                                            :class="[hasSkillTest(item.letter) ? 'btn-success' : 'btn-danger', {'border border-white border-3 btn-lg': indexes.consonant === index}]">
                                             {{ item.letter.toUpperCase() }}
                                         </button>
-                                        <!-- <span v-if="item.isDone"><i class="fas fa-check fa-xl"></i></span> -->
                                     </div>
                                 </template>
                                 <div v-else>
@@ -53,26 +51,38 @@
                 <div class="col-10 position-relative">
                     <template v-if="!isLoading">
                         <div v-if="selectedAlphabet">
-                            <div class="text-center">
-                                <img style="width: 40%" class="rounded box-shadow" :src="selectedAlphabet.image_url"
-                                    alt="" />
+                            <div class="row">
+                                <div class="col-lg-12 col-xl-6">
+                                    <div class="text-center">
+                                        <h4 class="fw-bold">Alphabet Image</h4>
+                                        <img style="width: 70%" class="box-shadow" :src="selectedAlphabet.image_url" alt="" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-xl-6">
+                                    <div class="d-flex align-items-center flex-column">
+                                        <h4 class="fw-bold">Alphabet Video</h4>
+                                        <video id="myVideo" class="video-width box-shadow" autoplay muted controls loop>
+                                            <source type="video/mp4"/>
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                </div>
                             </div>
                             <div class="d-flex justify-content-center mt-3">
-                                <div style="width: 40%" class="d-grid gap-2">
-                                    <button type="button" @click="setVideo()"
+                                <div class="d-grid gap-2">
+                                    <button type="button" @click="recordSkillTest()"
                                         class="btn btn-primary btn-lg rounded-0 fw-bold mt-3">
-                                        Play <i class="fas fa-play-circle"></i>
+                                        Submit Skill Test <i class="fas fa-external-link-alt"></i>
                                     </button>
+                                    <a href="javascript:;" type="button" class="h5 text-dark text-center" @click="showTutorial">View Skill Test Tutorial</a>
                                     <div v-if="selectedSkillTest && !selectedSkillTest.length" class="alert alert-danger mb-0 mt-3 fw-bold text-center" role="alert">No skill test submitted for this alphabet yet.</div>
                                     <div v-else class="alert alert-success mb-0 mt-3 fw-bold text-center" role="alert">Uploaded Skill Test: {{ selectedSkillTest.length }}</div>
                                     <button :disabled="selectedSkillTest && !selectedSkillTest.length" data-bs-toggle="modal" data-bs-target="#skillTestModal" type="button"
-                                        class="btn btn-success btn-lg rounded-0 fw-bold">
+                                        class="btn btn-warning btn-lg rounded-0 fw-bold">
                                         View Submitted Skill Test <i class="fas fa-external-link-alt"></i>
                                     </button>
                                 </div>
                             </div>
-                            <!-- <div class="col-6">
-                            </div> -->
                         </div>
                         <div class="position-absolute start-50 top-50 translate-middle" v-else>
                             <h1 class="fw-bold">No records found</h1>
@@ -127,8 +137,8 @@
                         <video-recorder :active="active"></video-recorder>
                     </div>
                     <div class="modal-footer">
-                        <button @click="active = false" class="btn btn-primary rounded-0" data-bs-target="#alphabetsModal"
-                            data-bs-toggle="modal" data-bs-dismiss="modal">
+                        <button @click="active = false" class="btn btn-primary rounded-0" data-bs-toggle="dismiss"
+                            data-bs-dismiss="modal">
                             Back
                         </button>
                     </div>
@@ -181,8 +191,9 @@
                                                             <video class="st-width" ref="previewElement"
                                                                 :src="item.file_url" controls></video>
                                                         </div>
-                                                        <h5 class="text-center fw-bold text-danger">Status: {{
-                                                            item.status.toUpperCase() }}</h5>
+                                                        <span style="font-size: 20px">
+                                                                Status: <span :class="item.status.toUpperCase() === 'PENDING' ? 'text-warning' : (item.status.toUpperCase() === 'CORRECT' ? 'text-success' : 'text-danger')" class="text-center fw-bold">{{ item.status.toUpperCase() }}</span>
+                                                            </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -206,6 +217,76 @@
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div v-show="tutorialModal" class="modal fade" id="tutorialModal" tabindex="-1" aria-labelledby="tutorialModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content rounded-0">
+                    <div class="modal-body position-relative">
+                        <div class="position-absolute top-0 end-0">
+                            <button type="button" class="btn-close border-0" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div id="carouselExampleIndicators" class="carousel slide" data-bs-touch="false"
+                            data-bs-interval="false">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active position-relative" style="height: 520px;">
+                                    <div class="position-absolute start-50 top-50 translate-middle">
+                                        <h3 class="text-center">Welcome to Skill Test tutorial.</h3>
+                                        <p class="text-center">This will help and guide you on how to record and submit your
+                                            skill test.</p>
+                                    </div>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-1.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3"><span class="text-danger fst-italic">First,
+                                        </span>select any of the alphabet ang click the "Submit Skill Test" button as shown
+                                        in the picture inside the red box.</p>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-2.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3"><span class="text-danger fst-italic">Second, </span>the
+                                        recorder modal will popup and you can start recording by clicking the "Start
+                                        Recording" button.</p>
+                                    <p class="fw-bold h5 px-3 mt-3">Once you're finished recording, you can stop it by
+                                        clicking the "Stop Recording" button.</p>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-3.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3"><span class="text-danger fst-italic">Third, </span>you
+                                        will be given options to either retake or submit your recorded video.</p>
+                                    <p class="fw-bold h5 px-3 mt-3">Clicking the "Retake" button let you record another
+                                        video.</p>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-4.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3"><span class="text-danger fst-italic">Lastly, </span>once
+                                        your skill test video submission is completed, a success message popup will appear.
+                                    </p>
+                                </div>
+                                <div class="carousel-item" style="height: 520px;">
+                                    <img src="/images/tutorial-5.png" class="d-block w-100" alt="...">
+                                    <p class="fw-bold h5 px-3 mt-3">Once the overall process is successful, the alphabet
+                                        button with submitted skill test will have a green background.</p>
+                                    <p class="fw-bold h5 px-3 mt-3">You can also view/watch your skill test video.</p>
+                                    <p class="fw-bold h2 px-3 mt-3 fst-italic">Thank You.</p>
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+                                data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon bg-secondary rounded" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+                                data-bs-slide="next">
+                                <span class="carousel-control-next-icon bg-secondary rounded" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -220,6 +301,7 @@ export default {
     data() {
         return {
             active: false,
+            tutorialModal: false,
             images: [],
             items: [],
             skillTest: [],
@@ -243,9 +325,22 @@ export default {
             flag: 'vowel-consonants'
         }
     },
-    created() {
-        this.getFlags()
-        this.getSkillTest()
+    async created() {
+        await this.getFlags();
+        await this.getSkillTest()
+        this.setVideo()
+    },
+    mounted() {
+        const isTutorialDone = localStorage.getItem('tutorialFlag')
+        if (!isTutorialDone) {
+            this.tutorialModal = true
+            $('#tutorialModal').modal('show')
+            localStorage.setItem('tutorialFlag', true)
+        }
+    },
+    beforeUnmount() {
+        $('#skillTestModal').modal('hide')
+        this.tutorialModal = false
     },
     computed: {
         ...mapGetters({
@@ -275,6 +370,10 @@ export default {
         navigate() {
             this.$router.push('/student-textbook')
         },
+        showTutorial() {
+            this.tutorialModal = true
+            $('#tutorialModal').modal('show')
+        },
         setVideo() {
             this.video = this.selectedAlphabet.video_url;
             var video = document.getElementById("myVideo");
@@ -283,10 +382,13 @@ export default {
             video.play(); // play the new video
             this.selected.letter = this.selectedAlphabet.letter;
             this.selected.object = this.selectedAlphabet.object;
-            $("#alphabetsModal").modal("show");
-            // if (!this.selectedAlphabet.isDone) {
-            //     this.updateFlag()
-            // }
+        },
+        recordSkillTest() {
+            this.active = true
+            $('#recordVideoModal').modal('show')
+        },
+                hasSkillTest(alphabet) {
+            return this.skillTest.hasOwnProperty(alphabet)
         },
         alphabetHandler(index, flag, letter) {
             if (flag === 'vowel') {
@@ -297,6 +399,7 @@ export default {
                 this.indexes.consonant = index
             }
             this.indexes.skillTest = letter
+            this.setVideo()
         },
         letterHandler(letter) {
             this.indexes.skillTest = letter
@@ -355,7 +458,7 @@ export default {
     color: #333;
     padding: 0;
     margin: 0;
-    overflow: hidden;
+    overflow-x: hidden;
     height: 100vh;
 }
 
@@ -417,7 +520,11 @@ export default {
 }
 
 .box-shadow {
-    box-shadow: 10px 10px 5px gray;
+    box-shadow: 10px 10px grey;
+}
+
+.video-width {
+    width: 90%;
 }
 
 .day-background {
