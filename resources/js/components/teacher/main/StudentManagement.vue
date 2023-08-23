@@ -82,7 +82,7 @@
                                             Hangman Game
                                         </button>
                                         <div class="collapse fw-bold" :id="`hangmanGameCollapse${index}`">
-                                            Average Score: {{ student.memory_game }}
+                                            Average Score: {{ student.hangman_game }}
                                         </div>
                                     </div>
                                 </td>

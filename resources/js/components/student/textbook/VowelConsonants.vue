@@ -37,7 +37,10 @@
                                     <p class="fw-bold">No vowel letters added</p>
                                 </div>
                                 <hr class="w-75">
-                                <button :disabled="Object.keys(skillTest).length < 5" @click="$router.push('/quiz-typing-balloon')" class="btn btn-danger btn-lg rounded-0 w-75 fw-bold">Take Quiz</button>
+                                <!-- <button :disabled="Object.keys(skillTest).length < 5"  -->
+                                <button
+                                    @click="$router.push('/quiz-typing-balloon')"
+                                    class="btn btn-danger btn-lg rounded-0 w-75 fw-bold">Take Quiz</button>
                             </div>
                             <div v-else>
                                 <h6 class="position-absolute start-50 top-50 translate-middle fw-bold">No records found</h6>
@@ -408,7 +411,7 @@ export default {
             this.isProcessing = true
             try {
                 const data = await axios.get(`/api/skill-test/fetch/${null}/${this.flag}?flag=student`)
-                const mergedObject = data.data.reduce((result, item) => {
+                const mergedObject = data.data.data.reduce((result, item) => {
                     const { letter, ...rest } = item;
 
                     if (result[letter]) {

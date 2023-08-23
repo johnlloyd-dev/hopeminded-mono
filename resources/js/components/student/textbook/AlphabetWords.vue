@@ -18,8 +18,9 @@
                                     <span v-if="item.isDone"><i class="fas fa-check fa-xl"></i></span>
                                 </div>
                                 <hr class="w-75">
-                                <button :disabled="Object.keys(skillTest).length < 5"
-                                    @click="$router.push('/quiz-memory-game')"
+                                <!-- <button :disabled="Object.keys(skillTest).length < 5" -->
+                                <button
+                                    @click="$router.push('quiz-hangman-game')"
                                     class="btn btn-danger btn-lg rounded-0 w-75 fw-bold">Take Quiz</button>
                             </div>
                             <div v-else>
@@ -373,7 +374,7 @@ export default {
             this.isProcessing = true
             try {
                 const data = await axios.get(`/api/skill-test/fetch/${null}/${this.flag}?flag=student`)
-                const mergedObject = data.data.reduce((result, item) => {
+                const mergedObject = data.data.data.reduce((result, item) => {
                     const { letter, ...rest } = item;
 
                     if (result[letter]) {

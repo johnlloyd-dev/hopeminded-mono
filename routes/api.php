@@ -7,6 +7,7 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CheckAccessIdController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PerfectScoreController;
 use App\Http\Controllers\QuizReportController;
 use App\Http\Controllers\SkillTestController;
@@ -82,6 +83,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('perfect-score/modify', [PerfectScoreController::class, 'modifyPerfectScore']);
 
     Route::post('skill-test-score/modify', [SkillTestController::class, 'updateScore']);
+
+    Route::get('notifications/get', [NotificationController::class, 'getNotifications']);
+    Route::put('retake/skill-test/allow/{retakeId}', [SkillTestController::class, 'allowRetake']);
+    Route::put('retake/quiz/allow/{retakeId}', [GameController::class, 'allowRetake']);
 
     Route::post('/logout', [LogoutController::class, 'logout']);
 
@@ -161,6 +166,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/skill-test/upload', [SkillTestController::class, 'addSkillTest']);
     Route::get('/skill-test/fetch/{studentId}/{flag}', [SkillTestController::class, 'getSkillTest']);
     Route::put('/skill-test/update/{skillTestId}', [SkillTestController::class, 'updateSkillTest']);
+    Route::post('/quiz-mistake/store',  [GameController::class, 'addQuizMistakeRecord']);
+
+    Route::get('/get-mistakes/{studentId}',  [GameController::class, 'getWeaknessesData']);
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);

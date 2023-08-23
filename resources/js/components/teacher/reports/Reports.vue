@@ -50,253 +50,8 @@
                         </div>
                     </div>
                 </div>
-                <AlphabetReports ref="AlphabetReports" :reports="reports" :student-id="studentId" :flag="flag" :game-name="gameName" :quiz-report-average="quizReportAverage" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                <!-- <div class="d-flex justify-content-between">
-                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                        <input type="radio" class="btn-check" v-model="gameId" :value="1" id="btnradio1" autocomplete="off"
-                            :checked="gameId == 1">
-                        <label class="btn btn-outline-dark fw-bold rounded-0"
-                            :class="gameId == 1 ? 'text-white' : 'text-black'" for="btnradio1">Hangman Game</label>
-
-                        <input type="radio" class="btn-check" v-model="gameId" :value="2" id="btnradio2" autocomplete="off"
-                            :checked="gameId == 2">
-                        <label class="btn btn-outline-dark fw-bold rounded-0"
-                            :class="gameId == 2 ? 'text-white' : 'text-black'" for="btnradio2">Typing Balloon</label>
-
-                        <input type="radio" class="btn-check" v-model="gameId" :value="3" id="btnradio3" autocomplete="off"
-                            :checked="gameId == 3">
-                        <label class="btn btn-outline-dark fw-bold rounded-0"
-                            :class="gameId == 3 ? 'text-white' : 'text-black'" for="btnradio3">Memory Game</label>
-                    </div>
-                    <div>
-                        <button data-bs-toggle="modal" data-bs-target="#skillTestModal"
-                            class="btn btn-secondary rounded-0 fw-bold">Check Skill Test</button>
-                    </div>
-                </div>
-
-                <h3 class="fw-bold mt-5 mb-2">{{ gameName }}</h3>
-                <div class="d-flex justify-content-center">
-                    <table class="table table-bordered table-responsive">
-                        <thead>
-                            <tr>
-                                <th scope="col">Date/Time</th>
-                                <th>Score</th>
-                                <th>Mark</th>
-                            </tr>
-                        </thead>
-                        <tbody v-if="isLoading">
-                            <tr>
-                                <td colspan="3" class="text-center fw-bold">Loading...</td>
-                            </tr>
-                        </tbody>
-                        <tbody v-else-if="!isLoading && reports.length == 0">
-                            <tr>
-                                <td colspan="3" class="text-center fw-bold">No data found</td>
-                            </tr>
-                        </tbody>
-                        <tbody v-else>
-                            <tr v-for="item in reports" :key="item.id">
-                                <td>{{ new Date(item.created_at).toLocaleString() }}</td>
-                                <td>{{ percentage(item.total_score) }}%</td>
-                                <td>{{ item.mark }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div v-if="reports.length !== 0" class="d-flex justify-content-around">
-                    <button :disabled="reports.length <= 10" class="btn btn-secondary rounded-0">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button :disabled="reports.length <= 10" class="btn btn-secondary rounded-0">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-                <div class="certificate my-3">
-                    <div class="card">
-                        <img :src="certificate.file" alt="">
-                        <div class="card-body">
-                            <h3 class="mb-3 fw-bold">Upload Certificates</h3>
-                            <form @submit.prevent="uploadCertificate" enctype="multipart/form-data">
-                                <div class="mb-3">
-                                    <input ref="fileInput" accept="image/*, .doc, .docx, .pdf" name="file"
-                                        @change="parseFile" type="file" class="form-control" id="certificate">
-                                    <small class="text-danger" v-if="errors && errors.file">{{ errors.file[0] }}</small>
-                                </div>
-                                <button v-if="!isProcessing" style="width: 180px" type="submit"
-                                    class="btn btn-success rounded-0 fw-bold">Upload
-                                    Certificate</button>
-                                <button v-else disabled style="font-weight: bold; width: 180px;" type="button"
-                                    class="btn btn-success rounded-0 pb-0">
-                                    <Loading />
-                                </button>
-                            </form>
-                            <hr>
-                            <div class="certificates mt-3">
-                                <h5 class="fw-bold">Files</h5>
-                            </div>
-                            <p v-if="isLoading">Loading...</p>
-                            <p v-if="!isLoading && certificates.length === 0">No certificates added</p>
-                            <li v-else v-for="item in certificates" :key="item.id" class="list-group-item">
-                                <a :href="item.file_url" download style="margin-right: 20px">{{ item.file }}</a>
-                                <button type="button" @click="deleteCertificate(item.id, item.file)"
-                                    class="btn btn-danger btn-sm rounded-0"><i class="fas fa-trash-alt"></i></button>
-                            </li>
-                        </div>
-                    </div>
-                </div> -->
+                <AlphabetReports ref="AlphabetReports" :reports="reports" :student-id="studentId" :flag="flag" :game-name="gameName" :quiz-report-average="quizReportAverage" :quiz-report-retake="quizReportRetake" />
             </div>
-            <!-- <div class="modal fade" id="skillTestModal" aria-hidden="true" data-bs-backdrop="static"
-                aria-labelledby="skillTestModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered modal-fullscreen">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="skillTestModal">Skill Test</h5>
-                            <button @click="active = false" type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="d-flex justify-content-between">
-                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                    <input type="radio" class="btn-check" v-model="flag" :value="'alphabet-letters'"
-                                        id="btnradio4" autocomplete="off" :checked="flag == 'alphabet-letters'">
-                                    <label class="btn btn-outline-dark fw-bold rounded-0"
-                                        :class="flag == 'alphabet-letters' ? 'text-white' : 'text-black'"
-                                        for="btnradio4">Alphabets/Letters</label>
-
-                                    <input type="radio" class="btn-check" v-model="flag" :value="'vowel-consonants'"
-                                        id="btnradio5" autocomplete="off" :checked="flag == 'vowel-consonants'">
-                                    <label class="btn btn-outline-dark fw-bold rounded-0"
-                                        :class="flag == 'vowel-consonants' ? 'text-white' : 'text-black'"
-                                        for="btnradio5">Vowels/Consonants</label>
-
-                                    <input type="radio" class="btn-check" v-model="flag" :value="'alphabet-words'"
-                                        id="btnradio6" autocomplete="off" :checked="flag == 'alphabet-words'">
-                                    <label class="btn btn-outline-dark fw-bold rounded-0"
-                                        :class="flag == 'alphabet-words' ? 'text-white' : 'text-black'"
-                                        for="btnradio6">Alphabets/Words</label>
-                                </div>
-                            </div>
-                            <div class="container mt-5">
-                                <div class="row w-100">
-                                    <div class="col-2 border-end border-secondary py-3">
-                                        <div class="scrollbar position-relative" id="scrollbar1">
-                                            <template v-if="!isLoading">
-                                                <div v-if="Object.keys(skillTest).length" class="row">
-                                                    <div class="col-12 mb-3" v-for="(item, index) in Object.keys(skillTest)"
-                                                        :key="index">
-                                                        <button @click="alphabetHandler(item)" style="width: 100px"
-                                                            type="button" class="btn rounded-0 fw-bold me-3"
-                                                            :class="indexes.skillTest === item ? 'btn-warning btn-lg' : 'btn-success'">
-                                                            {{ item.toUpperCase() }}
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div v-else>
-                                                    <h6 class="position-absolute start-50 top-50 translate-middle fw-bold">
-                                                        No records found</h6>
-                                                </div>
-                                            </template>
-                                            <div v-else>
-                                                <h6 class="position-absolute start-50 top-50 translate-middle fw-bold">
-                                                    Loading...</h6>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-10 position-relative">
-                                        <template v-if="!isLoading">
-                                            <div v-if="selectedSkillTest && selectedSkillTest.length">
-                                                <div class="text-center">
-                                                    <div class="row">
-                                                        <div v-for="(item, index) in selectedSkillTest" :key="index"
-                                                            class="col-lg-4 col-md-6 text-center mb-4">
-                                                            <div class="position-relative badge-overlay">
-                                                                <h5 class="text-center fw-bold">{{ item.object }}</h5>
-                                                                <video class="video-width" ref="previewElement"
-                                                                    :src="item.file_url" controls></video>
-                                                            </div>
-                                                            <h5 class="text-center fw-bold text-danger">Status: {{
-                                                                item.status.toUpperCase() }}</h5>
-                                                            <div class="mt-3">
-                                                                <div class="d-flex justify-content-around px-0">
-                                                                    <button type="button"
-                                                                        @click="updateSkillTest('correct', item.id)"
-                                                                        class="btn btn-success btn-lg rounded-0 fw-bold">
-                                                                        Correct <i class="fas fa-check"></i>
-                                                                    </button>
-                                                                    <button type="button"
-                                                                        @click="updateSkillTest('wrong', item.id)"
-                                                                        class="btn btn-danger btn-lg rounded-0 fw-bold">
-                                                                        Wrong <i class="fas fa-times"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="position-absolute start-50 top-50 translate-middle" v-else>
-                                                <h1 class="fw-bold">No records found</h1>
-                                            </div>
-                                        </template>
-                                        <div class="position-absolute start-50 top-50 translate-middle" v-else>
-                                            <h1 class="fw-bold">Loading...</h1>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button @click="active = false" class="btn btn-primary rounded-0" data-bs-dismiss="modal">
-                                Back
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
     </div>
 </template>
@@ -321,6 +76,7 @@ export default {
             file: '',
             certificates: [],
             quizReportAverage: 0,
+            quizReportRetake: [],
             isModifyPerfectScore: false,
             isProcessing: false,
             isLoading: false,
@@ -391,7 +147,7 @@ export default {
         async getReports() {
             this.isLoading = true
             try {
-                const data = await axios.get(`/api/quiz-report/student/${this.studentId}`)
+                const data = await axios.get(`/api/quiz-report/student/${this.studentId}?flag=${this.flag}`)
                 this.data = data.data
                 this.filterReports()
             } catch (error) {
@@ -473,8 +229,10 @@ export default {
             this.reports = this.data.data.filter((data) => {
                 return data.game_id == this.gameId
             })
-            if (Object.keys(this.reports).length)
+            if (Object.keys(this.reports).length) {
                 this.quizReportAverage = this.data.average ?? 0
+                this.quizReportRetake = this.data.retake ?? []
+            }
         },
         alphabetHandler(letter) {
             this.indexes.skillTest = letter

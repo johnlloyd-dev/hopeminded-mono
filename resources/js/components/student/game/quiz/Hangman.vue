@@ -64,7 +64,7 @@
                 </div>
 
                 <div id="button-board">
-                    <button v-for="letter in letters" @click="guess(letter.letter)" :key="letter.letter"
+                    <button v-for="letter in letters" @click="guess(letter.letter, letter.image)" :key="letter.letter"
                         :class="{ 'strike': badGuesses.includes(letter.letter), 'highlight': guesses.includes(letter.letter) }"
                         :disabled="guesses.includes(letter.letter) || gameOver || disabled">
                         <img :src="letter.image" class="letter" :class="{ 'riser': guesses.includes(letter.letter) }" />
@@ -148,7 +148,12 @@ export default {
         hangmanGame: {
             highestLevel: 1,
             score: 0
-        }
+        },
+        quizMistake: {
+            quiz_report_id: null,
+            flag: null,
+            attributes: {}
+        },
     }),
     mounted() {
         this.initQuizInfo()
@@ -333,11 +338,13 @@ export default {
             return this.guesses.includes(letter) || this.gameOver ? letter : '_'
         },
         //Handles the guess and all possible results
-        guess(letter) {
+        guess(letter, image) {
             this.guesses.push(letter)
             if (!this.currentQuote.includes(letter)) {
                 this.strikes.pop()
                 this.strikes = [{ key: Math.floor(Math.random() * 100), icon: '🚫', guess: letter }, ...this.strikes]
+
+                this.storeQuizMistakes(letter, image, 'wrong')
             }
 
             if (this.strikeout) {
@@ -352,7 +359,7 @@ export default {
                 this.gameOver = true
                 this.score++
                 this.setMainScore()
-
+                this.storeQuizMistakes(letter, image, 'correct')
                 if (this.score == 9) {
                     this.show = true
                     this.text = `Congratulations! You finished all 3 levels. Your score is ${this.hangmanGame.score}.`
@@ -424,7 +431,7 @@ export default {
         },
         cancelExit() {
             this.show = false
-            this.$router.push('/student-textbook')
+            this.$router.push('/alphabet-by-words')
         },
         setMainScore() {
             if ((this.flag + 1) == 1) {
@@ -435,6 +442,25 @@ export default {
                 this.hangmanGame.score += 3;
             }
             this.updateQuizInfo()
+        },
+        storeQuizMistakes(answerAlphabet, answerImage, mark) {
+            this.quizMistake.quiz_report_id = this.quizInfo.id
+            this.quizMistake.flag = 'hangman-game'
+            const attributes = {
+                object_text: this.currentData.word,
+                object_image: this.currentData.image,
+                answer: answerAlphabet,
+                answer_image: answerImage,
+                mark: mark
+            }
+
+            this.quizMistake.attributes = JSON.stringify(attributes)
+
+            try {
+                axios.post(`/api/quiz-mistake/store`, this.quizMistake)
+            } catch (error) {
+                console.log(error)
+            }
         },
         setLetters() {
             this.letters = [

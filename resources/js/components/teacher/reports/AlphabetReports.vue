@@ -64,7 +64,7 @@
                         </template>
                         <table v-else class="table table-bordered">
                             <tbody>
-                                <tr v-for="(item, index) in allAphabets" :key="item">
+                                <tr v-for="(item) in allAphabets" :key="item">
                                     <td>
                                         <template v-if="!skillTest.hasOwnProperty(item)">
                                             <div>
@@ -80,35 +80,40 @@
                                                     </div>
                                                     <div class="col-2 d-flex align-items-center">
                                                         <h6 class="mb-0">Object: <span class="fw-bold text-danger">{{
-                                                            skillTest[item][index].object }}</span></h6>
+                                                            skillTest[item][0].object }}</span></h6>
                                                     </div>
                                                     <div class="col-3 d-flex align-items-center">
                                                         Skill Test Video:
-                                                        <button @click="playSkillTestVideo(skillTest[item][index].file_url)"
+                                                        <button @click="playSkillTestVideo(skillTest[item][0].file_url)"
                                                             class="btn border-0">
                                                             <i class="fas fa-play-circle fa-lg text-danger"></i>
                                                         </button>
                                                     </div>
-                                                    <div class="col-5">
+                                                    <div class="col-5 d-flex">
                                                         Allowed Retake:
                                                         <span class="ms-3">
-                                                            <template v-if="!showRetakeModify.hasOwnProperty(item) || !showRetakeModify[item]">
-                                                                <span style="border-bottom: 3px solid black" class="h5 fw-bold me-3 text-center text-danger">1</span>
-                                                                <button @click="showRetakeModify[item] = true" class="btn btn-success rounded-0 btn-sm border-0">
+                                                            <template
+                                                                v-if="!showSkillTestRetakeModify.hasOwnProperty(item) || !showSkillTestRetakeModify[item]">
+                                                                <span style="border-bottom: 3px solid black"
+                                                                    class="h5 fw-bold me-3 text-center text-danger">{{ skillTestRetake[item].allowed_retake }}</span>
+                                                                <button @click="showSkillTestRetakeModify[item] = true, allowedSkillTestAttempt[item] = skillTestRetake[item].allowed_retake"
+                                                                    class="btn btn-success rounded-0 btn-sm border-0">
                                                                     <i class="fas fa-edit fa-sm"></i>
                                                                 </button>
                                                             </template>
                                                             <template v-else>
-                                                                <form class="d-flex align-items-center">
+                                                                <form @submit.prevent="allowRetakeSkillTest(skillTestRetake[item], item)" class="d-flex align-items-center">
                                                                     <div>
-                                                                        <input type="number" v-model="allowedAttempt[item]"
-                                                                            class="form-control form-control-sm rounded-0" min="1">
+                                                                        <input type="number" v-model="allowedSkillTestAttempt[item]"
+                                                                            class="form-control form-control-sm rounded-0"
+                                                                            min="1">
                                                                     </div>
-                                                                    <button type="submit"
+                                                                    <button :disabled="allowedSkillTestAttempt[item] < 1" type="submit"
                                                                         class="btn btn-primary rounded-0 btn-sm border-0">
                                                                         <i class="fas fa-save fa-sm"></i>
                                                                     </button>
-                                                                    <button @click="showRetakeModify[item] = false" type="button"
+                                                                    <button @click="showSkillTestRetakeModify[item] = false"
+                                                                        type="button"
                                                                         class="btn btn-secondary rounded-0 btn-sm border-0">
                                                                         <i class="fas fa-close fa-sm"></i>
                                                                     </button>
@@ -176,7 +181,7 @@
                                                     <tr class="fw-bold border-0">
                                                         <td colspan="1" class="border-0"></td>
                                                         <td class="text-end border-0">Average:</td>
-                                                        <td class="border-0">{{ skillTestAverage }}</td>
+                                                        <td class="border-0">{{ skillTestAverage[item] }}</td>
                                                         <td class="border-0" colspan="2"></td>
                                                     </tr>
                                                 </tbody>
@@ -200,8 +205,13 @@
                     </button>
                 </div>
                 <div class="collapse show" id="quizReport">
-                    <h6 class="fw-bold my-3">Perfect Score: <span class="text-danger">{{ reports.length ?
-                        reports[0].perfect_score : '(No data found)' }}</span></h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold my-3">Perfect Score: <span class="text-danger">{{ reports.length ?
+                            reports[0].perfect_score : '(No data found)' }}</span></h6>
+                        <button @click="viewWeaknesses()" class="btn btn-success btn-sm rounded-0 text-end">
+                            Weaknesses <i class="fas fa-book-reader"></i>
+                        </button>
+                    </div>
                     <div class="card card-body rounded-0">
                         <table class="table table-bordered table-responsive">
                             <thead>
@@ -229,12 +239,12 @@
                                     <td>{{ new Date(item.created_at).toLocaleString() }}</td>
                                     <td>{{ item.total_score }}</td>
                                     <td>{{ item.percentage }}% of {{ item.perfect_score }}</td>
-                                    <td>{{ upperCaseFirstLetter(item.mark) }}</td>
+                                    <td>{{ upperCaseFirstLetter(item.mark) }} </td>
                                 </tr>
                                 <tr class="fw-bold border-0">
                                     <td colspan="1" class="border-0"></td>
                                     <td class="text-end border-0">Average:</td>
-                                    <td class="border-0">{{ quizReportAverage }}</td>
+                                    <td class="border-0">{{ quizReportAverage[this.$parent.gameId] }}</td>
                                     <td class="border-0" colspan="2"></td>
                                 </tr>
                             </tbody>
@@ -260,6 +270,189 @@
                     </div>
                 </div>
             </div>
+            <!-- Modal -->
+            <div class="modal fade rounded-0" id="weaknessModal" tabindex="-1" aria-labelledby="weaknessModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Weaknesses</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <template v-if="weaknessesDataLoading">
+                                <ul class="o-vertical-spacing o-vertical-spacing--l">
+                                    <li class="blog-post o-media">
+                                        <div class="o-media__figure">
+                                            <span class="skeleton-box" style="width:100px;height:80px;"></span>
+                                        </div>
+                                        <div class="o-media__body">
+                                            <div class="o-vertical-spacing">
+                                                <h3 class="blog-post__headline">
+                                                    <span class="skeleton-box" style="width:55%;"></span>
+                                                </h3>
+                                                <p>
+                                                    <span class="skeleton-box" style="width:80%;"></span>
+                                                    <span class="skeleton-box" style="width:90%;"></span>
+                                                    <span class="skeleton-box" style="width:83%;"></span>
+                                                    <span class="skeleton-box" style="width:80%;"></span>
+                                                </p>
+                                                <div class="blog-post__meta">
+                                                    <span class="skeleton-box" style="width:70px;"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </template>
+                            <div v-else class="accordion" id="accordionExample">
+                                <div class="accordion-item">
+                                    <div class="alert alert-warning" role="alert">
+                                        <span class="fw-bold">Note: </span>Hangman game is played by selecting the correct
+                                        alphabet symbol based on the object image and text presented. If the selected
+                                        alphabet sign did not match to the object name, it will be considered wrong.
+                                    </div>
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            Quiz Answers/Responses
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse show"
+                                        aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                        <div class="accordion-body">
+                                            <template v-if="Object.keys(weaknessesData).length">
+                                                <div v-for="(item, index) in Object.values(weaknessesData.data)"
+                                                    :key="index" class="card mb-1">
+                                                    <div class="card-header">
+                                                        No. {{ index + 1 }}
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <template v-if="flag === 'alphabet-words'">
+                                                            <table class="table table-bordered table-responsive">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="width: 20%">Object Image</th>
+                                                                        <th style="width: 20%">Object Name</th>
+                                                                        <th style="width: 20%">Student Answer</th>
+                                                                        <th style="width: 20%">Answer Image</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody v-if="!item.length">
+                                                                    <tr>
+                                                                        <td colspan="4" class="text-center fw-bold">No data
+                                                                            found</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tbody v-else>
+                                                                    <tr :class="item2.attributes.mark === 'wrong' ? 'table-danger' : 'table-success'"
+                                                                        class="fw-bold" v-for="item2 in item" :key="item2.id">
+                                                                        <td>
+                                                                            <img width="100"
+                                                                                :src="'/' + item2.attributes.object_image">
+                                                                        </td>
+                                                                        <td>{{ item2.attributes.object_text }}</td>
+                                                                        <td>{{ item2.attributes.answer }}</td>
+                                                                        <td>
+                                                                            <img width="100"
+                                                                                :src="'/' + item2.attributes.answer_image">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </template>
+                                                        <template v-else-if="flag === 'alphabet-letters'">
+                                                            <table class="table table-bordered table-responsive">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="width: 20%">Alphabet</th>
+                                                                        <th style="width: 20%">Object Image</th>
+                                                                        <th style="width: 20%">Object Name</th>
+                                                                        <th style="width: 20%">Student Answer</th>
+                                                                        <th style="width: 20%">Answer Image</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody v-if="!item.length">
+                                                                    <tr>
+                                                                        <td colspan="4" class="text-center fw-bold">No data
+                                                                            found</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tbody v-else>
+                                                                    <tr :class="item2.attributes.mark === 'wrong' ? 'table-danger' : 'table-success'"
+                                                                        class="fw-bold" v-for="item2 in item" :key="item2.id">
+                                                                        <td>{{ item2.attributes.alphabet }}</td>
+                                                                        <td>
+                                                                            <img width="100"
+                                                                                :src="'/' + item2.attributes.object_image">
+                                                                        </td>
+                                                                        <td>{{ item2.attributes.object }}</td>
+                                                                        <td>{{ item2.attributes.answer }}</td>
+                                                                        <td>
+                                                                            <img width="100"
+                                                                                :src="item2.attributes.answer_image">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <div v-else>
+                                                <p class="text-center">No record to display.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingThree">
+                                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseThree" aria-expanded="false"
+                                            aria-controls="collapseThree">
+                                            Answer Keys
+                                        </button>
+                                    </h2>
+                                    <div id="collapseThree" class="accordion-collapse collapse"
+                                        aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                                        <div class="accordion-body">
+                                            <template v-if="Object.keys(weaknessesData).length">
+                                                <table class="table table-bordered table-responsive">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 20%">Object Image</th>
+                                                            <th style="width: 20%">Object Name</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody v-if="!weaknessesData.answer_key.length">
+                                                        <tr>
+                                                            <td colspan="2" class="text-center fw-bold">No data found</td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tbody v-else>
+                                                        <tr class="fw-bold"
+                                                            v-for="(item, index) in weaknessesData.answer_key" :key="index">
+                                                            <td>
+                                                                <img width="100" :src="'/' + item.image">
+                                                            </td>
+                                                            <td>{{ item.word.toUpperCase() }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </template>
+                                            <template v-else>
+                                                <div>
+                                                    <p class="text-center">No record to display</p>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -267,7 +460,7 @@
 <script>
 import swal from 'sweetalert2'
 export default {
-    props: ['gameName', 'studentId', 'flag', 'reports', 'quizReportAverage'],
+    props: ['gameName', 'studentId', 'flag', 'reports', 'quizReportAverage', 'quizReportRetake'],
     data() {
         return {
             indexes: {
@@ -281,11 +474,17 @@ export default {
             isEditScore: false,
             isEditPerfectScore: false,
             isLoading: false,
+            weaknessesDataLoading: false,
             skillTestVideoUrl: null,
+            weaknessesData: {},
             skillTest: {},
             newScore: {},
-            allowedAttempt: {},
-            showRetakeModify: {}
+            allowedSkillTestAttempt: {},
+            allowedQuizAttempt: {},
+            skillTestAverage: [],
+            skillTestRetake: [],
+            showSkillTestRetakeModify: {},
+            showQuizRetakeModify: {}
         }
     },
     created() {
@@ -324,8 +523,10 @@ export default {
                 }, {});
 
                 this.skillTest = mergedObject
-                if (Object.keys(this.skillTest).length)
+                if (Object.keys(this.skillTest).length) {
                     this.skillTestAverage = data.data.average ?? 0
+                    this.skillTestRetake = data.data.retake ?? []
+                }
 
                 this.indexes.skillTest = Object.keys(mergedObject)[0]
             } catch (error) {
@@ -358,7 +559,66 @@ export default {
         playSkillTestVideo(video_url) {
             this.skillTestVideoUrl = video_url
             $('#skillTestVideoModal').modal('show')
-        }
+        },
+        async viewWeaknesses() {
+            try {
+                $('#weaknessModal').modal('show')
+                let gameFlag = null;
+                switch (this.flag) {
+                    case 'alphabet-words':
+                        gameFlag = 'hangman-game'
+                        break;
+                    case 'alphabet-letters':
+                        gameFlag = 'memory-game'
+                        break;
+                    case 'vowel-consonants':
+                        gameFlag = 'typing-balloon'
+                        break;
+                }
+
+                this.weaknessesDataLoading = true
+                const response = await axios.get(`/api/get-mistakes/${this.studentId}?game_flag=${gameFlag}`)
+                if (response.status == 200 && response.data.data.length) {
+                    const groupedObjects = response.data.data.reduce((groups, obj) => {
+                        const key = obj.quiz_report_id;
+
+                        if (!groups[key]) {
+                            groups[key] = [];
+                        }
+
+                        groups[key].push(obj);
+
+                        return groups;
+                    }, {});
+                    this.weaknessesData.data = groupedObjects
+                    this.weaknessesData.answer_key = response.data.answer_key
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.weaknessesDataLoading = false
+            }
+        },
+        async allowRetakeSkillTest(data, item) {
+            try {
+                const response = await axios.put(`/api/retake/skill-test/allow/${data.id}`, { allowed_retake: this.allowedSkillTestAttempt[item] })
+                swal.fire('Success', response.data.message, 'success')
+                this.getSkillTest()
+                this.showSkillTestRetakeModify[item] = false
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        // async allowRetakeQuiz(data, item) {
+        //     try {
+        //         const response = await axios.put(`/api/retake/quiz/allow/${data.id}`, { allowed_retake: this.allowedSkillTestAttempt[item] })
+        //         swal.fire('Success', response.data.message, 'success')
+        //         this.$parent.getReports()
+        //         this.showSkillTestRetakeModify[item] = false
+        //     } catch (error) {
+        //         console.log(error)
+        //     }
+        // }
     }
 }
 </script>

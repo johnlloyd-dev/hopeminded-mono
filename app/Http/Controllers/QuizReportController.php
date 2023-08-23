@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\QuizReport;
+use App\Models\Retake;
 use Illuminate\Http\Request;
 
 class QuizReportController extends Controller
 {
-    public function getStudentQuizReport($studentId)
+    public function getStudentQuizReport(Request $request, $studentId)
     {
         $quizReport = [];
         $quizReport['data'] = QuizReport::where('student_id', $studentId)
@@ -22,17 +23,55 @@ class QuizReportController extends Controller
                 $report->perfect_score = $perfect_score;
                 $report->percentage = round($percentage);
                 return $report;
-            })
-            ->toArray();
+            });
 
         if ($quizReport['data']) {
-            $total = 0;
-            $count = count($quizReport);
+            $groupedObjects = [];
 
-            foreach ($quizReport['data'] as $index => $item) {
-                $total += $item["total_score"];
+            foreach ($quizReport['data'] as $object) {
+                $gameId = $object['game_id'];
+
+                if (!isset($groupedObjects[$gameId])) {
+                    $groupedObjects[$gameId] = [];
+                }
+
+                $groupedObjects[$gameId][] = $object;
             }
-            $quizReport["average"] = ceil($total / $count);
+            $itemKeys = $groupedObjects;
+            $averages = [];
+
+
+            foreach ($itemKeys as $key => $group) {
+                $totalScores = array_column($group, 'total_score');
+                $totalScores = array_map('intval', $totalScores);
+
+                $average = array_sum($totalScores) / count($totalScores);
+                $averages[$key] = $average;
+            }
+
+            $quizReport['average'] = $averages;
+
+            $retake = Retake::where('student_id', $studentId)
+                ->where('flag', 'quiz')
+                ->get()
+                ->map(function ($data) {
+                    $data->attributes = json_decode($data->attributes);
+                    return $data;
+                })
+                ->toArray();
+
+            $groupedRetakes = [];
+            foreach ($retake as $data) {
+                if (isset($data['attributes']->game_id)) {
+                    $gameId = $data['attributes']->game_id;
+                    if (!isset($groupedRetakes[$gameId])) {
+                        $groupedRetakes[$gameId] = [];
+                    }
+                    $groupedRetakes[$gameId] = $data;
+                }
+            }
+
+            $quizReport['retake'] = $groupedRetakes;
         }
 
         return $quizReport;

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\PerfectScore;
+use App\Models\Retake;
 use App\Models\SkillTest;
 use App\Models\Student;
 use DateTime;
@@ -13,6 +15,11 @@ class SkillTestController extends Controller
 {
     public function addSkillTest(Request $request)
     {
+        $student_id = Student::where('user_id', Auth::user()->id)->first()->id;
+        $skillTest = SkillTest::where('student_id', $student_id)
+            ->where('letter', $request->letter)
+            ->count();
+
         $expiresAt = new DateTime();
         $expiresAt->modify('+1 year');
         $image = $request->file('video'); //image file from frontend
@@ -28,20 +35,38 @@ class SkillTestController extends Controller
             ])->signedUrl($expiresAt);
             unlink($localfolder . $file);
             if ($path) {
-                $modify = self::modifyExistingObject($request->flag, $request->object);
-                if ($modify) {
-                    SkillTest::create([
-                        'student_id' => Student::where('user_id', Auth::user()->id)->first()->id,
-                        'letter' => $request->letter,
-                        'flag' => $request->flag,
-                        'file_url' => $path,
-                        'object' => $request->object,
-                        'status' => 'pending'
-                    ]);
-                    return response()->json([
-                        'message' => 'Skill test is uploaded successfull.'
-                    ]);
-                }
+                SkillTest::create([
+                    'student_id' => $student_id,
+                    'letter' => $request->letter,
+                    'flag' => $request->flag,
+                    'file_url' => $path,
+                    'object' => $request->object,
+                    'status' => 'pending'
+                ]);
+
+                Retake::create([
+                    'allowed_retake' => 0,
+                    'student_id' => $student_id,
+                    'flag' => 'skill_test',
+                    'textbook_flag' => $request->flag,
+                    'attributes' => json_encode((object)[
+                        'alphabet' => $request->letter
+                    ])
+                ]);
+
+                Notification::create([
+                    'student_id' => $student_id,
+                    'flag' => $skillTest != 0 ? 'fs_resubmit_skill_test' : 'fs_first_skill_test',
+                    'subject' => 'for_teacher',
+                    'url' => '/student-quiz-report' . '/' . $student_id,
+                    'status' => 'unread',
+                    'attributes' => json_encode((object)[
+                        'alphabet' => $request->letter
+                    ])
+                ]);
+                return response()->json([
+                    'message' => 'Skill test is uploaded successfull.'
+                ]);
             }
             return response()->json([
                 'message' => 'Something went wrong.'
@@ -76,12 +101,51 @@ class SkillTestController extends Controller
 
 
         if (count($skillTest['data'])) {
-            $total = 0;
-            $count = count($skillTest);
-            foreach ($skillTest['data'] as $index => $item) {
-                $total += $item["score"];
+            $groupedObjects = [];
+
+            foreach ($skillTest['data'] as $object) {
+                $letter = $object['letter'];
+
+                if (!isset($groupedObjects[$letter])) {
+                    $groupedObjects[$letter] = [];
+                }
+
+                $groupedObjects[$letter][] = $object;
             }
-            $skillTest["average"] = ceil($total / $count);
+            $average = $groupedObjects;
+            $averages = [];
+
+            foreach ($average as $key => $group) {
+                $totalScores = array_column($group, 'score');
+                $totalScores = array_map('intval', $totalScores);
+
+                $average = array_sum($totalScores) / count($totalScores);
+                $averages[$key] = $average;
+            }
+
+            $skillTest['average'] = $averages;
+
+            $retake = Retake::where('student_id', $studentId)
+                ->where('flag', 'skill_test')
+                ->get()
+                ->map(function ($data) {
+                    $data->attributes = json_decode($data->attributes);
+                    return $data;
+                })
+                ->toArray();
+
+            $groupedRetakes = [];
+            foreach ($retake as $data) {
+                if (isset($data['attributes']->alphabet)) {
+                    $alphabet = $data['attributes']->alphabet;
+                    if (!isset($groupedRetakes[$alphabet])) {
+                        $groupedRetakes[$alphabet] = [];
+                    }
+                    $groupedRetakes[$alphabet] = $data;
+                }
+            }
+
+            $skillTest['retake'] = $groupedRetakes;
         }
 
         return $skillTest;
@@ -124,6 +188,43 @@ class SkillTestController extends Controller
 
         return response()->json([
             'message' => 'Score is updated.'
+        ]);
+    }
+
+    public function allowRetake(Request $request, $retakeId)
+    {
+        $retake = Retake::find($retakeId);
+
+        $retake->allowed_retake = $request->input('allowed_retake');
+        $retake->save();
+
+        $url = null;
+        switch ($retake->textbook_flag) {
+            case 'alphabet-words':
+                $url = '/alphabet-by-words';
+                break;
+
+            case 'alphabet-letters':
+                $url = '/alphabet-by-letters';
+                break;
+
+            case 'vowel-consonants':
+                $url = '/vowel-consonants';
+                break;
+        }
+
+        Notification::create([
+            'student_id' => $retake->student_id,
+            'flag' => 'ft_retake_skill_test',
+            'subject' => 'for_student',
+            'url' => $url,
+            'status' => 'unread',
+            'attributes' => json_encode((object)[
+                'alphabet' => json_decode($retake->attributes)->alphabet
+            ])
+        ]);
+        return response()->json([
+            'message' => 'Allowed retake successfully updated.'
         ]);
     }
 }

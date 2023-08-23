@@ -67,7 +67,7 @@
                                 </ul>
                             </div>
                             <div v-for="option in alphabetOptions" :key="option.letter" class="col-6 mb-3">
-                                <button :class="{'vibrating-element bg-danger': !letter_selection.mark && option.letter === letter_selection.letter, 'bg-success': letter_selection.mark && option.letter === letter_selection.letter}" @click="handleMatched(option.letter)" style="height: 200px; width: 200px" class="btn border">
+                                <button :class="{'vibrating-element bg-danger': !letter_selection.mark && option.letter === letter_selection.letter, 'bg-success': letter_selection.mark && option.letter === letter_selection.letter}" @click="handleMatched(option.letter, option.image)" style="height: 200px; width: 200px" class="btn border">
                                     <img style="width: 100px;" :src="option.image">
                                 </button>
                             </div>
@@ -135,6 +135,11 @@ export default {
             memoryGame: {
                 highestLevel: 1,
                 score: 0
+            },
+            quizMistake: {
+                quiz_report_id: null,
+                flag: null,
+                attributes: {}
             },
             time: 60, // Initial time in seconds
             timer: null // Timer reference
@@ -236,6 +241,7 @@ export default {
                                 // this.startTimer();
                                 this.disabledGame = false
                                 this.storeQuizInfo()
+                                this.fetchAlphabets()
                                 this.fetchData();
                             }
                         })
@@ -256,6 +262,7 @@ export default {
                         // this.startTimer();
                         this.disabledGame = false
                         this.storeQuizInfo()
+                        this.fetchAlphabets()
                         this.fetchData();
                     }
                 }
@@ -270,6 +277,7 @@ export default {
                 this.cards[index] = {
                     icon: '',
                     image: '',
+                    object: '',
                     down: true,
                     matched: false
                 }
@@ -280,6 +288,8 @@ export default {
                 this.cards[index + icons.length].icon = icon.letter;
                 this.cards[index].image = icon.image
                 this.cards[index + icons.length].image = icon.image;
+                this.cards[index].object = icon.object
+                this.cards[index + icons.length].object = icon.object;
             });
             this.cards = _.shuffle(this.cards);
         },
@@ -328,11 +338,13 @@ export default {
                 }
             }
         },
-        handleMatched(letter) {
+        handleMatched(letter, image) {
             if(letter.toLowerCase() !== this.matchedData.icon.toLowerCase()) {
                 this.strikes.pop()
                 this.strikes = [{ key: Math.floor(Math.random() * 100), icon: '🚫', guess: letter }, ...this.strikes]
                 this.letter_selection = { mark: 0, letter: letter }
+
+                this.storeQuizMistakes(letter, image, 'wrong')
             }
 
             if (this.strikeout) {
@@ -344,6 +356,7 @@ export default {
             } else {
                 if (letter.toLowerCase() === this.matchedData.icon.toLowerCase()) {
                     this.letter_selection = { mark: 1, letter: letter }
+                    this.storeQuizMistakes(letter, image, 'correct')
                     this.cards.forEach((card) => {
                         if (this.matched && !card.down && !card.matched) {
                             card.matched = true;
@@ -392,6 +405,26 @@ export default {
         updateQuizInfo() {
             axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=3`, this.memoryGame)
         },
+        storeQuizMistakes(answerAlphabet, answerImage, mark) {
+            this.quizMistake.quiz_report_id = this.quizInfo.id
+            this.quizMistake.flag = 'memory-game'
+            const attributes = {
+                alphabet: this.matchedData.icon,
+                object: this.matchedData.object,
+                object_image: this.matchedData.image,
+                answer: answerAlphabet,
+                answer_image: answerImage,
+                mark: mark
+            }
+
+            this.quizMistake.attributes = JSON.stringify(attributes)
+
+            try {
+                axios.post(`/api/quiz-mistake/store`, this.quizMistake)
+            } catch (error) {
+                console.log(error)
+            }
+        },
         nextLevel() {
             if (this.nextButtonText == 'Replay') {
                 window.location.reload()
@@ -414,7 +447,7 @@ export default {
         },
         cancelExit() {
             this.show = false
-            this.$router.push('/student-textbook')
+            this.$router.push('/alphabet-by-letters')
         },
         startTimer() {
             this.timer = setInterval(() => {

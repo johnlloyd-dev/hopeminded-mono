@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\Notification;
+use App\Models\QuizMistake;
 use App\Models\QuizReport;
+use App\Models\Retake;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class GameController extends Controller
 {
@@ -48,9 +52,8 @@ class GameController extends Controller
         $gameInfo = Game::where('flag', $flag)->first();
         $quizReport = QuizReport::where('student_id', $student->id)
             ->where('game_id', $gameInfo->id)
-            ->latest()
-            ->first();
-        $attemptNumber = $quizReport ? $quizReport->attempt_number : 1;
+            ->get();
+        $attemptNumber = count($quizReport) != 0 ? $quizReport[0]->attempt_number++ : 1;
         $quiz = QuizReport::create([
             'student_id' => $student->id,
             'game_id' => $gameInfo->id,
@@ -59,6 +62,36 @@ class GameController extends Controller
             'mark' => 'failed',
             'attempt_number' => $attemptNumber,
             'flag' => $request->get('flag') && $request->get('flag') === 'tutorial' ? 'tutorial' : 'quiz'
+        ]);
+
+        $textbookName = null;
+        if ($gameInfo->flag === 'hangman-game')
+            $textbookName = 'Alphabets/Words';
+        else if ($gameInfo->flag === 'typing-balloon')
+            $textbookName = 'Vowels/Consonants';
+        else
+            $textbookName = 'Alphabets/Letters';
+
+        Retake::create([
+            'allowed_retake' => 0,
+            'student_id' => $student->id,
+            'flag' => 'quiz',
+            'textbook_flag' => $gameInfo->textbook_flag,
+            'attributes' => json_encode((object)[
+                'game_id' => $gameInfo->id
+            ])
+        ]);
+
+        Notification::create([
+            'student_id' => $student->id,
+            'flag' => count($quizReport) != 0 ? 'fs_retake_quiz' : 'fs_first_take_quiz',
+            'subject' => 'for_teacher',
+            'url' => '/student-quiz-report' . '/' . $student->id,
+            'status' => 'unread',
+            'attributes' => json_encode((object)[
+                'game_id' => $gameInfo->id,
+                'textbook_name' => $textbookName
+            ])
         ]);
 
         return $quiz;
@@ -112,5 +145,90 @@ class GameController extends Controller
             ->where('flag', 'quiz')
             ->orderByRaw('-total_score ASC')
             ->get();
+    }
+
+    public function addQuizMistakeRecord(Request $request)
+    {
+        QuizMistake::create([
+            'quiz_report_id' => $request->input('quiz_report_id'),
+            'game_flag' => $request->input('flag'),
+            'student_id' => Student::where('user_id', Auth::user()->id)->first()->id,
+            'attributes' => $request->input('attributes')
+        ]);
+
+        return response()->json([
+            'message' => 'Stored successfully.'
+        ]);
+    }
+
+    public function getWeaknessesData(Request $request, $studentId)
+    {
+        $quizReport['data'] = QuizMistake::where('student_id', $studentId)
+            ->where('game_flag', $request->query('game_flag'))
+            ->get()
+            ->map(function ($data) {
+                $data->attributes = json_decode($data->attributes);
+                return $data;
+            });
+        if (count($quizReport['data'])) {
+            if ($quizReport['data'][0]->flag === 'hangman-game' || $quizReport['data'][0]->flag === 'typing-balloon') {
+                $jsonFile = Storage::path('public/json/balloon-game.json');
+                $jsonData = json_decode(file_get_contents($jsonFile), true);
+                $quizReport['answer_key'] = $jsonData;
+            } else {
+                $jsonFile = Storage::path('public/json/hangman-game.json');
+                $jsonData = json_decode(file_get_contents($jsonFile), true);
+                $quizReport['answer_key'] = $jsonData;
+            }
+        }
+
+        return $quizReport;
+    }
+
+    public function allowRetake(Request $request, $retakeId)
+    {
+        $retake = Retake::find($retakeId);
+
+        $retake->allowed_retake = $request->input('allowed_retake');
+        $retake->save();
+
+        $url = null;
+        switch ($retake->textbook_flag) {
+            case 'alphabet-words':
+                $url = '/alphabet-by-words';
+                break;
+
+            case 'alphabet-letters':
+                $url = '/alphabet-by-letters';
+                break;
+
+            case 'vowel-consonants':
+                $url = '/vowel-consonants';
+                break;
+        }
+
+        $textbookName = null;
+        if ($retake->textbook_flag === 'hangman-game')
+            $textbookName = 'Alphabets/Words';
+        else if ($retake->textbook_flag === 'typing-balloon')
+            $textbookName = 'Vowels/Consonants';
+        else
+            $textbookName = 'Alphabets/Letters';
+
+        Notification::create([
+            'student_id' => $retake->student_id,
+            'flag' => 'ft_retake_quiz',
+            'subject' => 'for_student',
+            'url' => $url,
+            'status' => 'unread',
+            'attributes' => json_encode((object)[
+                'game_id' => json_decode($retake->attributes)->game_id,
+                'textbook_name' => $textbookName
+            ])
+        ]);
+
+        return response()->json([
+            'message' => 'Retake allowed.'
+        ]);
     }
 }
