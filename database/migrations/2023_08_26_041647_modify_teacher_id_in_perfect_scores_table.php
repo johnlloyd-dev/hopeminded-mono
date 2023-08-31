@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('retakes', function (Blueprint $table) {
-            $table->string('textbook_flag')->nullable();
+        Schema::table('perfect_scores', function (Blueprint $table) {
+            $table->dropForeign(['teacher_id']);
+            $table->foreignId('student_id')->constrained('students');
         });
     }
 
@@ -21,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('retakes', function (Blueprint $table) {
+        Schema::table('perfect_scores', function (Blueprint $table) {
             //
         });
     }

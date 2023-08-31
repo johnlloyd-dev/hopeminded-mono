@@ -9,5 +9,5 @@ class PerfectScore extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['score', 'flag', 'teacher_id'];
+    protected $fillable = ['score', 'flag', 'student_id'];
 }

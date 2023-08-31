@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('retakes', function (Blueprint $table) {
-            $table->string('textbook_flag')->nullable();
+        Schema::table('perfect_scores', function (Blueprint $table) {
+            $table->dropColumn('teacher_id');
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('retakes', function (Blueprint $table) {
+        Schema::table('perfect_scores', function (Blueprint $table) {
             //
         });
     }

@@ -42,15 +42,16 @@
                                     <div class="mb-3">
                                         <label for="scoreInput" class="form-label">Perfect Score:</label>
                                         <input type="text" v-model="setScore.score" class="form-control rounded-0" id="scoreInput" required>
+                                        <small v-if="perfectScoreError" class="text-danger">Perfect score must be above the highest score from skill test.</small>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-sm rounded-0 me-3">Save</button>
-                                    <button @click="isModifyPerfectScore = !isModifyPerfectScore" class="btn btn-secondary btn-sm rounded-0">Back</button>
+                                    <button @click="isModifyPerfectScore = !isModifyPerfectScore" type="button" class="btn btn-secondary btn-sm rounded-0">Back</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
-                <AlphabetReports ref="AlphabetReports" :reports="reports" :student-id="studentId" :flag="flag" :game-name="gameName" :quiz-report-average="quizReportAverage" :quiz-report-retake="quizReportRetake" />
+                <AlphabetReports ref="AlphabetReports" :reports="reports" :student-id="studentId" :flag="flag" :game-name="gameName" :quiz-report-highest-score="quizReportHighestScore" :quiz-report-retake="quizReportRetake" />
             </div>
         </div>
     </div>
@@ -75,9 +76,10 @@ export default {
             studentId: null,
             file: '',
             certificates: [],
-            quizReportAverage: 0,
+            quizReportHighestScore: 0,
             quizReportRetake: [],
             isModifyPerfectScore: false,
+            perfectScoreError: false,
             isProcessing: false,
             isLoading: false,
             perfectScoreMessage: null,
@@ -169,7 +171,7 @@ export default {
         },
         async getPerfectScore() {
            try {
-                const response = await axios.get(`/api/perfect-score/get`)
+                const response = await axios.get(`/api/perfect-score/get?student_id=${this.studentId}`)
                 this.perfect_score = response.data
                 this.setScore.score = response.data.score ?? this.default_perfect_score
             } catch (error) {
@@ -206,14 +208,15 @@ export default {
                 this.setScore.score = parseInt(this.setScore.score)
 
             try {
-                const response = await axios.post(`/api/perfect-score/modify?flag=${this.flag}`, this.setScore)
+                const response = await axios.post(`/api/perfect-score/modify?flag=${this.flag}&student_id=${this.studentId}`, this.setScore)
                 this.perfectScoreMessage = response.data.message
                 this.getPerfectScore()
                 this.$refs.AlphabetReports.getSkillTest()
                 swal.fire('Success', response.data.message, 'success')
                 this.isModifyPerfectScore = !this.isModifyPerfectScore
+                this.perfectScoreError = false
             } catch (error) {
-                console.log(error)
+                this.perfectScoreError = true
             }
         },
         percentage(score) {
@@ -226,11 +229,12 @@ export default {
             }
         },
         filterReports() {
+            this.quizReportHighestScore = []
             this.reports = this.data.data.filter((data) => {
                 return data.game_id == this.gameId
             })
             if (Object.keys(this.reports).length) {
-                this.quizReportAverage = this.data.average ?? 0
+                this.quizReportHighestScore = this.data.highest_score ?? 0
                 this.quizReportRetake = this.data.retake ?? []
             }
         },

@@ -169,6 +169,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/quiz-mistake/store',  [GameController::class, 'addQuizMistakeRecord']);
 
     Route::get('/get-mistakes/{studentId}',  [GameController::class, 'getWeaknessesData']);
+
+    Route::put('/notification/update/{notificationId}',  [NotificationController::class, 'updateNotification']);
+
+    Route::get('/available-ratake/quiz/get',  [QuizReportController::class, 'getAvailableQuizRetakes']);
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);

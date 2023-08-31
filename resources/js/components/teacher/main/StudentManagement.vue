@@ -11,7 +11,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">Student</th>
-                                <th scope="col">Skill Test Report</th>
+                                <th style="width: 30%" scope="col">Skill Test Report</th>
                                 <th scope="col">Quiz Report</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -48,41 +48,82 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
-                                        student.skill_test.length }}/26</span></span>
-                                    <span class="vr"></span>
-                                    <span class="mb-0 ms-2">Lacking: <span class="fw-bold rounded-5 p-1">{{ 26 -
-                                        student.skill_test.length }}</span></span>
+                                    <div>
+                                        <button class="btn rounded-0 btn-secondary btn-sm fw-bold w-100" type="button"
+                                            data-bs-toggle="collapse" :data-bs-target="`#alphabetLetters${index}`"
+                                            aria-expanded="false" aria-controls="alphabetLetters">
+                                            Alphabets/Letters
+                                        </button>
+                                        <div class="collapse fw-bold text-center bg-info" :id="`alphabetLetters${index}`">
+                                            <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
+                                                student.skill_test['alphabet-letters'] ? Object.keys(student.skill_test['alphabet-letters']).length : 0 }}/26</span></span>
+                                            <span class="vr"></span>
+                                            <span class="mb-0 ms-2">Lacking: <span class="fw-bold rounded-5 p-1">{{ 26 -
+                                                (student.skill_test['alphabet-letters'] ? Object.keys(student.skill_test['alphabet-letters']).length : 0)}}</span></span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn rounded-0 btn-secondary btn-sm mt-2 fw-bold w-100" type="button"
+                                            data-bs-toggle="collapse" :data-bs-target="`#vowelConsonants${index}`"
+                                            aria-expanded="false" aria-controls="vowelConsonants">
+                                            Vowels/Consonants
+                                        </button>
+                                        <div class="collapse fw-bold text-center bg-warning"
+                                            :id="`vowelConsonants${index}`">
+                                            <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
+                                                student.skill_test['vowel-consonants'] ? Object.keys(student.skill_test['vowel-consonants']).length : 0 }}/26</span></span>
+                                            <span class="vr"></span>
+                                            <span class="mb-0 ms-2">Lacking: <span class="fw-bold rounded-5 p-1">{{ 26 -
+                                                (student.skill_test['vowel-consonants'] ? Object.keys(student.skill_test['vowel-consonants']).length : 0)}}</span></span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn rounded-0 btn-secondary btn-sm mt-2 fw-bold w-100" type="button"
+                                            data-bs-toggle="collapse" :data-bs-target="`#alphabetWords${index}`"
+                                            aria-expanded="false" aria-controls="alphabetWords">
+                                            Alphabets/Words
+                                        </button>
+                                        <div class="collapse fw-bold text-center bg-white" :id="`alphabetWords${index}`">
+                                            <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
+                                                student.skill_test['alphabet-words'] ? Object.keys(student.skill_test['alphabet-words']).length : 0 }}/26</span></span>
+                                            <span class="vr"></span>
+                                            <span class="mb-0 ms-2">Lacking: <span class="fw-bold rounded-5 p-1">{{ 26 -
+                                                (student.skill_test['alphabet-words'] ? Object.keys(student.skill_test['alphabet-words']).length : 0)}}</span></span>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="w-25">
                                     <div>
-                                        <button class="btn rounded-0 btn-secondary btn-sm my-1 fw-bold" style="width: 200px" type="button"
+                                        <button class="btn rounded-0 btn-secondary btn-sm fw-bold w-100" type="button"
                                             data-bs-toggle="collapse" :data-bs-target="`#memoryGameCollapse${index}`"
                                             aria-expanded="false" aria-controls="memoryGameCollapse">
                                             Memory Game
                                         </button>
-                                        <div class="collapse fw-bold" :id="`memoryGameCollapse${index}`">
-                                            Average Score: {{ student.memory_game }}
+                                        <div class="collapse fw-bold text-center bg-info"
+                                            :id="`memoryGameCollapse${index}`">
+                                            <span>Highest Score: {{ student.memory_game }}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <button class="btn rounded-0 btn-warning btn-sm my-1 fw-bold" style="width: 200px" type="button"
+                                        <button class="btn rounded-0 btn-secondary btn-sm mt-2 fw-bold w-100" type="button"
                                             data-bs-toggle="collapse" :data-bs-target="`#typingBalloonCollapse${index}`"
                                             aria-expanded="false" aria-controls="typingBalloonCollapse">
                                             Typing Balloon
                                         </button>
-                                        <div class="collapse fw-bold" :id="`typingBalloonCollapse${index}`">
-                                            Average Score: {{ student.typing_balloon }}
+                                        <div class="collapse fw-bold text-center bg-warning"
+                                            :id="`typingBalloonCollapse${index}`">
+                                            <span>Highest Score: {{ student.typing_balloon }}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <button class="btn rounded-0 btn-primary btn-sm my-1 fw-bold" style="width: 200px" type="button"
+                                        <button class="btn rounded-0 btn-secondary btn-sm mt-2 fw-bold w-100" type="button"
                                             data-bs-toggle="collapse" :data-bs-target="`#hangmanGameCollapse${index}`"
                                             aria-expanded="false" aria-controls="hangmanGameCollapse">
                                             Hangman Game
                                         </button>
-                                        <div class="collapse fw-bold" :id="`hangmanGameCollapse${index}`">
-                                            Average Score: {{ student.hangman_game }}
+                                        <div class="collapse fw-bold text-center bg-white"
+                                            :id="`hangmanGameCollapse${index}`">
+                                            <span>Highest Score: {{ student.hangman_game }}</span>
                                         </div>
                                     </div>
                                 </td>

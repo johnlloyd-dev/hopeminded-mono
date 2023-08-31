@@ -39,10 +39,25 @@ class GameController extends Controller
                 ->where('game_id', $request->gameId)
                 ->get();
         } else {
-            return QuizReport::where('student_id', $student->id)
+            $report = QuizReport::where('student_id', $student->id)
                 ->where('flag', 'quiz')
                 ->where('game_id', $request->gameId)
                 ->get();
+            $retake = [];
+            if (count($report)) {
+                $retake = Retake::where('student_id', $student->id)
+                    ->where('flag', 'quiz')
+                    ->whereRaw('JSON_UNQUOTE(JSON_EXTRACT(attributes, "$.game_id")) = ?', [$request->gameId])
+                    ->get()
+                    ->map(function ($data) {
+                        $data->attributes = json_decode($data->attributes);
+                        return $data;
+                    });
+            }
+            return [
+                'report' => $report,
+                'retake' => $retake
+            ];
         }
     }
 
@@ -53,7 +68,7 @@ class GameController extends Controller
         $quizReport = QuizReport::where('student_id', $student->id)
             ->where('game_id', $gameInfo->id)
             ->get();
-        $attemptNumber = count($quizReport) != 0 ? $quizReport[0]->attempt_number++ : 1;
+        $attemptNumber = count($quizReport) != 0 ? $quizReport[0]->attempt_number + 1 : 1;
         $quiz = QuizReport::create([
             'student_id' => $student->id,
             'game_id' => $gameInfo->id,
@@ -65,22 +80,33 @@ class GameController extends Controller
         ]);
 
         $textbookName = null;
-        if ($gameInfo->flag === 'hangman-game')
+        if ($gameInfo->textbook_flag === 'hangman-game')
             $textbookName = 'Alphabets/Words';
-        else if ($gameInfo->flag === 'typing-balloon')
+        else if ($gameInfo->textbook_flag === 'typing-balloon')
             $textbookName = 'Vowels/Consonants';
         else
             $textbookName = 'Alphabets/Letters';
 
-        Retake::create([
-            'allowed_retake' => 0,
-            'student_id' => $student->id,
-            'flag' => 'quiz',
-            'textbook_flag' => $gameInfo->textbook_flag,
-            'attributes' => json_encode((object)[
-                'game_id' => $gameInfo->id
-            ])
-        ]);
+        if (count($quizReport) > 0) {
+            $retake = Retake::where('student_id', $student->id)->where('flag', 'quiz')->where('textbook_flag', $gameInfo->textbook_flag)->first();
+            if ($retake) {
+                if ($retake->allowed_retake > 0) {
+                    $retake->update(['allowed_retake' => $retake->allowed_retake - 1]);
+                } else {
+                    $retake->update(['allowed_retake' => 0]);
+                }
+            }
+        } else {
+            Retake::create([
+                'allowed_retake' => 0,
+                'student_id' => $student->id,
+                'flag' => 'quiz',
+                'textbook_flag' => $gameInfo->textbook_flag,
+                'attributes' => json_encode((object)[
+                    'game_id' => $gameInfo->id
+                ])
+            ]);
+        }
 
         Notification::create([
             'student_id' => $student->id,
@@ -140,11 +166,30 @@ class GameController extends Controller
 
     public function getQuizReports(Request $request)
     {
+        $quizReports = (object)[];
         $student = Student::where('user_id', Auth::user()->id)->first();
-        return QuizReport::where('student_id', $student->id)
+        $quizReports->reports = QuizReport::where('student_id', $student->id)
             ->where('flag', 'quiz')
             ->orderByRaw('-total_score ASC')
             ->get();
+
+        $quizReports->highest_scores['memory_game'] = QuizReport::where('student_id', $student->id)
+            ->where('flag', 'quiz')
+            ->where('game_id', 3)
+            ->select('total_score')
+            ->max('total_score');
+        $quizReports->highest_scores['typing_balloon'] = QuizReport::where('student_id', $student->id)
+            ->where('flag', 'quiz')
+            ->where('game_id', 2)
+            ->select('total_score')
+            ->max('total_score');
+        $quizReports->highest_scores['hangman_game'] = QuizReport::where('student_id', $student->id)
+            ->where('flag', 'quiz')
+            ->where('game_id', 1)
+            ->select('total_score')
+            ->max('total_score');
+
+        return $quizReports;
     }
 
     public function addQuizMistakeRecord(Request $request)

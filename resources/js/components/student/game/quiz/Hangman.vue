@@ -2,13 +2,13 @@
     <div id="overlay"></div>
     <div style="z-index: 9999">
         <div v-if="!disabledGame" id="app" @keyup="handleKeyPress">
-            <h3 style="font-weight: bold;">Chances:
+            <!-- <h3 style="font-weight: bold;">Chances:
                 <img v-if="chances == 2 || chances == 1" style="width: 30px" class="me-1" src="/images/red-heart.png"
                     alt="">
                 <img v-if="chances == 2" style="width: 30px" class="me-1" src="/images/red-heart.png" alt="">
                 <img v-if="chances == 1" style="width: 30px" src="/images/white-heart.png" alt="">
                 <span v-if="chances == 'unli'" class="text-danger">Unlimited</span>
-            </h3>
+            </h3> -->
             <h4 v-if="isQuiz" style="font-weight: bolder; font-family: 'Skranji', cursive;" class="text-center mt-2">Level
                 {{ flag + 1 }} - <span>Test {{ test + 1 }}</span></h4>
             <div class="row w-100">
@@ -166,14 +166,14 @@ export default {
             this.disabledGame = true
             const data = await axios.get(`/api/quiz-reports/get?gameId=${1}`)
             if (data.data) {
-                const record = data.data
+                const record = data.data.report
                 if (record.length == 0) {
                     this.chances = 2
                     this.highestScore = 0
                     this.disabledGame = true
                     swal.fire({
                         title: 'Remember',
-                        text: `If you have played levels 1 and 2 in your first attempt but failed to get the passing score, you will be given another chance to play the game. But if you reach level 3 but failed to get the passing score, you will not be given another chance to play this game. When the game starts, don't exit or refresh the browser. Happy playing.`,
+                        text: `After taking this first quiz attempt, your score will be automatically recorded, and if you fail on this attempt, your teacher will decide regarding your retake. When the game starts, don't exit or refresh the browser. Happy playing.`,
                         confirmButtonText: `Got it!`,
                         icon: 'info',
                         width: 600,
@@ -192,10 +192,14 @@ export default {
                             this.fetchWords()
                         }
                     })
-                } else if (record.length == 1) {
+                } else if (record.length > 0) {
                     this.chances = 1
-                    this.highestScore = record[0].total_score
-                    if (record[0].mark == 'failed' && record[0].highest_level == 3) {
+                    const retake = data.data.retake[0].allowed_retake
+                    const scores = record.map(data => {
+                        return data.total_score
+                    })
+                    this.highestScore = Math.max(...scores)
+                    if (retake === 0) {
                         this.disabledGame = true
                         this.show = true
                         this.hideNextButton = true
@@ -205,7 +209,7 @@ export default {
                         this.disabledGame = true
                         swal.fire({
                             title: 'Remember',
-                            text: `You failed to get the passing score on your first attempt. This will be your final chance. When the game starts, don't exit or refresh the browser. Happy playing.`,
+                            text: `You failed to get the passing score on your previous attempt. Make sure to pass this one. When the game starts, don't exit or refresh the browser. Happy playing.`,
                             confirmButtonText: `Got it!`,
                             icon: 'info',
                             width: 600,
@@ -225,25 +229,26 @@ export default {
                             }
                         })
                     }
-                } else if (record.length > 1) {
-                    this.chances = 'unli'
-                    const scores = record.map(data => {
-                        return data.total_score
-                    })
-                    this.highestScore = Math.max(...scores)
-                    if (record[1].mark == 'failed') {
-                        this.disabledGame = true
-                        this.show = true
-                        this.hideNextButton = true
-                        this.text = `Sorry. You already used up your play chances.`
-                        this.cancelButtonText = 'Exit'
-                    } else {
-                        this.disabledGame = false
-                        this.storeQuizInfo()
-                        this.setLetters()
-                        this.fetchWords()
-                    }
                 }
+                // else if (record.length > 1) {
+                //     this.chances = 'unli'
+                //     const scores = record.map(data => {
+                //         return data.total_score
+                //     })
+                //     this.highestScore = Math.max(...scores)
+                //     if (record[1].mark == 'failed') {
+                //         this.disabledGame = true
+                //         this.show = true
+                //         this.hideNextButton = true
+                //         this.text = `Sorry. You already used up your play chances.`
+                //         this.cancelButtonText = 'Exit'
+                //     } else {
+                //         this.disabledGame = false
+                //         this.storeQuizInfo()
+                //         this.setLetters()
+                //         this.fetchWords()
+                //     }
+                // }
             }
         },
         storeQuizInfo() {

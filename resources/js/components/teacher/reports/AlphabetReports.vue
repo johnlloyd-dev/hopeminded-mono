@@ -13,185 +13,163 @@
                         <span>Skill Test Report</span>
                         <i class="fas fa-chevron-circle-down"></i>
                     </button>
-                    <!-- <div style="height: 60px">
-                        <span>
-                            Perfect score:
-                        </span>
-                        <div class="d-flex justify-content-between align-items-center w-100 p-3">
-                            <template v-if="isEditPerfectScore">
-                                <input type="text" class="form-control w-75" placeholder="Enter perfect score">
-                                <button @click="isEditPerfectScore = !isEditPerfectScore"
-                                    class="btn btn-warning btn-sm">
-                                    <i class="fas fa-save"></i>
-                                </button>
-                            </template>
-                            <template v-else>
-                                <h6 class="mb-0 w-75 text-center">0/10</h6>
-                                <button @click="isEditPerfectScore = !isEditPerfectScore"
-                                    class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </template>
-                        </div>
-                    </div> -->
                 </div>
                 <div class="collapse show rounded-0" id="skillTestReport">
-                    <div class="card card-body rounded-0">
-                        <template v-if="isLoading">
-                            <ul class="o-vertical-spacing o-vertical-spacing--l">
-                                <li class="blog-post o-media">
-                                    <div class="o-media__figure">
-                                        <span class="skeleton-box" style="width:100px;height:80px;"></span>
+                    <template v-if="isLoading">
+                        <ul class="o-vertical-spacing o-vertical-spacing--l">
+                            <li class="blog-post o-media">
+                                <div class="o-media__figure">
+                                    <span class="skeleton-box" style="width:100px;height:80px;"></span>
+                                </div>
+                                <div class="o-media__body">
+                                    <div class="o-vertical-spacing">
+                                        <h3 class="blog-post__headline">
+                                            <span class="skeleton-box" style="width:55%;"></span>
+                                        </h3>
+                                        <p>
+                                            <span class="skeleton-box" style="width:80%;"></span>
+                                            <span class="skeleton-box" style="width:90%;"></span>
+                                            <span class="skeleton-box" style="width:83%;"></span>
+                                            <span class="skeleton-box" style="width:80%;"></span>
+                                        </p>
+                                        <div class="blog-post__meta">
+                                            <span class="skeleton-box" style="width:70px;"></span>
+                                        </div>
                                     </div>
-                                    <div class="o-media__body">
-                                        <div class="o-vertical-spacing">
-                                            <h3 class="blog-post__headline">
-                                                <span class="skeleton-box" style="width:55%;"></span>
-                                            </h3>
-                                            <p>
-                                                <span class="skeleton-box" style="width:80%;"></span>
-                                                <span class="skeleton-box" style="width:90%;"></span>
-                                                <span class="skeleton-box" style="width:83%;"></span>
-                                                <span class="skeleton-box" style="width:80%;"></span>
-                                            </p>
-                                            <div class="blog-post__meta">
-                                                <span class="skeleton-box" style="width:70px;"></span>
+                                </div>
+                            </li>
+                        </ul>
+                    </template>
+                    <table v-else class="table table-bordered">
+                        <tbody>
+                            <tr v-for="(item) in allAphabets" :key="item">
+                                <td>
+                                    <div class="card rounded-0 border-bottom-0 p-2">
+                                        <div class="row p-1">
+                                            <div class="col-2 d-flex align-items-center">
+                                                <h5 class="mb-0">Alphabet: <span class="fw-bold text-danger">{{
+                                                    item.toUpperCase() }}</span></h5>
+                                            </div>
+                                            <div v-if="skillTest.hasOwnProperty(item)"
+                                                class="col-2 d-flex align-items-center">
+                                                <h5 class="mb-0">Object: <span class="fw-bold text-danger">{{
+                                                    skillTest[item][0].object }}</span></h5>
+                                            </div>
+                                            <div v-if="skillTest.hasOwnProperty(item)"
+                                                class="col-5 d-flex align-items-center">
+                                                <h5 class="mb-0">Allowed Retake:</h5>
+                                                <span class="ms-3">
+                                                    <template
+                                                        v-if="!showSkillTestRetakeModify.hasOwnProperty(item) || !showSkillTestRetakeModify[item]">
+                                                        <span style="border-bottom: 3px solid black"
+                                                            class="h5 fw-bold me-3 text-center text-danger">{{
+                                                                skillTestRetake[item].allowed_retake }}</span>
+                                                        <button
+                                                            @click="showSkillTestRetakeModify[item] = true, allowedSkillTestAttempt[item] = skillTestRetake[item].allowed_retake"
+                                                            class="btn btn-success rounded-0 btn-sm border-0">
+                                                            <i class="fas fa-edit fa-sm"></i>
+                                                        </button>
+                                                    </template>
+                                                    <template v-else>
+                                                        <form
+                                                            @submit.prevent="allowRetakeSkillTest(skillTestRetake[item], item)"
+                                                            class="d-flex align-items-center">
+                                                            <div>
+                                                                <input type="number" v-model="allowedSkillTestAttempt[item]"
+                                                                    class="form-control form-control-sm rounded-0" min="1">
+                                                            </div>
+                                                            <button :disabled="allowedSkillTestAttempt[item] < 1"
+                                                                type="submit"
+                                                                class="btn btn-primary rounded-0 btn-sm border-0">
+                                                                <i class="fas fa-save fa-sm"></i>
+                                                            </button>
+                                                            <button @click="showSkillTestRetakeModify[item] = false"
+                                                                type="button"
+                                                                class="btn btn-secondary rounded-0 btn-sm border-0">
+                                                                <i class="fas fa-close fa-sm"></i>
+                                                            </button>
+                                                        </form>
+                                                    </template>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
-                                </li>
-                            </ul>
-                        </template>
-                        <table v-else class="table table-bordered">
-                            <tbody>
-                                <tr v-for="(item) in allAphabets" :key="item">
-                                    <td>
-                                        <template v-if="!skillTest.hasOwnProperty(item)">
-                                            <div>
-                                                <p class="text-danger">No submitted skill test for this alphabet yet.</p>
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="card rounded-0 border-bottom-0">
-                                                <div class="row p-1">
-                                                    <div class="col-2 d-flex align-items-center">
-                                                        <h6 class="mb-0">Alphabet: <span class="fw-bold text-danger">{{
-                                                            item.toUpperCase() }}</span></h6>
-                                                    </div>
-                                                    <div class="col-2 d-flex align-items-center">
-                                                        <h6 class="mb-0">Object: <span class="fw-bold text-danger">{{
-                                                            skillTest[item][0].object }}</span></h6>
-                                                    </div>
-                                                    <div class="col-3 d-flex align-items-center">
-                                                        Skill Test Video:
-                                                        <button @click="playSkillTestVideo(skillTest[item][0].file_url)"
-                                                            class="btn border-0">
-                                                            <i class="fas fa-play-circle fa-lg text-danger"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-5 d-flex">
-                                                        Allowed Retake:
-                                                        <span class="ms-3">
-                                                            <template
-                                                                v-if="!showSkillTestRetakeModify.hasOwnProperty(item) || !showSkillTestRetakeModify[item]">
-                                                                <span style="border-bottom: 3px solid black"
-                                                                    class="h5 fw-bold me-3 text-center text-danger">{{ skillTestRetake[item].allowed_retake }}</span>
-                                                                <button @click="showSkillTestRetakeModify[item] = true, allowedSkillTestAttempt[item] = skillTestRetake[item].allowed_retake"
-                                                                    class="btn btn-success rounded-0 btn-sm border-0">
-                                                                    <i class="fas fa-edit fa-sm"></i>
+                                    <table class="table table-bordered">
+                                        <thead class="table-secondary">
+                                            <tr>
+                                                <th>Attempt No.</th>
+                                                <th>Date/Time</th>
+                                                <th>Skill Test Video</th>
+                                                <th>Score</th>
+                                                <th>Percentage</th>
+                                                <th>Mark</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody v-if="skillTest.hasOwnProperty(item)">
+                                            <tr class="fw-bold" v-for="(data, index) in skillTest[item]" :key="data.id">
+                                                <td>{{ index + 1 }}</td>
+                                                <td>{{ new Date(data.created_at).toLocaleString() }}</td>
+                                                <td> <button @click="playSkillTestVideo(skillTest[item][0].file_url)"
+                                                        class="btn border-0">
+                                                        <i class="fas fa-play-circle fa-lg text-danger"></i>
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <span>
+                                                        <template v-if="!data.is_display">
+                                                            {{ data.score + '/' + data.perfect_score }}
+                                                            <button
+                                                                @click="data.is_display = !data.is_display, newScore[data.letter] = data.score"
+                                                                class="btn btn-success rounded-0 btn-sm border-0">
+                                                                <i class="fas fa-edit fa-sm"></i>
+                                                            </button>
+                                                        </template>
+                                                        <template v-else>
+                                                            <form class="d-flex align-items-center"
+                                                                @submit.prevent="updateScore(data, index)">
+                                                                <div>
+                                                                    <input type="text" v-model="newScore[data.letter]"
+                                                                        class="form-control rounded-0" id="score"
+                                                                        aria-describedby="emailHelp">
+                                                                </div>
+                                                                <span class="w-25 text-center">/{{
+                                                                    data.perfect_score }}</span>
+                                                                <button type="submit"
+                                                                    class="btn btn-primary rounded-0 btn-sm border-0">
+                                                                    <i class="fas fa-save fa-sm"></i>
                                                                 </button>
-                                                            </template>
-                                                            <template v-else>
-                                                                <form @submit.prevent="allowRetakeSkillTest(skillTestRetake[item], item)" class="d-flex align-items-center">
-                                                                    <div>
-                                                                        <input type="number" v-model="allowedSkillTestAttempt[item]"
-                                                                            class="form-control form-control-sm rounded-0"
-                                                                            min="1">
-                                                                    </div>
-                                                                    <button :disabled="allowedSkillTestAttempt[item] < 1" type="submit"
-                                                                        class="btn btn-primary rounded-0 btn-sm border-0">
-                                                                        <i class="fas fa-save fa-sm"></i>
-                                                                    </button>
-                                                                    <button @click="showSkillTestRetakeModify[item] = false"
-                                                                        type="button"
-                                                                        class="btn btn-secondary rounded-0 btn-sm border-0">
-                                                                        <i class="fas fa-close fa-sm"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </template>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="width: 15%">Attempt No.</th>
-                                                        <th style="width: 25%">Date/Time</th>
-                                                        <th style="width: 20%">Score</th>
-                                                        <th style="width: 20%">Percentage</th>
-                                                        <th style="width: 20%">Mark</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr class="fw-bold" v-for="(data, index) in skillTest[item]"
-                                                        :key="data.id">
-                                                        <td>{{ index + 1 }}</td>
-                                                        <td>{{ new Date(data.created_at).toLocaleString() }}</td>
-                                                        <td>
-                                                            <span>
-                                                                <template v-if="!data.is_display">
-                                                                    {{ data.score + '/' + data.perfect_score }}
-                                                                    <button
-                                                                        @click="data.is_display = !data.is_display, newScore[data.letter] = data.score"
-                                                                        class="btn btn-success rounded-0 btn-sm border-0">
-                                                                        <i class="fas fa-edit fa-sm"></i>
-                                                                    </button>
-                                                                </template>
-                                                                <template v-else>
-                                                                    <form class="d-flex align-items-center"
-                                                                        @submit.prevent="updateScore(data, index)">
-                                                                        <div>
-                                                                            <input type="text"
-                                                                                v-model="newScore[data.letter]"
-                                                                                class="form-control rounded-0" id="score"
-                                                                                aria-describedby="emailHelp">
-                                                                        </div>
-                                                                        <span class="w-25 text-center">/{{
-                                                                            data.perfect_score }}</span>
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary rounded-0 btn-sm border-0">
-                                                                            <i class="fas fa-save fa-sm"></i>
-                                                                        </button>
-                                                                        <button type="button"
-                                                                            @click="data.is_display = !data.is_display"
-                                                                            class="btn btn-secondary rounded-0 btn-sm border-0">
-                                                                            <i class="fas fa-close fa-sm"></i>
-                                                                        </button>
-                                                                    </form>
-                                                                    <small v-if="data.error_message"
-                                                                        class="text-danger">Score must not be greater than
-                                                                        the perfect score.</small>
-                                                                </template>
-                                                            </span>
-                                                        </td>
-                                                        <td>{{ data.percentage }}% of {{ data.perfect_score }}</td>
-                                                        <td>{{ data.mark }}</td>
-                                                    </tr>
-                                                    <tr class="fw-bold border-0">
-                                                        <td colspan="1" class="border-0"></td>
-                                                        <td class="text-end border-0">Average:</td>
-                                                        <td class="border-0">{{ skillTestAverage[item] }}</td>
-                                                        <td class="border-0" colspan="2"></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </template>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                                                <button type="button"
+                                                                    @click="data.is_display = !data.is_display"
+                                                                    class="btn btn-secondary rounded-0 btn-sm border-0">
+                                                                    <i class="fas fa-close fa-sm"></i>
+                                                                </button>
+                                                            </form>
+                                                            <small v-if="data.error_message" class="text-danger">Score
+                                                                must not be greater than
+                                                                the perfect score.</small>
+                                                        </template>
+                                                    </span>
+                                                </td>
+                                                <td>{{ data.percentage }}% of {{ data.perfect_score }}</td>
+                                                <td>{{ data.mark }}</td>
+                                            </tr>
+                                            <tr class="fw-bold border-0">
+                                                <td colspan="2" class="border-0"></td>
+                                                <td class="text-end border-0">Highest Score:</td>
+                                                <td class="border-0">{{ highestScore[item] }}</td>
+                                                <td class="border-0" colspan="1"></td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody v-else>
+                                            <tr class="fw-bold text-center">
+                                                <td class="text-danger" colspan="6">No skill test submitted yet</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <hr>
@@ -205,22 +183,52 @@
                     </button>
                 </div>
                 <div class="collapse show" id="quizReport">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div v-if="reports.length" class="d-flex justify-content-between align-items-center">
                         <h6 class="fw-bold my-3">Perfect Score: <span class="text-danger">{{ reports.length ?
                             reports[0].perfect_score : '(No data found)' }}</span></h6>
+                        <div class="d-flex">
+                            Allowed Retake:
+                            <span class="ms-3">
+                                <template v-if="!showQuizRetakeModify.hasOwnProperty(filteredFlag) || !showQuizRetakeModify[filteredFlag]">
+                                    <span style="border-bottom: 3px solid black"
+                                        class="h5 fw-bold me-3 text-center text-danger">{{
+                                            quizReportRetake[filteredFlag].allowed_retake }}</span>
+                                    <button @click="allowQuiz()" class="btn btn-success rounded-0 btn-sm border-0">
+                                        <i class="fas fa-edit fa-sm"></i>
+                                    </button>
+                                </template>
+                                <template v-else>
+                                    <form @submit.prevent="allowRetakeQuiz(quizReportRetake[filteredFlag], filteredFlag)"
+                                        class="d-flex align-items-center">
+                                        <div>
+                                            <input type="number" v-model="allowedQuizAttempt[filteredFlag]"
+                                                class="form-control form-control-sm rounded-0" min="1">
+                                        </div>
+                                        <button :disabled="allowedQuizAttempt[filteredFlag] < 1" type="submit"
+                                            class="btn btn-primary rounded-0 btn-sm border-0">
+                                            <i class="fas fa-save fa-sm"></i>
+                                        </button>
+                                        <button @click="showQuizRetakeModify[filteredFlag] = false" type="button"
+                                            class="btn btn-secondary rounded-0 btn-sm border-0">
+                                            <i class="fas fa-close fa-sm"></i>
+                                        </button>
+                                    </form>
+                                </template>
+                            </span>
+                        </div>
                         <button @click="viewWeaknesses()" class="btn btn-success btn-sm rounded-0 text-end">
                             Weaknesses <i class="fas fa-book-reader"></i>
                         </button>
                     </div>
                     <div class="card card-body rounded-0">
                         <table class="table table-bordered table-responsive">
-                            <thead>
+                            <thead class="table-secondary">
                                 <tr>
-                                    <th style="width: 15%">Attempt No.</th>
-                                    <th style="width: 25%">Date/Time</th>
-                                    <th style="width: 20%">Score</th>
-                                    <th style="width: 20%">Percentage</th>
-                                    <th style="width: 20%">Mark</th>
+                                    <th>Attempt No.</th>
+                                    <th>Date/Time</th>
+                                    <th>Score</th>
+                                    <th>Percentage</th>
+                                    <th>Mark</th>
                                 </tr>
                             </thead>
                             <tbody v-if="isReportsLoading">
@@ -244,11 +252,67 @@
                                 <tr class="fw-bold border-0">
                                     <td colspan="1" class="border-0"></td>
                                     <td class="text-end border-0">Average:</td>
-                                    <td class="border-0">{{ quizReportAverage[this.$parent.gameId] }}</td>
+                                    <td class="border-0">{{ quizReportHighestScore[this.$parent.gameId] }}</td>
                                     <td class="border-0" colspan="2"></td>
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="score-tally mt-3">
+                <h4 class="fw-bold">Summary / Average</h4>
+                <table class="table table-bordered table-responsive w-50">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Activity</th>
+                            <th>Average Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">Skill Test</td>
+                            <td class="fw-bold">{{ skillTestAverageScore }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Quiz</td>
+                            <td class="fw-bold">{{ quizAverageScore }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <hr>
+            <div class="certificate my-3">
+                <div class="card">
+                    <img :src="certificate.file" alt="">
+                    <div class="card-body">
+                        <h3 class="mb-3 fw-bold">Upload Certificates</h3>
+                        <form @submit.prevent="uploadCertificate" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <input ref="fileInput" accept="image/*, .doc, .docx, .pdf" name="file" @change="parseFile"
+                                    type="file" class="form-control" id="certificate">
+                                <small class="text-danger" v-if="errors && errors.file">{{ errors.file[0] }}</small>
+                            </div>
+                            <button v-if="!isProcessing" style="width: 180px" type="submit"
+                                class="btn btn-success rounded-0 fw-bold">Upload
+                                Certificate</button>
+                            <button v-else disabled style="font-weight: bold; width: 180px;" type="button"
+                                class="btn btn-success rounded-0 pb-0">
+                                <Loading />
+                            </button>
+                        </form>
+                        <hr>
+                        <div class="certificates mt-3">
+                            <h5 class="fw-bold">Files</h5>
+                        </div>
+                        <p v-if="isLoading">Loading...</p>
+                        <p v-if="!isLoading && certificates.length === 0">No certificates added</p>
+                        <li v-else v-for="item in certificates" :key="item.id" class="list-group-item">
+                            <a :href="item.file_url" download style="margin-right: 20px">{{ item.file }}</a>
+                            <button type="button" @click="deleteCertificate(item.id, item.file)"
+                                class="btn btn-danger btn-sm rounded-0"><i class="fas fa-trash-alt"></i></button>
+                        </li>
                     </div>
                 </div>
             </div>
@@ -346,7 +410,8 @@
                                                                 </tbody>
                                                                 <tbody v-else>
                                                                     <tr :class="item2.attributes.mark === 'wrong' ? 'table-danger' : 'table-success'"
-                                                                        class="fw-bold" v-for="item2 in item" :key="item2.id">
+                                                                        class="fw-bold" v-for="item2 in item"
+                                                                        :key="item2.id">
                                                                         <td>
                                                                             <img width="100"
                                                                                 :src="'/' + item2.attributes.object_image">
@@ -380,7 +445,8 @@
                                                                 </tbody>
                                                                 <tbody v-else>
                                                                     <tr :class="item2.attributes.mark === 'wrong' ? 'table-danger' : 'table-success'"
-                                                                        class="fw-bold" v-for="item2 in item" :key="item2.id">
+                                                                        class="fw-bold" v-for="item2 in item"
+                                                                        :key="item2.id">
                                                                         <td>{{ item2.attributes.alphabet }}</td>
                                                                         <td>
                                                                             <img width="100"
@@ -407,8 +473,8 @@
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="headingThree">
-                                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapseThree" aria-expanded="false"
+                                        <button class="accordion-button collapsed fw-bold" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false"
                                             aria-controls="collapseThree">
                                             Answer Keys
                                         </button>
@@ -459,8 +525,12 @@
 
 <script>
 import swal from 'sweetalert2'
+import Loading from '../../loading/Loading.vue'
 export default {
-    props: ['gameName', 'studentId', 'flag', 'reports', 'quizReportAverage', 'quizReportRetake'],
+    props: ['gameName', 'studentId', 'flag', 'reports', 'quizReportHighestScore', 'quizReportRetake'],
+    components: {
+        Loading
+    },
     data() {
         return {
             indexes: {
@@ -470,10 +540,13 @@ export default {
                 score: 0,
                 skill_test_id: null
             },
+            certificates: [],
+            errors: [],
             average: 0,
             isEditScore: false,
             isEditPerfectScore: false,
             isLoading: false,
+            isProcessing: false,
             weaknessesDataLoading: false,
             skillTestVideoUrl: null,
             weaknessesData: {},
@@ -481,20 +554,25 @@ export default {
             newScore: {},
             allowedSkillTestAttempt: {},
             allowedQuizAttempt: {},
-            skillTestAverage: [],
+            highestScore: [],
             skillTestRetake: [],
             showSkillTestRetakeModify: {},
-            showQuizRetakeModify: {}
+            showQuizRetakeModify: {},
+            certificate: {
+                file: null
+            }
         }
     },
     created() {
         this.getSkillTest()
+        this.getCertificates()
     },
     watch: {
         async flag() {
             this.skillTest = {}
             this.isLoading = true
             await this.getSkillTest()
+            await this.getCertificates()
         }
     },
     computed: {
@@ -503,11 +581,34 @@ export default {
         },
         isReportsLoading() {
             return this.$parent.isLoading
+        },
+        gameId() {
+            return this.$parent.gameId.toString()
+        },
+        skillTestAverageScore() {
+            if (Object.keys(this.highestScore).length) {
+                const scores = Object.values(this.highestScore);
+                const totalScore = scores.reduce(function (a, b) { return a + b; }, 0);
+                const count = scores.length
+
+                return `${totalScore / count} / ${this.$parent.perfect_score.score}`;
+            }
+            return 0;
+        },
+        filteredFlag() {
+            return this.flag.replace(/-/g, "_");
+        },
+        quizAverageScore() {
+            if (Object.keys(this.quizReportHighestScore).length) {
+                return `${this.quizReportHighestScore[this.gameId]} / ${this.reports[0].perfect_score}`;
+            }
+            return 0;
         }
     },
     methods: {
         async getSkillTest() {
             this.isLoading = true
+            this.highestScore = []
             try {
                 const data = await axios.get(`/api/skill-test/fetch/${this.studentId}/${this.flag}`)
                 const mergedObject = data.data.data.reduce((result, item) => {
@@ -524,7 +625,7 @@ export default {
 
                 this.skillTest = mergedObject
                 if (Object.keys(this.skillTest).length) {
-                    this.skillTestAverage = data.data.average ?? 0
+                    this.highestScore = data.data.highest_score ?? 0
                     this.skillTestRetake = data.data.retake ?? []
                 }
 
@@ -534,6 +635,61 @@ export default {
             } finally {
                 this.isLoading = false
             }
+        },
+        async getCertificates() {
+            this.isLoading = true
+            try {
+                const response = await axios.get(`/api/certificates/student/${this.studentId}/game-id/${this.gameId}`)
+                this.certificates = response.data
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.isLoading = false
+            }
+        },
+        parseFile(event) {
+            this.file = event.target.files[0];
+        },
+        async uploadCertificate() {
+            try {
+                this.isProcessing = true
+                this.errors = []
+                let formData = new FormData();
+                formData.append("gameId", this.gameId);
+                formData.append("studentId", this.studentId);
+                formData.append("file", this.file);
+                const response = await axios.post('/api/certificate/upload', formData);
+                if (response.status) {
+                    this.file = null
+                    this.$refs.fileInput.value = '';
+                    swal.fire('Success', response.data.message, 'success')
+                    this.getCertificates()
+                }
+            } catch (error) {
+                this.errors = error.response.data.errors;
+                // Handle the error, e.g., show an error message
+            } finally {
+                this.isProcessing = false
+            }
+        },
+        async deleteCertificate(id, filePath) {
+            const data = { id: id, file: filePath }
+            try {
+                this.isProcessing = true
+                const response = await axios.post('/api/certificate/delete', data)
+                if (response.status) {
+                    swal.fire('Success', response.data.message, 'success')
+                    this.getCertificates()
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.isProcessing = false
+            }
+        },
+        allowQuiz() {
+            this.showQuizRetakeModify[this.filteredFlag] = true
+            this.allowedQuizAttempt[this.filteredFlag] = this.quizReportRetake[this.filteredFlag].allowed_retake
         },
         async updateScore(data, index) {
             this.setScore.score = this.newScore[data.letter]
@@ -609,16 +765,16 @@ export default {
                 console.log(error)
             }
         },
-        // async allowRetakeQuiz(data, item) {
-        //     try {
-        //         const response = await axios.put(`/api/retake/quiz/allow/${data.id}`, { allowed_retake: this.allowedSkillTestAttempt[item] })
-        //         swal.fire('Success', response.data.message, 'success')
-        //         this.$parent.getReports()
-        //         this.showSkillTestRetakeModify[item] = false
-        //     } catch (error) {
-        //         console.log(error)
-        //     }
-        // }
+        async allowRetakeQuiz(data, item) {
+            try {
+                const response = await axios.put(`/api/retake/quiz/allow/${data.id}`, { allowed_retake: this.allowedQuizAttempt[item] })
+                swal.fire('Success', response.data.message, 'success')
+                this.$parent.getReports()
+                this.showQuizRetakeModify[item] = false
+            } catch (error) {
+                console.log(error)
+            }
+        }
     }
 }
 </script>

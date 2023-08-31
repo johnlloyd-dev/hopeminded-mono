@@ -4,7 +4,7 @@
             <div class="d-flex align-items-center justify-content-center flex-column pt-3 position-relative" style="height: 110px;">
                 <button data-bs-toggle="offcanvas" data-bs-target="#notificationPanel" aria-controls="notificationPanel" style="right: 20px" type="button" class="icon-button mt-3 position-absolute top-0">
                     <i class="far fa-bell fa-lg"></i>
-                    <span v-if="notifications.length" class="icon-button__badge">{{ notifications.length ?? '' }}</span>
+                    <span v-if="notificationCount" class="icon-button__badge">{{ notificationCount ?? '' }}</span>
                 </button>
                 <div class="profile-image" :class="{ 'mb-3' : !collapsed }">
                     <img src="/images/user-icon.png" alt="User profile image">
@@ -20,15 +20,20 @@
                 </div>
                 <div class="offcanvas-body">
                     <h5 class="fw-bold">ALL</h5>
-                    <ul class="list-group rounded-0">
-                        <li v-for="item in notifications" :key="item.id" class="list-group-item">
-                            <a class="text-dark notification-link" href="javascript:;" @click="$router.push(item.url)">
+                    <hr>
+                    <template v-if="notifications.length">
+                        <div v-for="item in notifications" :key="item.id">
+                            <a class="text-dark notification-link" href="javascript:;" @click="updateNotification(item)">
                                 <i v-if="item.status === 'read'" class="fas fa-envelope-open-text me-1 fa-lg text-success"></i>
-                                <i v-else class="fas fa-envelope me-1 fa-lg text-danger"></i>
+                                <i v-else class="fas fa-circle me-1 fa-sm text-danger"></i>
                                 <span :class="{ 'fw-bold': item.status === 'unread' }">{{ item.notification_content }}</span>
                             </a>
-                        </li>
-                    </ul>
+                            <hr>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <p class="text-center">No records found</p>
+                    </template>
                 </div>
             </div>
         </template>
@@ -74,6 +79,12 @@ export default {
         fullname() {
             return localStorage.getItem('fullname')
         },
+        notificationCount() {
+            const unreadNotification = this.notifications.filter($data => {
+                return $data.status === 'unread'
+            })
+            return unreadNotification.length
+        }
     },
     mounted() {
         this.getNotifications()
@@ -103,6 +114,16 @@ export default {
             try {
                 const response = await axios.get('/api/notifications/get?user_flag=teacher')
                 this.notifications = response.data
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async updateNotification(data) {
+            try {
+                if (data.status === 'unread')
+                    await axios.put(`/api/notification/update/${data.id}`)
+
+                this.$router.push(data.url)
             } catch (error) {
                 console.log(error)
             }

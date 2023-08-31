@@ -55,10 +55,11 @@
                                                     </ul>
                                                 </template>
                                                 <template v-else>
-                                                    <h6 class="fw-bold">Perfect Score: {{ perfectScore.memory_game }}</h6>
+                                                    <h6 class="fw-bold">Perfect Score: <span class="text-danger">{{ perfectScore.memory_game }}</span></h6>
                                                     <table class="table table-bordered table-responsive">
                                                         <thead>
                                                             <tr>
+                                                                <th scope="col">Attempt Number</th>
                                                                 <th scope="col">Date/Time</th>
                                                                 <th scope="col">Score</th>
                                                                 <th scope="col">Percentage</th>
@@ -67,19 +68,21 @@
                                                         </thead>
                                                         <tbody v-if="memoryGame.length === 0">
                                                             <tr>
-                                                                <td colspan="4" class="text-center fw-bold">No data found
+                                                                <td colspan="5" class="text-center fw-bold">No data found
                                                                 </td>
                                                             </tr>
                                                         </tbody>
                                                         <tbody v-else>
                                                             <tr v-for="item in memoryGame" :key="item.id">
+                                                                <td>{{ item.attempt_number }}</td>
                                                                 <td>{{ new Date(item.created_at).toLocaleString() }}</td>
                                                                 <td>{{ `${item.total_score} / ${perfectScore.memory_game}` }}</td>
                                                                 <td>{{ percentage(item.total_score, 'mg') }}%</td>
-                                                                <td>{{ item.mark }}</td>
+                                                                <td>{{ item.mark.toUpperCase() }}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
+                                                    <h6 class="fw-bold">Highest Score: <span class="fw-bold text-danger">{{ highestScores['memory_game'] ?? 0 }}/{{ perfectScore.memory_game }}</span></h6>
                                                 </template>
                                             </div>
                                         </div>
@@ -127,10 +130,11 @@
                                                     </ul>
                                                 </template>
                                                 <template v-else>
-                                                    <h6 class="fw-bold">Perfect Score: {{ perfectScore.typing_balloon }}</h6>
+                                                    <h6 class="fw-bold">Perfect Score: <span class="text-danger">{{ perfectScore.typing_balloon }}</span></h6>
                                                     <table class="table table-bordered table-responsive">
                                                         <thead>
                                                             <tr>
+                                                                <th scope="col">Attempt Number</th>
                                                                 <th scope="col">Date/Time</th>
                                                                 <th scope="col">Score</th>
                                                                 <th scope="col">Percentage</th>
@@ -139,19 +143,21 @@
                                                         </thead>
                                                         <tbody v-if="typingBalloon.length === 0">
                                                             <tr>
-                                                                <td colspan="4" class="text-center fw-bold">No data found
+                                                                <td colspan="5" class="text-center fw-bold">No data found
                                                                 </td>
                                                             </tr>
                                                         </tbody>
                                                         <tbody v-else>
                                                             <tr v-for="item in typingBalloon" :key="item.id">
+                                                                <td>{{ item.attempt_number }}</td>
                                                                 <td>{{ new Date(item.created_at).toLocaleString() }}</td>
                                                                 <td>{{ `${item.total_score} / ${perfectScore.typing_balloon}` }}</td>
                                                                 <td>{{ percentage(item.total_score, 'tp') }}%</td>
-                                                                <td>{{ item.mark }}</td>
+                                                                <td>{{ item.mark.toUpperCase() }}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
+                                                    <h6 class="fw-bold">Highest Score: <span class="fw-bold text-danger">{{ highestScores['typing_balloon'] ?? 0 }}/{{ perfectScore.typing_balloon }}</span></h6>
                                                 </template>
                                             </div>
                                         </div>
@@ -199,10 +205,11 @@
                                                     </ul>
                                                 </template>
                                                 <template v-else>
-                                                    <h6 class="fw-bold">Perfect Score: {{ perfectScore.hangman_game }}</h6>
+                                                    <h6 class="fw-bold">Perfect Score: <span class="text-danger">{{ perfectScore.hangman_game }}</span></h6>
                                                     <table class="table table-bordered table-responsive">
                                                         <thead>
                                                             <tr>
+                                                                <th scope="col">Attempt Number</th>
                                                                 <th scope="col">Date/Time</th>
                                                                 <th scope="col">Score</th>
                                                                 <th scope="col">Percentage</th>
@@ -211,19 +218,21 @@
                                                         </thead>
                                                         <tbody v-if="hangmanGame.length === 0">
                                                             <tr>
-                                                                <td colspan="4" class="text-center fw-bold">No data found
+                                                                <td colspan="5" class="text-center fw-bold">No data found
                                                                 </td>
                                                             </tr>
                                                         </tbody>
                                                         <tbody v-else>
                                                             <tr v-for="item in hangmanGame" :key="item.id">
+                                                                <td>{{ item.attempt_number }}</td>
                                                                 <td>{{ new Date(item.created_at).toLocaleString() }}</td>
                                                                 <td>{{ `${item.total_score} / ${perfectScore.hangman_game}` }}</td>
                                                                 <td>{{ percentage(item.total_score, 'hg') }}%</td>
-                                                                <td>{{ item.mark }}</td>
+                                                                <td>{{ item.mark.toUpperCase() }}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
+                                                    <h6 class="fw-bold">Highest Score: <span class="fw-bold text-danger">{{ highestScores['hangman_game'] ?? 0 }}/{{ perfectScore.hangman_game }}</span></h6>
                                                 </template>
                                             </div>
                                         </div>
@@ -246,6 +255,7 @@ export default {
             isProcessing: false,
             isLoading: false,
             data: [],
+            highestScores: {}
         };
     },
     created() {
@@ -315,7 +325,8 @@ export default {
         async getQuizReports() {
             this.isProcessing = true;
             const data = await axios.get("/api/quiz/reports/get");
-            this.data = data.data
+            this.data = data.data.reports
+            this.highestScores = data.data.highest_scores
             this.isProcessing = false;
         }
     }

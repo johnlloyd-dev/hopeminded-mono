@@ -88,3 +88,8 @@ body {
   border-radius: 50%;
 }
 
+.tutorial-button {
+    bottom: 100px;
+    right: 100px;
+}
+

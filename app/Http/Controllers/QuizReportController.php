@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use App\Models\QuizReport;
 use App\Models\Retake;
+use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class QuizReportController extends Controller
 {
@@ -38,18 +40,18 @@ class QuizReportController extends Controller
                 $groupedObjects[$gameId][] = $object;
             }
             $itemKeys = $groupedObjects;
-            $averages = [];
+            $highest_scores = [];
 
 
             foreach ($itemKeys as $key => $group) {
                 $totalScores = array_column($group, 'total_score');
                 $totalScores = array_map('intval', $totalScores);
 
-                $average = array_sum($totalScores) / count($totalScores);
-                $averages[$key] = $average;
+                $highest_score = max($totalScores);
+                $highest_scores[$key] = $highest_score;
             }
 
-            $quizReport['average'] = $averages;
+            $quizReport['highest_score'] = $highest_scores;
 
             $retake = Retake::where('student_id', $studentId)
                 ->where('flag', 'quiz')
@@ -62,12 +64,12 @@ class QuizReportController extends Controller
 
             $groupedRetakes = [];
             foreach ($retake as $data) {
-                if (isset($data['attributes']->game_id)) {
-                    $gameId = $data['attributes']->game_id;
-                    if (!isset($groupedRetakes[$gameId])) {
-                        $groupedRetakes[$gameId] = [];
+                if (isset($data['textbook_flag'])) {
+                    $textbookFlag = strval($data['textbook_flag']);
+                    if (!isset($groupedRetakes[$textbookFlag])) {
+                        $groupedRetakes[$textbookFlag] = [];
                     }
-                    $groupedRetakes[$gameId] = $data;
+                    $groupedRetakes[$textbookFlag] = $data;
                 }
             }
 
@@ -75,5 +77,31 @@ class QuizReportController extends Controller
         }
 
         return $quizReport;
+    }
+
+    public function getAvailableQuizRetakes()
+    {
+        $studentId = Student::where('user_id', Auth::user()->id)->first()->id;
+        $retake = Retake::where('student_id', $studentId)
+            ->where('flag', 'quiz')
+            ->get()
+            ->map(function ($data) {
+                $data->attributes = json_decode($data->attributes);
+                return $data;
+            })
+            ->toArray();
+
+        $groupedRetakes = [];
+        foreach ($retake as $data) {
+            if (isset($data['textbook_flag'])) {
+                $textbookFlag = strval($data['textbook_flag']);
+                if (!isset($groupedRetakes[$textbookFlag])) {
+                    $groupedRetakes[$textbookFlag] = [];
+                }
+                $groupedRetakes[$textbookFlag] = $data;
+            }
+        }
+
+        return $groupedRetakes;
     }
 }

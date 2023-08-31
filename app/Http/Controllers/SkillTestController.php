@@ -43,16 +43,29 @@ class SkillTestController extends Controller
                     'object' => $request->object,
                     'status' => 'pending'
                 ]);
+                $retake = Retake::where('student_id', $student_id)
+                    ->where('flag', 'skill_test')
+                    ->where('textbook_flag', $request->flag)
+                    ->whereRaw('JSON_UNQUOTE(JSON_EXTRACT(attributes, "$.alphabet")) = ?', [$request->letter])
+                    ->first();
 
-                Retake::create([
-                    'allowed_retake' => 0,
-                    'student_id' => $student_id,
-                    'flag' => 'skill_test',
-                    'textbook_flag' => $request->flag,
-                    'attributes' => json_encode((object)[
-                        'alphabet' => $request->letter
-                    ])
-                ]);
+                if ($retake) {
+                    if ($retake->allowed_retake > 0) {
+                        $retake->update(['allowed_retake' => $retake->allowed_retake - 1]);
+                    } else {
+                        $retake->update(['allowed_retake' => 0]);
+                    }
+                } else {
+                    Retake::create([
+                        'allowed_retake' => 0,
+                        'student_id' => $student_id,
+                        'flag' => 'skill_test',
+                        'textbook_flag' => $request->flag,
+                        'attributes' => json_encode((object)[
+                            'alphabet' => $request->letter
+                        ])
+                    ]);
+                }
 
                 Notification::create([
                     'student_id' => $student_id,
@@ -61,7 +74,8 @@ class SkillTestController extends Controller
                     'url' => '/student-quiz-report' . '/' . $student_id,
                     'status' => 'unread',
                     'attributes' => json_encode((object)[
-                        'alphabet' => $request->letter
+                        'alphabet' => $request->letter,
+                        'textbook_name' => ucwords(str_replace('-', ' ', $request->flag))
                     ])
                 ]);
                 return response()->json([
@@ -86,8 +100,8 @@ class SkillTestController extends Controller
             ->where('flag', $flag)
             ->get()
             ->map(function ($skill_test) use ($studentId) {
-                $teacher_id = Student::where('id', $studentId)->first()->teacher_id;
-                $perfect_score = PerfectScore::where('teacher_id', $teacher_id)->first()->score ?? 10;
+                // $teacher_id = Student::where('id', $studentId)->first()->teacher_id;
+                $perfect_score = PerfectScore::where('student_id', $studentId)->first()->score ?? 10;
                 $score = (int)$skill_test->score;
                 $percentage = ((int)$skill_test->score / $perfect_score) * 100;
                 $passing_score = $perfect_score * .75;
@@ -112,18 +126,18 @@ class SkillTestController extends Controller
 
                 $groupedObjects[$letter][] = $object;
             }
-            $average = $groupedObjects;
-            $averages = [];
+            $itemKeys = $groupedObjects;
+            $highest_scores = [];
 
-            foreach ($average as $key => $group) {
+            foreach ($itemKeys as $key => $group) {
                 $totalScores = array_column($group, 'score');
                 $totalScores = array_map('intval', $totalScores);
 
-                $average = array_sum($totalScores) / count($totalScores);
-                $averages[$key] = $average;
+                $highest_score = max($totalScores);
+                $highest_scores[$key] = $highest_score;
             }
 
-            $skillTest['average'] = $averages;
+            $skillTest['highest_score'] = $highest_scores;
 
             $retake = Retake::where('student_id', $studentId)
                 ->where('flag', 'skill_test')
@@ -220,7 +234,8 @@ class SkillTestController extends Controller
             'url' => $url,
             'status' => 'unread',
             'attributes' => json_encode((object)[
-                'alphabet' => json_decode($retake->attributes)->alphabet
+                'alphabet' => json_decode($retake->attributes)->alphabet,
+                'textbook_name' => ucwords(str_replace('-', ' ', $retake->textbook_flag))
             ])
         ]);
         return response()->json([

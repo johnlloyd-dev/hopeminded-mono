@@ -36,11 +36,11 @@ class NotificationController extends Controller
                             break;
 
                         case 'fs_first_skill_test':
-                            $notification_content = $student_name . ' has submitted a skill test for the ' . $attributes->alphabet . '.';
+                            $notification_content = $student_name . ' has submitted a skill test for the alphabet ' . strtoupper($attributes->alphabet) . ' of ' . $attributes->textbook_name . ' textbook.';
                             break;
 
                         case 'fs_resubmit_skill_test':
-                            $notification_content = $student_name . ' has submitted a skill test for the ' . $attributes->alphabet . '.';
+                            $notification_content = $student_name . ' has submitted a skill test for the alphabet ' . strtoupper($attributes->alphabet) . ' of ' . $attributes->textbook_name . ' textbook.';
                             break;
                     }
                     $data->notification_content = $notification_content;
@@ -55,14 +55,13 @@ class NotificationController extends Controller
                     $notification_content = null;
                     $attributes = json_decode($data->attributes);
                     switch ($data->flag) {
-                        case 'ft_tetake_quiz':
+                        case 'ft_retake_quiz':
                             $game_name = Game::find($attributes->game_id)->name;
-                            $notification_content = 'You are given you another chance to retake the quiz for the ' . $game_name . ' of' . $attributes->textbook_name . ' textbook.';
+                            $notification_content = 'You are given another chance to retake the quiz for the ' . $game_name . ' of ' . $attributes->textbook_name . ' textbook.';
                             break;
 
                         case 'ft_retake_skill_test':
-                            $game_name = Game::find($attributes->game_id)->name;
-                            $notification_content = 'You are given you another chance to resubmit a skill test for the alphabet ' . $attributes->alphabet . '.';
+                            $notification_content = 'You are given another chance to resubmit a skill test for the alphabet ' . strtoupper($attributes->alphabet) . '.';
                             break;
                     }
                     $data->notification_content = $notification_content;
@@ -70,5 +69,14 @@ class NotificationController extends Controller
                     return $data;
                 });
         }
+    }
+
+    public function updateNotification($notificationId)
+    {
+        $notification = Notification::find($notificationId);
+        $notification->status = 'read';
+        $notification->save();
+
+        return 'Notification successfully updated.';
     }
 }

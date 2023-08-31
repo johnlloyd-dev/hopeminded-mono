@@ -101,14 +101,14 @@ export default {
             this.disabledGame = true
             const data = await axios.get(`/api/quiz-reports/get?gameId=${2}`)
             if (data.data) {
-                const record = data.data
+                const record = data.data.report
                 if (record.length == 0) {
                     this.chances = 2
                     this.highestScore = 0
                     this.disabledGame = true
                     swal.fire({
                         title: 'Remember',
-                        text: `If you have reached levels 1 and 2 in your first attempt but didn't get the passing score, you still have one chance to replay the game. However, if you reached level 3 on your first attempt and failed to get the passing score, you'll be out of chances. When the game starts, don't exit or refresh the browser. Happy playing.`,
+                        text: `After taking this first quiz attempt, your score will be automatically recorded, and if you fail on this attempt, your teacher will decide regarding your retake. When the game starts, don't exit or refresh the browser. Happy playing.`,
                         confirmButtonText: `Got it!`,
                         icon: 'info',
                         width: 600,
@@ -127,10 +127,14 @@ export default {
                             window.addEventListener("keyup", this.handleKeyUp, true);
                         }
                     })
-                } else if (record.length == 1) {
+                } else if (record.length > 0) {
                     this.chances = 1
-                    this.highestScore = record[0].total_score
-                    if (record[0].mark == 'failed' && record[0].highest_level == 3) {
+                    const retake = data.data.retake[0].allowed_retake
+                    const scores = record.map(data => {
+                        return data.total_score
+                    })
+                    this.highestScore = Math.max(...scores)
+                    if (retake === 0) {
                         this.disabledGame = true
                         this.show = true
                         this.hideNextButton = true
@@ -140,7 +144,7 @@ export default {
                         this.disabledGame = true
                         swal.fire({
                             title: 'Remember',
-                            text: `You failed to get the passing score on your first attempt. This will be your final chance. When the game starts, don't exit or refresh the browser. Happy playing.`,
+                            text: `You failed to get the passing score on your previous attempt. Make sure to pass this one. When the game starts, don't exit or refresh the browser. Happy playing.`,
                             confirmButtonText: `Got it!`,
                             icon: 'info',
                             width: 600,
@@ -160,25 +164,26 @@ export default {
                             }
                         })
                     }
-                } else if (record.length > 1) {
-                    this.chances = 'unli'
-                    const scores = record.map(data => {
-                        return data.total_score
-                    })
-                    this.highestScore = Math.max(...scores)
-                    if (record[1].mark == 'failed') {
-                        this.disabledGame = true
-                        this.show = true
-                        this.hideNextButton = true
-                        this.text = `Sorry. You already used up your play chances.`
-                        this.cancelButtonText = 'Exit'
-                    } else {
-                        this.disabledGame = false
-                        this.storeQuizInfo()
-                        this.fetchThemes()
-                        window.addEventListener("keyup", this.handleKeyUp, true);
-                    }
                 }
+                // else if (record.length > 1) {
+                //     this.chances = 'unli'
+                //     const scores = record.map(data => {
+                //         return data.total_score
+                //     })
+                //     this.highestScore = Math.max(...scores)
+                //     if (record[1].mark == 'failed') {
+                //         this.disabledGame = true
+                //         this.show = true
+                //         this.hideNextButton = true
+                //         this.text = `Sorry. You already used up your play chances.`
+                //         this.cancelButtonText = 'Exit'
+                //     } else {
+                //         this.disabledGame = false
+                //         this.storeQuizInfo()
+                //         this.fetchThemes()
+                //         window.addEventListener("keyup", this.handleKeyUp, true);
+                //     }
+                // }
             }
         },
         storeQuizInfo() {
@@ -276,26 +281,26 @@ export default {
             );
             this.ctx.fill();
 
-            let img = new Image()
-            let img2 = new Image()
-            let img3 = new Image()
-            if (this.chances == 2) {
-                img.src = 'images/red-heart.png';
-                this.ctx.drawImage(img, 130, 5, 30, 30);
+            // let img = new Image()
+            // let img2 = new Image()
+            // let img3 = new Image()
+            // if (this.chances == 2) {
+            //     img.src = 'images/red-heart.png';
+            //     this.ctx.drawImage(img, 130, 5, 30, 30);
 
-                img2.src = 'images/red-heart.png';
-                this.ctx.drawImage(img2, 165, 5, 30, 30);
-            } else if(this.chances == 1) {
-                img.src = 'images/red-heart.png';
-                this.ctx.drawImage(img, 130, 5, 30, 30);
+            //     img2.src = 'images/red-heart.png';
+            //     this.ctx.drawImage(img2, 165, 5, 30, 30);
+            // } else if(this.chances == 1) {
+            //     img.src = 'images/red-heart.png';
+            //     this.ctx.drawImage(img, 130, 5, 30, 30);
 
-                img3.src = 'images/white-heart.png';
-                this.ctx.drawImage(img3, 165, 5, 30, 30);
-            } else {
-                this.ctx.font = "25px Century Gothic";
-                this.ctx.fillStyle = "red";
-                this.ctx.fillText(`Unlimited`, 130, 25);
-            }
+            //     img3.src = 'images/white-heart.png';
+            //     this.ctx.drawImage(img3, 165, 5, 30, 30);
+            // } else {
+            //     this.ctx.font = "25px Century Gothic";
+            //     this.ctx.fillStyle = "red";
+            //     this.ctx.fillText(`Unlimited`, 130, 25);
+            // }
 
             for (let m = 0; m < this.array.length; m++) {
                 this.drawBalloon(this.array[m]);

@@ -38,9 +38,10 @@
                                 </div>
                                 <hr class="w-75">
                                 <!-- <button :disabled="Object.keys(skillTest).length < 5"  -->
-                                <button
+                                <button :disabled="Object.keys(skillTest).length < 0 || (availableQuizRetakes.hasOwnProperty(flag) && availableQuizRetakes[flag].allowed_retake === 0)"
                                     @click="$router.push('/quiz-typing-balloon')"
-                                    class="btn btn-danger btn-lg rounded-0 w-75 fw-bold">Take Quiz</button>
+                                    class="btn btn-danger btn-lg rounded-0 w-75 fw-bold">{{ availableQuizRetakes.hasOwnProperty(flag) ? 'Retake Quiz' : 'Take Quiz' }}</button>
+                                <h6 class="fw-bold" v-if="availableQuizRetakes.hasOwnProperty(flag)">Available Retake: <span class="text-danger">{{ availableQuizRetakes.hasOwnProperty(flag) ? availableQuizRetakes[flag].allowed_retake : 0 }}</span></h6>
                             </div>
                             <div v-else>
                                 <h6 class="position-absolute start-50 top-50 translate-middle fw-bold">No records found</h6>
@@ -73,11 +74,12 @@
                             </div>
                             <div class="d-flex justify-content-center mt-3">
                                 <div class="d-grid gap-2">
-                                    <button type="button" @click="recordSkillTest()"
+                                    <button :disabled="availableRetakes.hasOwnProperty(indexes.skillTest) && availableRetakes[indexes.skillTest].allowed_retake === 0" type="button" @click="recordSkillTest()"
                                         class="btn btn-primary btn-lg rounded-0 fw-bold mt-3">
-                                        Submit Skill Test <i class="fas fa-external-link-alt"></i>
+                                        {{ skillTest.hasOwnProperty(indexes.skillTest) ? 'Resubmit Skill Test' : 'Submit Skill Test' }} <i class="fas fa-external-link-alt"></i>
                                     </button>
-                                    <a href="javascript:;" type="button" class="h5 text-dark text-center" @click="showTutorial">View Skill Test Tutorial</a>
+                                    <h5 class="fw-bold text-center" v-if="skillTest.hasOwnProperty(indexes.skillTest)">Available Resubmit: <span class="text-danger">{{ availableRetakes.hasOwnProperty(indexes.skillTest) ? availableRetakes[indexes.skillTest].allowed_retake : 0 }}</span></h5>
+                                    <!-- <a href="javascript:;" type="button" class="h5 text-dark text-center" @click="showTutorial">View Skill Test Tutorial</a> -->
                                     <div v-if="selectedSkillTest && !selectedSkillTest.length" class="alert alert-danger mb-0 mt-3 fw-bold text-center" role="alert">No skill test submitted for this alphabet yet.</div>
                                     <div v-else class="alert alert-success mb-0 mt-3 fw-bold text-center" role="alert">Uploaded Skill Test: {{ selectedSkillTest.length }}</div>
                                     <button :disabled="selectedSkillTest && !selectedSkillTest.length" data-bs-toggle="modal" data-bs-target="#skillTestModal" type="button"
@@ -183,6 +185,7 @@
                                     </div>
                                 </div>
                                 <div class="col-10 position-relative">
+                                    <h5 class="fw-bold">Highest Score: <span class="text-danger">{{ highestScores[indexes.skillTest] ?? 0 }}</span></h5>
                                     <template v-if="!isProcessing">
                                         <div v-if="selectedSkillTest && selectedSkillTest.length">
                                             <div class="text-center">
@@ -190,13 +193,15 @@
                                                     <div v-for="(item, index) in selectedSkillTest" :key="index"
                                                         class="col-lg-4 col-md-6 text-center mb-4">
                                                         <div class="position-relative badge-overlay">
-                                                            <h5 class="text-center fw-bold">{{ item.object }}</h5>
+                                                            <h5 class="text-center fw-bold">{{ item.object + (index > 0 ? ' (Retake)' : '') }}</h5>
                                                             <video class="st-width" ref="previewElement"
                                                                 :src="item.file_url" controls></video>
                                                         </div>
                                                         <span style="font-size: 20px">
-                                                                Status: <span :class="item.status.toUpperCase() === 'PENDING' ? 'text-warning' : (item.status.toUpperCase() === 'CORRECT' ? 'text-success' : 'text-danger')" class="text-center fw-bold">{{ item.status.toUpperCase() }}</span>
-                                                            </span>
+                                                            Score: <span
+                                                                class="text-center fw-bold text-danger">{{ item.score
+                                                                }}/{{ item.perfect_score }}</span>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -290,6 +295,12 @@
                 </div>
             </div>
         </div>
+        <div class="position-absolute tutorial-button fw-bold">
+            Skill Test Tutorial
+            <button class="btn btn-primary rounded-circle" data-bs-toggle="modal" data-bs-target="#tutorialModal">
+                <i class="fas fa-question fa-lg"></i>
+            </button>
+        </div>
     </div>
 </template>
 
@@ -313,6 +324,9 @@ export default {
             isConsonant: false,
             isProcessing: false,
             letter: null,
+            highestScores: {},
+            availableRetakes: {},
+            availableQuizRetakes: {},
             indexes: {
                 vowel: 0,
                 consonant: null,
@@ -331,6 +345,7 @@ export default {
     async created() {
         await this.getFlags();
         await this.getSkillTest()
+        await this.getAvailableQuizRetakes()
         this.setVideo()
     },
     mounted() {
@@ -424,11 +439,22 @@ export default {
                 }, {});
 
                 this.skillTest = mergedObject
+                this.highestScores = data.data.highest_score ?? {}
+                this.availableRetakes = data.data.retake ?? {}
             } catch (error) {
                 console.log(error)
             } finally {
                 this.isProcessing = false
             }
+        },
+        async getAvailableQuizRetakes() {
+            try {
+                const response = await axios.get('/api/available-ratake/quiz/get')
+                this.availableQuizRetakes = response.data
+            } catch (error) {
+                console.log(error)
+            }
+
         },
         setUploadSuccess() {
             $("#alphabetsModal").modal("hide");
