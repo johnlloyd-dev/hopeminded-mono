@@ -56,10 +56,13 @@
                                         </button>
                                         <div class="collapse fw-bold text-center bg-info" :id="`alphabetLetters${index}`">
                                             <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
-                                                student.skill_test['alphabet-letters'] ? Object.keys(student.skill_test['alphabet-letters']).length : 0 }}/26</span></span>
+                                                getProgressPercentage(student, 'alphabet-letters') }}/26</span></span>
                                             <span class="vr"></span>
                                             <span class="mb-0 ms-2">Lacking: <span class="fw-bold rounded-5 p-1">{{ 26 -
-                                                (student.skill_test['alphabet-letters'] ? Object.keys(student.skill_test['alphabet-letters']).length : 0)}}</span></span>
+                                                (getProgressPercentage(student, 'alphabet-letters'))}}</span></span>
+                                            <div class="progress rounded-0 bg-white">
+                                                <div style="min-width: 20px;" :class="getProgressPercentage(student, 'alphabet-letters') !== 0 ? 'progress-bar-striped progress-bar-animated' : 'bg-white text-dark'" class="progress-bar" role="progressbar" :style="`width: ${Math.round(((getProgressPercentage(student, 'alphabet-letters'))/26) * 100)}%;`" :aria-valuenow="Math.round(((getProgressPercentage(student, 'alphabet-letters'))/26) * 100)" aria-valuemin="0" aria-valuemax="100">{{ Math.round(((getProgressPercentage(student, 'alphabet-letters'))/26) * 100) }}%</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
@@ -71,10 +74,13 @@
                                         <div class="collapse fw-bold text-center bg-warning"
                                             :id="`vowelConsonants${index}`">
                                             <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
-                                                student.skill_test['vowel-consonants'] ? Object.keys(student.skill_test['vowel-consonants']).length : 0 }}/26</span></span>
+                                                getProgressPercentage(student, 'vowel-consonants') }}/26</span></span>
                                             <span class="vr"></span>
                                             <span class="mb-0 ms-2">Lacking: <span class="fw-bold rounded-5 p-1">{{ 26 -
-                                                (student.skill_test['vowel-consonants'] ? Object.keys(student.skill_test['vowel-consonants']).length : 0)}}</span></span>
+                                                (getProgressPercentage(student, 'vowel-consonants'))}}</span></span>
+                                            <div class="progress rounded-0 bg-white">
+                                                <div style="min-width: 20px;" :class="getProgressPercentage(student, 'vowel-consonants') !== 0 ? 'progress-bar-striped progress-bar-animated' : 'bg-white text-dark'" class="progress-bar" role="progressbar" :style="`width: ${Math.round(((getProgressPercentage(student, 'vowel-consonants'))/26) * 100)}%;`" :aria-valuenow="Math.round(((getProgressPercentage(student, 'vowel-consonants'))/26) * 100)" aria-valuemin="0" aria-valuemax="100">{{ Math.round(((getProgressPercentage(student, 'vowel-consonants'))/26) * 100) }}%</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
@@ -83,12 +89,15 @@
                                             aria-expanded="false" aria-controls="alphabetWords">
                                             Alphabets/Words
                                         </button>
-                                        <div class="collapse fw-bold text-center bg-white" :id="`alphabetWords${index}`">
+                                        <div class="collapse fw-bold text-center bg-success" :id="`alphabetWords${index}`">
                                             <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
-                                                student.skill_test['alphabet-words'] ? Object.keys(student.skill_test['alphabet-words']).length : 0 }}/26</span></span>
+                                                getProgressPercentage(student, 'alphabet-words') }}/26</span></span>
                                             <span class="vr"></span>
                                             <span class="mb-0 ms-2">Lacking: <span class="fw-bold rounded-5 p-1">{{ 26 -
-                                                (student.skill_test['alphabet-words'] ? Object.keys(student.skill_test['alphabet-words']).length : 0)}}</span></span>
+                                                (getProgressPercentage(student, 'alphabet-words'))}}</span></span>
+                                                <div class="progress rounded-0 bg-white">
+                                                    <div style="min-width: 20px;" :class="getProgressPercentage(student, 'alphabet-words') !== 0 ? 'progress-bar-striped progress-bar-animated' : 'bg-white text-dark'" class="progress-bar" role="progressbar" :style="`width: ${Math.round(((getProgressPercentage(student, 'alphabet-words'))/26) * 100)}%;`" :aria-valuenow="Math.round(((getProgressPercentage(student, 'alphabet-words'))/26) * 100)" aria-valuemin="0" aria-valuemax="100">{{ Math.round(((getProgressPercentage(student, 'alphabet-words'))/26) * 100) }}%</div>
+                                                </div>
                                         </div>
                                     </div>
                                 </td>
@@ -319,6 +328,9 @@ export default {
                 .finally(() => {
                     this.isLoading = false
                 })
+        },
+        getProgressPercentage(student, key) {
+            return student.skill_test && student.skill_test[key] ? Object.keys(student.skill_test[key]).length : 0
         }
     }
 }

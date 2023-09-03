@@ -64,7 +64,7 @@
                             </div>
                             <div class="col-lg-12 mb-3">
                                 <label for="email" style="font-weight: bold;" class="form-label">Email Address:</label>
-                                <input type="email" v-model="auth.email" class="form-control" id="email">
+                                <input disabled type="email" v-model="auth.email" class="form-control" id="email">
                                 <small class="text-danger font-weight-bold" v-if="errors && errors.email">{{ errors.email[0]
                                 }}</small>
                             </div>
@@ -172,6 +172,7 @@ export default {
                     this.auth.middleName = data.middle_name;
                     this.auth.lastName = data.last_name;
                     this.auth.teacherId = data.id;
+                    this.auth.email = data.email
                     this.canAccess = true
                 }).catch((error) => {
                     this.errors = error.response.data.errors

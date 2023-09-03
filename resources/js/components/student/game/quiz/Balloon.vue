@@ -267,9 +267,9 @@ export default {
             this.ctx.strokeStyle = "black";
             this.ctx.fillText(`Level ${this.flag + 1}`, 756, 100);
 
-            this.ctx.font = "25px Century Gothic";
-            this.ctx.strokeStyle = "black";
-            this.ctx.fillText(`Chances:`, 7, 25);
+            // this.ctx.font = "25px Century Gothic";
+            // this.ctx.strokeStyle = "black";
+            // this.ctx.fillText(`Chances:`, 7, 25);
 
             this.ctx.beginPath();
             this.ctx.fillStyle = "lightgrey";

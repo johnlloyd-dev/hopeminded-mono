@@ -93,3 +93,7 @@ body {
     right: 100px;
 }
 
+.unread-background {
+    background-color: rgb(211, 211, 211);
+}
+

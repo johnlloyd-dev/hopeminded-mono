@@ -22,7 +22,7 @@
                     <h5 class="fw-bold">ALL</h5>
                     <hr>
                     <template v-if="notifications.length">
-                        <div v-for="item in notifications" :key="item.id">
+                        <div :class="{ 'unread-background': item.status === 'unread' }" v-for="item in notifications" :key="item.id">
                             <a class="text-dark notification-link" href="javascript:;" @click="updateNotification(item)">
                                 <i v-if="item.status === 'read'" class="fas fa-envelope-open-text me-1 fa-lg text-success"></i>
                                 <i v-else class="fas fa-circle me-1 fa-sm text-danger"></i>
@@ -168,6 +168,6 @@ export default {
 }
 
 .notification-link:hover {
-    text-decoration: underline;
+    color: blue !important;
 }
 </style>

@@ -18,6 +18,7 @@ class NotificationController extends Controller
             $student_ids = Student::where('teacher_id', $teacher_id)->pluck('id');
             return Notification::whereIn('student_id', $student_ids)
                 ->where('subject', 'for_teacher')
+                ->orderBy('status', 'desc')
                 ->get()
                 ->map(function ($data) {
                     $notification_content = null;

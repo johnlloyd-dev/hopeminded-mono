@@ -239,15 +239,15 @@ class GameController extends Controller
 
         $url = null;
         switch ($retake->textbook_flag) {
-            case 'alphabet-words':
+            case 'alphabet_words':
                 $url = '/alphabet-by-words';
                 break;
 
-            case 'alphabet-letters':
+            case 'alphabet_letters':
                 $url = '/alphabet-by-letters';
                 break;
 
-            case 'vowel-consonants':
+            case 'vowel_consonants':
                 $url = '/vowel-consonants';
                 break;
         }

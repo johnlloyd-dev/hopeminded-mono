@@ -150,8 +150,8 @@
                                                         </template>
                                                     </span>
                                                 </td>
-                                                <td>{{ data.percentage }}% of {{ data.perfect_score }}</td>
-                                                <td>{{ data.mark }}</td>
+                                                <td>{{ data.percentage }}</td>
+                                                <td>{{ 'Right or Wrong' }}</td>
                                             </tr>
                                             <tr class="fw-bold border-0">
                                                 <td colspan="2" class="border-0"></td>
