@@ -6,12 +6,14 @@
                 <div class="d-flex justify-content-center">
                     <div class="card rounded-0 py-5 px-5" style="width: 100%;">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h4 class="fw-bold">Quiz Reports </h4>
+                            <h4 class="fw-bold">Reports </h4>
                             <img src="/images/kids.png" alt="Kids" width="150">
                         </div>
                         <div class="card-body">
                             <div class="card">
                                 <div class="card-body">
+                                    <h3 class="fw-bold mb-3">Quiz Report</h3>
+                                    <p v-if="Object.keys(passingPercentages).length" class="alert alert-warning fw-bold" role="alert">Note: The percentage set by your teacher for the quiz passing score is <span class="fw-bold">{{ passingPercentages['quiz'][0].percentage }}%.</span></p>
                                     <div class="hangman-game mb-3">
                                         <button
                                             class="btn btn-secondary d-block fw-bold rounded-0 w-100 d-flex justify-content-between align-items-center mb-1 fs-6 p-3"
@@ -237,6 +239,47 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <hr class="my-4">
+                                    <h3 class="fw-bold mb-3">Skill Test Report</h3>
+                                    <p v-if="Object.keys(passingPercentages).length" class="alert alert-warning fw-bold" role="alert">Note: The percentage set by your teacher for the skill test passing score is <span class="fw-bold">{{ passingPercentages['skill_test'][0].percentage }}%.</span></p>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="card" style="width: 18rem;">
+                                                <div class="card-body">
+                                                    <h5 class="card-title fw-bold">Alphabets-Words</h5>
+                                                    <hr>
+                                                    <p class="card-text">Submitted: <span class="fw-bold">{{ skillTestReports['alphabet-words'].submitted }}/26</span></p>
+                                                    <p class="card-text">Average Score: <span class="fw-bold">{{ skillTestReports['alphabet-words'].average }}/10</span></p>
+                                                    <p class="card-text">Percentage: <span class="fw-bold">{{ skillTestReports['alphabet-words'].percentage ?? '[No records found]'  }}</span></p>
+                                                    <p class="card-text">Mark: <span class="fw-bold" :class="skillTestReports['alphabet-words'].mark ? 'text-danger' : 'text-success'">{{ skillTestReports['alphabet-words'].mark }}</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="card" style="width: 18rem;">
+                                                <div class="card-body">
+                                                    <h5 class="card-title fw-bold">Vowels-Consonants</h5>
+                                                    <hr>
+                                                    <p class="card-text">Submitted: <span class="fw-bold">{{ skillTestReports['vowel-consonants'].submitted }}/26</span></p>
+                                                    <p class="card-text">Average Score: <span class="fw-bold">{{ skillTestReports['vowel-consonants'].average }}/10</span></p>
+                                                    <p class="card-text">Percentage: <span class="fw-bold">{{ skillTestReports['vowel-consonants'].percentage ?? '[No records found]'  }}</span></p>
+                                                    <p class="card-text">Mark: <span class="fw-bold" :class="skillTestReports['vowel-consonants'].mark ? 'text-danger' : 'text-success'">{{ skillTestReports['alphabet-words'].mark }}</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="card" style="width: 18rem;">
+                                                <div class="card-body">
+                                                    <h5 class="card-title fw-bold">Alphabets-Letters</h5>
+                                                    <hr>
+                                                    <p class="card-text">Submitted: <span class="fw-bold">{{ skillTestReports['alphabet-letters'].submitted }}/26</span></p>
+                                                    <p class="card-text">Average Score: <span class="fw-bold">{{ skillTestReports['alphabet-letters'].average }}/10</span></p>
+                                                    <p class="card-text">Percentage: <span class="fw-bold">{{ skillTestReports['alphabet-letters'].percentage ?? '[No records found]'  }}</span></p>
+                                                    <p class="card-text">Mark: <span class="fw-bold" :class="skillTestReports['alphabet-letters'].mark ? 'text-danger' : 'text-success'">{{ skillTestReports['alphabet-words'].mark }}</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -255,11 +298,15 @@ export default {
             isProcessing: false,
             isLoading: false,
             data: [],
-            highestScores: {}
+            skillTestsData: [],
+            highestScores: {},
+            passingPercentages: []
         };
     },
     created() {
         this.getQuizReports();
+        this.getSkillTestReports()
+        this.getAllPassingPercentages()
     },
     computed: {
         gameId() {
@@ -304,6 +351,29 @@ export default {
                 })
             }
             return this.data
+        },
+        skillTestReports() {
+            let data = {};
+            const flags = ['alphabet-words', 'alphabet-letters', 'vowel-consonants'];
+
+            flags.forEach(element => {
+                if (this.skillTestsData.hasOwnProperty(element)) {
+                    data[element] = {
+                        submitted: this.skillTestsData[element].submitted,
+                        average: this.skillTestsData[element].average,
+                        mark: this.skillTestsData[element].mark,
+                        percentage: this.skillTestsData[element].percentage + '%'
+                    }
+                } else {
+                    data[element] = {
+                        submitted: 0,
+                        average: 0,
+                        mark: 'Failed',
+                        percentage: '0%'
+                    }
+                }
+            });
+            return data;
         }
     },
     methods: {
@@ -327,6 +397,29 @@ export default {
             const data = await axios.get("/api/quiz/reports/get");
             this.data = data.data.reports
             this.highestScores = data.data.highest_scores
+            this.isProcessing = false;
+        },
+        async getSkillTestReports() {
+            this.isProcessing = true;
+            const data = await axios.get("/api/skill-test/reports/get");
+            this.skillTestsData = data.data.data
+            this.isProcessing = false;
+        },
+        async getAllPassingPercentages() {
+            this.isProcessing = true;
+            const data = await axios.get("/api/passing-percentage/all/get");
+            const mergedObject = data.data.reduce((result, item) => {
+                    const { flag, ...rest } = item;
+
+                    if (result[flag]) {
+                        result[flag].push(rest);
+                    } else {
+                        result[flag] = [rest];
+                    }
+
+                    return result;
+            }, {});
+            this.passingPercentages = mergedObject
             this.isProcessing = false;
         }
     }

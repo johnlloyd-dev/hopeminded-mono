@@ -62,7 +62,7 @@ class NotificationController extends Controller
                             break;
 
                         case 'ft_retake_skill_test':
-                            $notification_content = 'You are given another chance to resubmit a skill test for the alphabet ' . strtoupper($attributes->alphabet) . '.';
+                            $notification_content = 'You are given another chance to resubmit a skill test for each alphabet.';
                             break;
                     }
                     $data->notification_content = $notification_content;

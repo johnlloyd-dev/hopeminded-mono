@@ -54,7 +54,7 @@
                                             aria-expanded="false" aria-controls="alphabetLetters">
                                             Alphabets/Letters
                                         </button>
-                                        <div class="collapse fw-bold text-center bg-info" :id="`alphabetLetters${index}`">
+                                        <div class="collapse fw-bold text-center bg-info bg-gradient" :id="`alphabetLetters${index}`">
                                             <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
                                                 getProgressPercentage(student, 'alphabet-letters') }}/26</span></span>
                                             <span class="vr"></span>
@@ -71,7 +71,7 @@
                                             aria-expanded="false" aria-controls="vowelConsonants">
                                             Vowels/Consonants
                                         </button>
-                                        <div class="collapse fw-bold text-center bg-warning"
+                                        <div class="collapse fw-bold text-center bg-warning bg-gradient"
                                             :id="`vowelConsonants${index}`">
                                             <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
                                                 getProgressPercentage(student, 'vowel-consonants') }}/26</span></span>
@@ -89,7 +89,7 @@
                                             aria-expanded="false" aria-controls="alphabetWords">
                                             Alphabets/Words
                                         </button>
-                                        <div class="collapse fw-bold text-center bg-success" :id="`alphabetWords${index}`">
+                                        <div class="collapse fw-bold text-center bg-success bg-gradient text-white" :id="`alphabetWords${index}`">
                                             <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
                                                 getProgressPercentage(student, 'alphabet-words') }}/26</span></span>
                                             <span class="vr"></span>

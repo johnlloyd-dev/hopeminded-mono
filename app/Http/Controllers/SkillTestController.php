@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use App\Models\PassingPercentage;
 use App\Models\PerfectScore;
+use App\Models\PivotRetakes;
 use App\Models\Retake;
 use App\Models\SkillTest;
 use App\Models\Student;
@@ -65,6 +67,16 @@ class SkillTestController extends Controller
                             'alphabet' => $request->letter
                         ])
                     ]);
+                }
+
+                $pivotRetake = PivotRetakes::where('student_id', $student_id)->first();
+
+                if (!isset($pivotRetake)) {
+                    $pivotRetake = new PivotRetakes;
+                    $pivotRetake->student_id = $student_id;
+                    $pivotRetake->main_retake = 0;
+                    $pivotRetake->textbook_flag = $request->flag;
+                    $pivotRetake->save();
                 }
 
                 Notification::create([
@@ -160,7 +172,75 @@ class SkillTestController extends Controller
             }
 
             $skillTest['retake'] = $groupedRetakes;
+            $skillTest['main_retake'] = PivotRetakes::where('student_id', $studentId)->where('textbook_flag', $flag)->first();
         }
+
+        return $skillTest;
+    }
+
+    public function getAllSkillTests()
+    {
+        $skillTest = [];
+        $studentId = Student::where('user_id', Auth::user()->id)->first()->id;
+        $teacherId = Student::find($studentId)->teacher_id;
+        $passingPercentage = PassingPercentage::where('teacher_id', $teacherId)->first()->percentage;
+        $skillTests = SkillTest::where('student_id', $studentId)
+            ->get()
+            ->toArray();
+
+
+        $newData = [];
+        if (count($skillTests)) {
+            $groupedObjects = [];
+
+            foreach ($skillTests as $object) {
+                $flag = $object['flag'];
+
+                if (!isset($groupedObjects[$flag])) {
+                    $groupedObjects[$flag] = [];
+                }
+
+                $groupedObjects[$flag][] = $object;
+            }
+            $itemKeys = $groupedObjects;
+            $highest_scores = [];
+
+            foreach ($itemKeys as $key => $group) {
+                $groupedObjects2 = [];
+
+                foreach ($group as $object2) {
+                    $flag2 = $object2['letter'];
+
+                    if (!isset($groupedObjects2[$flag2])) {
+                        $groupedObjects2[$flag2] = [];
+                    }
+
+                    $groupedObjects2[$flag2][] = $object2;
+                }
+                $itemKeys2 = $groupedObjects2;
+                $average = [];
+                foreach ($itemKeys2 as $key2 => $group2) {
+                    $totalScores = array_column($group2, 'score');
+                    $totalScores = array_map('intval', $totalScores);
+
+                    $highest_score = max($totalScores);
+                    $highest_scores[$key][$key2] = $highest_score;
+
+                    array_push($average, $highest_score);;
+                }
+                $newAverage = array_sum($average) / count($average);
+                $newData[$key]['average'] = $newAverage;
+                $newData[$key]['submitted'] = count($average);
+
+                $percentage = ($newAverage / 10) * 100;
+                $newData[$key]['percentage'] = $percentage;
+                $newData[$key]['passing_percentage'] = $passingPercentage;
+
+                $mark = $percentage > $passingPercentage ? 'Passed' : 'Failed';
+                $newData[$key]['mark'] = $mark;
+            }
+        }
+        $skillTest['data'] = $newData;
 
         return $skillTest;
     }
@@ -205,15 +285,37 @@ class SkillTestController extends Controller
         ]);
     }
 
+    public function updateMark(Request $request)
+    {
+        $skillTest = SkillTest::find($request->skill_test_id);
+        if ($request->input('mark') === 'correct') {
+            $skillTest->score = 10;
+        } else {
+            $skillTest->score = 5;
+        }
+        $skillTest->status = $request->input('mark');
+        $skillTest->save();
+
+        return response()->json([
+            'message' => 'Skill test mark and score is updated successfully.'
+        ]);
+    }
+
     public function allowRetake(Request $request, $retakeId)
     {
-        $retake = Retake::find($retakeId);
+        $mainRetake = PivotRetakes::find($retakeId);
 
-        $retake->allowed_retake = $request->input('allowed_retake');
-        $retake->save();
+        $mainRetake->main_retake = $request->input('allowed_retake');
+        $mainRetake->save();
+
+        $retakes = Retake::where('student_id', $mainRetake->student_id)
+            ->where('flag', 'skill_test')
+            ->where('textbook_flag', $request->query('flag'));
+        $retakes->update(['allowed_retake' => $request->input('allowed_retake')]);
+        $newRetakes = $retakes->first();
 
         $url = null;
-        switch ($retake->textbook_flag) {
+        switch ($newRetakes->textbook_flag) {
             case 'alphabet-words':
                 $url = '/alphabet-by-words';
                 break;
@@ -228,14 +330,14 @@ class SkillTestController extends Controller
         }
 
         Notification::create([
-            'student_id' => $retake->student_id,
+            'student_id' => $newRetakes->student_id,
             'flag' => 'ft_retake_skill_test',
             'subject' => 'for_student',
             'url' => $url,
             'status' => 'unread',
             'attributes' => json_encode((object)[
-                'alphabet' => json_decode($retake->attributes)->alphabet,
-                'textbook_name' => ucwords(str_replace('-', ' ', $retake->textbook_flag))
+                'alphabet' => json_decode($newRetakes->attributes)->alphabet,
+                'textbook_name' => ucwords(str_replace('-', ' ', $newRetakes->textbook_flag))
             ])
         ]);
         return response()->json([

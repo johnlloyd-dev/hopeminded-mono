@@ -2,10 +2,15 @@
     <div class="body position-relative">
         <div class="d-flex">
             <div class="main-content mx-5 w-100 h-100">
-                <div class="my-3">
+                <div class="my-3 d-flex d-flex justify-content-between align-items-center">
                     <button @click="navigate()" class="btn-secondary btn rounded-0">
                         Back
                     </button>
+                    <div class="perfect-score-handler">
+                        <div>
+                            <h4 class="mb-0"><span class="student-title">{{ Object.keys(studentInfo).length ? `${studentInfo.last_name}, ${studentInfo.first_name} ${(studentInfo && studentInfo.middle_name ? studentInfo.middle_name.charAt(0) + '.' : '')}` : '' }}</span></h4>
+                        </div>
+                    </div>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
@@ -23,32 +28,6 @@
                             :checked="gameId == 3">
                         <label class="btn btn-outline-dark fw-bold rounded-0"
                             :class="gameId == 3 ? 'text-white' : 'text-black'" for="btnradio3">Memory Game</label>
-                    </div>
-                </div>
-                <div class="perfect-score-handler">
-                    <div class="card rounded-0" style="width: 400px">
-                        <div class="card-body">
-                            <h5 class="fw-bold">Set Skill Test Perfect Score</h5>
-                            <div v-if="!isModifyPerfectScore">
-                                Perfect Score: <span class="fw-bold text-danger">{{ perfect_score.score }} <small class="text-danger" v-if="!perfect_score.id">{{ '(default)' }}</small></span>
-                                <span class="ms-3">
-                                    <button class="btn btn-primary rounded-0 btn-sm" @click="isModifyPerfectScore = !isModifyPerfectScore">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </span>
-                            </div>
-                            <div v-else>
-                                <form @submit.prevent="modifyPerfectScore()">
-                                    <div class="mb-3">
-                                        <label for="scoreInput" class="form-label">Perfect Score:</label>
-                                        <input type="text" v-model="setScore.score" class="form-control rounded-0" id="scoreInput" required>
-                                        <small v-if="perfectScoreError" class="text-danger">Perfect score must be above the highest score from skill test.</small>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary btn-sm rounded-0 me-3">Save</button>
-                                    <button @click="isModifyPerfectScore = !isModifyPerfectScore" type="button" class="btn btn-secondary btn-sm rounded-0">Back</button>
-                                </form>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <AlphabetReports ref="AlphabetReports" :reports="reports" :student-id="studentId" :flag="flag" :game-name="gameName" :quiz-report-highest-score="quizReportHighestScore" :quiz-report-retake="quizReportRetake" />
@@ -85,6 +64,7 @@ export default {
             perfectScoreMessage: null,
             errors: [],
             perfect_score: {},
+            studentInfo: {},
             default_perfect_score: 10,
             flag: 'alphabet-words',
             setScore: {
@@ -107,6 +87,7 @@ export default {
         this.getReports()
         this.getCertificates()
         // this.getSkillTest()
+        this.getStudentInfo()
         this.getPerfectScore()
     },
     beforeUnmount() {
@@ -294,7 +275,15 @@ export default {
             } catch (error) {
                 console.log(error)
             }
-        }
+        },
+        async getStudentInfo() {
+            try {
+                const response = await axios.get(`/api/profile/get?student_id=${this.studentId}`)
+                this.studentInfo = response.data
+            } catch (error) {
+                console.log(error)
+            }
+        },
     },
 }
 </script>
@@ -312,6 +301,10 @@ export default {
     overflow-x: hidden;
 }
 
+.student-title {
+    font-family: 'Bangers', cursive;
+    font-size: 30px;
+}
 .video-width {
     width: 320px;
 }</style>

@@ -15,6 +15,8 @@
                     </button>
                 </div>
                 <div class="collapse show rounded-0" id="skillTestReport">
+                    <p class="alert alert-warning rounded-0 fw-bold" role="alert">Note: For scoring, <code>[5]</code> pts
+                        for wrong mark and <code>[10]</code> pts for correct mark.</p>
                     <template v-if="isLoading">
                         <ul class="o-vertical-spacing o-vertical-spacing--l">
                             <li class="blog-post o-media">
@@ -55,7 +57,7 @@
                                                 <h5 class="mb-0">Object: <span class="fw-bold text-danger">{{
                                                     skillTest[item][0].object }}</span></h5>
                                             </div>
-                                            <div v-if="skillTest.hasOwnProperty(item)"
+                                            <!-- <div v-if="skillTest.hasOwnProperty(item)"
                                                 class="col-5 d-flex align-items-center">
                                                 <h5 class="mb-0">Allowed Retake:</h5>
                                                 <span class="ms-3">
@@ -91,18 +93,17 @@
                                                         </form>
                                                     </template>
                                                 </span>
-                                            </div>
+                                            </div> -->
                                         </div>
                                     </div>
                                     <table class="table table-bordered">
                                         <thead class="table-secondary">
                                             <tr>
-                                                <th>Attempt No.</th>
-                                                <th>Date/Time</th>
-                                                <th>Skill Test Video</th>
+                                                <th style="width: 15%">Attempt No.</th>
+                                                <th style="width: 20%">Date/Time</th>
+                                                <th style="width: 20%">Skill Test Video</th>
+                                                <th style="width: 20%">Mark</th>
                                                 <th>Score</th>
-                                                <th>Percentage</th>
-                                                <th>Mark</th>
                                             </tr>
                                         </thead>
                                         <tbody v-if="skillTest.hasOwnProperty(item)">
@@ -117,47 +118,65 @@
                                                 <td>
                                                     <span>
                                                         <template v-if="!data.is_display">
-                                                            {{ data.score + '/' + data.perfect_score }}
-                                                            <button
-                                                                @click="data.is_display = !data.is_display, newScore[data.letter] = data.score"
-                                                                class="btn btn-success rounded-0 btn-sm border-0">
-                                                                <i class="fas fa-edit fa-sm"></i>
-                                                            </button>
+                                                            <div class="d-flex justify-content-around">
+                                                                <span class="fw-bold"
+                                                                    :class="data.status === 'pending' ? 'text-warning' : (data.status === 'correct' ? 'text-success' : 'text-danger')">{{
+                                                                        data.status === 'pending' ? '[UNCHECKED]' :
+                                                                        `[${data.status.toUpperCase()}]` }}</span>
+                                                                <button
+                                                                    @click="data.is_display = !data.is_display, newScore[data.letter] = data.score"
+                                                                    class="btn btn-success rounded-0 btn-sm border-0">
+                                                                    <i class="fas fa-edit fa-sm"></i>
+                                                                </button>
+                                                            </div>
                                                         </template>
                                                         <template v-else>
-                                                            <form class="d-flex align-items-center"
-                                                                @submit.prevent="updateScore(data, index)">
-                                                                <div>
-                                                                    <input type="text" v-model="newScore[data.letter]"
-                                                                        class="form-control rounded-0" id="score"
-                                                                        aria-describedby="emailHelp">
+                                                            <div class="update-mark">
+                                                                <div class="card rounded-0 position-relative">
+                                                                    <button type="button"
+                                                                        @click="data.is_display = !data.is_display"
+                                                                        class="btn border-0 rounded-0 position-absolute top-0 start-100 translate-middle">
+                                                                        <i class="fas fa-close fa-lg"></i>
+                                                                    </button>
+                                                                    <h6 class="fw-bold p-2">Mark: <span class="fw-bold"
+                                                                            :class="data.status === 'pending' ? 'text-warning' : (data.status === 'correct' ? 'text-success' : 'text-danger')">{{
+                                                                                data.status === 'pending' ? '[UNCHECKED]' :
+                                                                                `[${data.status.toUpperCase()}]` }}</span></h6>
+                                                                    <div
+                                                                        class="card-body d-flex justify-content-around p-0">
+                                                                        <div class="d-flex flex-column">
+                                                                            <button type="button"
+                                                                                @click="markSkillTest(data, 'correct')"
+                                                                                class="btn rounded-0 text-success p-0 border-0 zoom-button">
+                                                                                <i class="fas fa-check-circle h1"></i>
+                                                                            </button>
+                                                                            <span>Correct</span>
+                                                                        </div>
+                                                                        <div class="d-flex flex-column">
+                                                                            <button type="button"
+                                                                                @click="markSkillTest(data, 'wrong')"
+                                                                                class="btn rounded-0 text-danger p-0 border-0 zoom-button">
+                                                                                <i class="fas fa-times-circle h1"></i>
+                                                                            </button>
+                                                                            <span>Wrong</span>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <span class="w-25 text-center">/{{
-                                                                    data.perfect_score }}</span>
-                                                                <button type="submit"
-                                                                    class="btn btn-primary rounded-0 btn-sm border-0">
-                                                                    <i class="fas fa-save fa-sm"></i>
-                                                                </button>
-                                                                <button type="button"
-                                                                    @click="data.is_display = !data.is_display"
-                                                                    class="btn btn-secondary rounded-0 btn-sm border-0">
-                                                                    <i class="fas fa-close fa-sm"></i>
-                                                                </button>
-                                                            </form>
+                                                            </div>
                                                             <small v-if="data.error_message" class="text-danger">Score
                                                                 must not be greater than
                                                                 the perfect score.</small>
                                                         </template>
                                                     </span>
                                                 </td>
-                                                <td>{{ data.percentage }}</td>
-                                                <td>{{ 'Right or Wrong' }}</td>
+                                                <td>
+                                                    {{ data.score + '/' + data.perfect_score }}
+                                                </td>
                                             </tr>
                                             <tr class="fw-bold border-0">
-                                                <td colspan="2" class="border-0"></td>
+                                                <td colspan="3" class="border-0"></td>
                                                 <td class="text-end border-0">Highest Score:</td>
-                                                <td class="border-0">{{ highestScore[item] }}</td>
-                                                <td class="border-0" colspan="1"></td>
+                                                <td class="border-0">{{ highestScore[item] }}/10</td>
                                             </tr>
                                         </tbody>
                                         <tbody v-else>
@@ -171,10 +190,92 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Skill Test Summary -->
+                <div v-if="Object.keys(skillTest).length" class="alert alert-success d-flex justify-content-around"
+                    role="alert">
+                    <div class="w-50 me-5">
+                        <h6 class="fw-bold">Skill Test Score Summary</h6>
+                        <p class="d-flex">Submitted:
+                            <span class="fw-bold ms-1">{{ Object.keys(skillTest).length }}/26</span>
+                            <span class="fw-bold ms-1 text-danger"
+                                v-if="Object.keys(skillTest).length !== 26">(INCOMPLETE)</span>
+                        </p>
+                        <h6>Choose a percentage for a passing score:</h6>
+                        <div class="d-flex justify-content-around">
+                            <div v-for="(percentage, index) in percentages" :key="index" class="form-check">
+                                <input @click="updatePassingPercentage('skill_test')"
+                                    v-model="selectedPercentage.skill_test" :value="percentage.value"
+                                    class="form-check-input" type="radio" :id="`percentageOptions${index}`">
+                                <label class="form-check-label fw-bold" :for="`percentageOptions${index}`">
+                                    {{ percentage.name }}
+                                </label>
+                                <i v-if="percentage.value == selectedPercentage.skill_test"
+                                    class="fas fa-check fa-lg ms-1"></i>
+                            </div>
+                        </div>
+                        <hr>
+                        <p :class="{ 'mb-0': Object.keys(skillTest).length !== 26 }">{{ Object.keys(skillTest).length !== 26
+                            ? 'Partial Average' : 'Average' }}: <span class="fw-bold">{{ skillTestAverageScore.display }}</span></p>
+                        <p v-if="Object.keys(skillTest).length !== 26" class="fw-bold">Note: <span>This average is
+                                considered partial due to the student's incomplete skill test submissions.</span></p>
+                        <h6>Score Percentage: <span class="fw-bold">{{ calculatePercentage(skillTestAverageScore.score)
+                        }}%</span></h6>
+                        <h6>Mark: <span class="fw-bold"
+                                :class="calculatePercentage(skillTestAverageScore.score) < selectedPercentage.skill_test ? 'text-danger' : 'text-success'">{{
+                                    (calculatePercentage(skillTestAverageScore.score) < selectedPercentage.skill_test)
+                                    ? 'FAILED' : 'PASSED' }}</span>
+                        </h6>
+                    </div>
+                    <div class="w-50 ms-5 text-center">
+                        <div style="height: 100%" class="border border-secondary rounded p-3 text-center d-flex align-items-center justify-content-center flex-column">
+                            <h4 class="text-center fw-bold">Allowed Retake: <span class="fw-bold text-danger">{{ Object.keys(skillTestMainRetake).length ? skillTestMainRetake.main_retake : 0 }}</span></h4>
+                            <template
+                                v-if="!showSkillTestRetakeModify.hasOwnProperty(filteredFlag) || showSkillTestRetakeModify[filteredFlag] == false">
+                                <!-- <button @click="showSkillTestRetakeModify[filteredFlag] = true"
+                                    :disabled="Object.keys(skillTest).length !== 26"
+                                    class="btn btn-secondary border border-secondary p-4">
+                                    <i class="fas fa-edit fa-lg h1"></i>
+                                </button> -->
+                                <button @click="allowSkillTest()"
+                                    class="btn btn-secondary border border-secondary p-4">
+                                    <i class="fas fa-edit fa-lg h1"></i>
+                                </button>
+                                <p class="fw-bold alert alert-warning mt-3 mb-0 text-start"
+                                    role="alert">Note:
+                                    <ul class="text-justify">
+                                        <li>Button is disabled if the submitted skill tests are not complete.</li>
+                                        <li>By updating the allowed retake for skill test, it will allow student to retake/resubmit skill tests for each alphabet.</li>
+                                    </ul>
+                                    </p>
+                            </template>
+                            <template v-else-if="showSkillTestRetakeModify[filteredFlag] == true">
+                                <form
+                                    @submit.prevent="allowRetakeSkillTest()"
+                                    class="text-center">
+                                    <div class="mb-3">
+                                        <input style="font-size: 30px;" type="number" v-model="allowedSkillTestAttempt[filteredFlag]"
+                                            class="form-control" min="1">
+                                    </div>
+                                    <button :disabled="allowedSkillTestAttempt[filteredFlag] < 1"
+                                        type="submit"
+                                        class="btn btn-primary border-0 me-1 btn-lg">
+                                        <i class="fas fa-save fa-lg"></i>
+                                    </button>
+                                    <button @click="showSkillTestRetakeModify[filteredFlag] = false"
+                                        type="button"
+                                        class="btn btn-secondary border-0 ms-1 btn-lg">
+                                        <i class="fas fa-close fa-lg"></i>
+                                    </button>
+                                </form>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Skill Test Summary -->
             </div>
             <hr>
-            <div class="quiz-report">
-                <div>
+            <div class="quiz-report mb-3">
+                <div class="mb-3">
                     <button
                         class="btn btn-secondary d-block fw-bold rounded-0 w-100 d-flex justify-content-between align-items-center"
                         type="button" data-bs-toggle="collapse" data-bs-target="#quizReport" aria-expanded="false"
@@ -182,14 +283,15 @@
                         Quiz Report <i class="fas fa-chevron-circle-down"></i>
                     </button>
                 </div>
-                <div class="collapse show" id="quizReport">
+                <div class="collapse show mb-3" id="quizReport">
                     <div v-if="reports.length" class="d-flex justify-content-between align-items-center">
                         <h6 class="fw-bold my-3">Perfect Score: <span class="text-danger">{{ reports.length ?
                             reports[0].perfect_score : '(No data found)' }}</span></h6>
-                        <div class="d-flex">
+                        <!-- <div class="d-flex">
                             Allowed Retake:
                             <span class="ms-3">
-                                <template v-if="!showQuizRetakeModify.hasOwnProperty(filteredFlag) || !showQuizRetakeModify[filteredFlag]">
+                                <template
+                                    v-if="!showQuizRetakeModify.hasOwnProperty(filteredFlag) || !showQuizRetakeModify[filteredFlag]">
                                     <span style="border-bottom: 3px solid black"
                                         class="h5 fw-bold me-3 text-center text-danger">{{
                                             quizReportRetake[filteredFlag].allowed_retake }}</span>
@@ -215,7 +317,7 @@
                                     </form>
                                 </template>
                             </span>
-                        </div>
+                        </div> -->
                         <button @click="viewWeaknesses()" class="btn btn-success btn-sm rounded-0 text-end">
                             Weaknesses <i class="fas fa-book-reader"></i>
                         </button>
@@ -246,22 +348,79 @@
                                     <td>{{ item.attempt_number }}</td>
                                     <td>{{ new Date(item.created_at).toLocaleString() }}</td>
                                     <td>{{ item.total_score }}</td>
-                                    <td>{{ item.percentage }}% of {{ item.perfect_score }}</td>
+                                    <td>{{ item.percentage }}%</td>
                                     <td>{{ upperCaseFirstLetter(item.mark) }} </td>
                                 </tr>
                                 <tr class="fw-bold border-0">
                                     <td colspan="1" class="border-0"></td>
-                                    <td class="text-end border-0">Average:</td>
-                                    <td class="border-0">{{ quizReportHighestScore[this.$parent.gameId] }}</td>
+                                    <td class="text-end border-0">Highest Score:</td>
+                                    <td class="border-0">{{ quizReportHighestScore[$parent.gameId] }}/{{
+                                        reports[0].perfect_score }}</td>
                                     <td class="border-0" colspan="2"></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+                <div v-if="reports.length" class="alert alert-success d-flex justify-content-around" role="alert">
+                    <div class="w-50 me-5">
+                        <h6 class="fw-bold">Quiz/Game Score Summary</h6>
+                        <p>Attempts Taken: <span class="fw-bold">{{ reports.length }}</span></p>
+                        <h6>Choose a percentage for a passing score:</h6>
+                        <div class="d-flex justify-content-around">
+                            <div v-for="(percentage, index) in percentages" :key="index" class="form-check">
+                                <input @click="updatePassingPercentage('quiz')" v-model="selectedPercentage.quiz"
+                                    :value="percentage.value" class="form-check-input" type="radio"
+                                    :id="`percentageOptions${index}`">
+                                <label class="form-check-label fw-bold" :for="`percentageOptions${index}`">
+                                    {{ percentage.name }}
+                                </label>
+                                <i v-if="percentage.value == selectedPercentage.quiz" class="fas fa-check fa-lg ms-1"></i>
+                            </div>
+                        </div>
+                        <hr>
+                        <p>Highest Score: <span class="fw-bold">{{ quizAverageScore.display }}</span></p>
+                        <h6>Score Percentage: <span class="fw-bold">{{ calculatePercentage(quizAverageScore.score,
+                            reports[0].perfect_score) }}%</span></h6>
+                        <h6>Mark: <span class="fw-bold"
+                                :class="calculatePercentage(quizAverageScore.score, reports[0].perfect_score) < selectedPercentage.quiz ? 'text-danger' : 'text-success'">{{
+                                    (calculatePercentage(quizAverageScore.score, reports[0].perfect_score) <
+                                        selectedPercentage.quiz) ? 'FAILED' : 'PASSED' }}</span>
+                        </h6>
+                    </div>
+                    <div class="ms-5 w-50 text-center">
+                        <div style="height: 96%" class="border border-secondary rounded p-3 text-center d-flex align-items-center justify-content-center flex-column">
+                            <h4 class="fw-bold">Allowed Retake: <span class="fw-bold text-danger">{{ quizReportRetake[filteredFlag].allowed_retake }}</span></h4>
+                            <template v-if="!showQuizRetakeModify.hasOwnProperty(filteredFlag) || showQuizRetakeModify[filteredFlag] == false">
+                                <button @click="allowQuiz()" class="btn btn-secondary border border-secondary p-4">
+                                    <i class="fas fa-edit fa-lg h1"></i>
+                                </button>
+                            </template>
+                            <template v-else-if="showQuizRetakeModify.hasOwnProperty(filteredFlag) && showQuizRetakeModify[filteredFlag] == true">
+                                <form @submit.prevent="allowRetakeQuiz(quizReportRetake[filteredFlag], filteredFlag)"
+                                    class="text-center">
+                                    <div class="mb-3">
+                                        <input style="font-size: 30px;" type="number" v-model="allowedQuizAttempt[filteredFlag]"
+                                            class="form-control" min="1">
+                                    </div>
+                                    <button :disabled="allowedQuizAttempt[filteredFlag] < 1" type="submit"
+                                        class="btn btn-primary btn-lg border-0 me-1">
+                                        <i class="fas fa-save fa-lg"></i>
+                                    </button>
+                                    <button @click="showQuizRetakeModify[filteredFlag] = false" type="button"
+                                        class="btn btn-secondary btn-lg border-0 ms-1">
+                                        <i class="fas fa-close fa-lg"></i>
+                                    </button>
+                                </form>
+                            </template>
+                        </div>
+                        <!-- <p v-if="Object.keys(skillTest).length !== 26" class="position-absolute bottom-0 start-50 translate-middle-x fw-bold">Note: Button is disabled if the submitted skill test is not complete.</p> -->
+                    </div>
+                </div>
             </div>
             <hr>
-            <div class="score-tally mt-3">
+            <!-- Summary/Average -->
+            <!-- <div class="score-tally mt-3">
                 <h4 class="fw-bold">Summary / Average</h4>
                 <table class="table table-bordered table-responsive w-50">
                     <thead class="table-secondary">
@@ -273,16 +432,16 @@
                     <tbody>
                         <tr>
                             <td class="fw-bold">Skill Test</td>
-                            <td class="fw-bold">{{ skillTestAverageScore }}</td>
+                            <td class="fw-bold">{{ skillTestAverageScore.display }}</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Quiz</td>
-                            <td class="fw-bold">{{ quizAverageScore }}</td>
+                            <td class="fw-bold">{{ quizAverageScore.display }}</td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-            <hr>
+            </div> -->
+            <!-- End of Summary/Certificates -->
             <div class="certificate my-3">
                 <div class="card">
                     <img :src="certificate.file" alt="">
@@ -372,9 +531,19 @@
                             <div v-else class="accordion" id="accordionExample">
                                 <div class="accordion-item">
                                     <div class="alert alert-warning" role="alert">
-                                        <span class="fw-bold">Note: </span>Hangman game is played by selecting the correct
-                                        alphabet symbol based on the object image and text presented. If the selected
-                                        alphabet sign did not match to the object name, it will be considered wrong.
+                                        <span class="fw-bold text-black">Note: </span>
+                                        <p class="fw-bold">
+                                            Hangman game is played by selecting the correct
+                                            alphabet symbol based on the object image and text presented. If the selected
+                                            alphabet sign did not match to the object name, it will be considered wrong.
+                                        </p>
+                                        <h6 class="fw-bold text-black">Legend: </h6>
+                                        <ul>
+                                            <li class="fw-bold">Wrong: <span style="background-color: #f8d7da;"
+                                                    class="p-1 text-dark fw-bold">Red Background</span></li>
+                                            <li class="fw-bold">Correct: <span style="background-color: #d1e7dd;"
+                                                    class="p-1 text-dark fw-bold">Green Background</span></li>
+                                        </ul>
                                     </div>
                                     <h2 class="accordion-header" id="headingOne">
                                         <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
@@ -540,6 +709,11 @@ export default {
                 score: 0,
                 skill_test_id: null
             },
+            setMark: {
+                mark: null,
+                skill_test_id: null
+            },
+            passingPercentage: [],
             certificates: [],
             errors: [],
             average: 0,
@@ -558,9 +732,20 @@ export default {
             skillTestRetake: [],
             showSkillTestRetakeModify: {},
             showQuizRetakeModify: {},
+            skillTestMainRetake: {},
             certificate: {
                 file: null
-            }
+            },
+            selectedPercentage: {
+                skill_test: null,
+                quiz: null
+            },
+            percentages: [
+                { name: '50%', value: 50 },
+                { name: '60%', value: 60 },
+                { name: '75%', value: 75 },
+                { name: '80%', value: 80 }
+            ]
         }
     },
     created() {
@@ -571,8 +756,11 @@ export default {
         async flag() {
             this.skillTest = {}
             this.isLoading = true
+            this.showSkillTestRetakeModify = {}
+            this.showQuizRetakeModify = {}
             await this.getSkillTest()
             await this.getCertificates()
+            await this.getPassingPercentage()
         }
     },
     computed: {
@@ -591,18 +779,30 @@ export default {
                 const totalScore = scores.reduce(function (a, b) { return a + b; }, 0);
                 const count = scores.length
 
-                return `${totalScore / count} / ${this.$parent.perfect_score.score}`;
+                return {
+                    score: totalScore / count,
+                    display: `${totalScore / count} / ${this.$parent.perfect_score.score}`
+                };
             }
-            return 0;
+            return {
+                score: 0,
+                display: 0
+            };
         },
         filteredFlag() {
             return this.flag.replace(/-/g, "_");
         },
         quizAverageScore() {
             if (Object.keys(this.quizReportHighestScore).length) {
-                return `${this.quizReportHighestScore[this.gameId]} / ${this.reports[0].perfect_score}`;
+                return {
+                    score: this.quizReportHighestScore[this.gameId],
+                    display: `${this.quizReportHighestScore[this.gameId]} / ${this.reports[0].perfect_score}`
+                };
             }
-            return 0;
+            return {
+                score: 0,
+                display: 0
+            };
         }
     },
     methods: {
@@ -627,6 +827,7 @@ export default {
                 if (Object.keys(this.skillTest).length) {
                     this.highestScore = data.data.highest_score ?? 0
                     this.skillTestRetake = data.data.retake ?? []
+                    this.skillTestMainRetake = data.data.main_retake ?? {}
                 }
 
                 this.indexes.skillTest = Object.keys(mergedObject)[0]
@@ -691,6 +892,10 @@ export default {
             this.showQuizRetakeModify[this.filteredFlag] = true
             this.allowedQuizAttempt[this.filteredFlag] = this.quizReportRetake[this.filteredFlag].allowed_retake
         },
+        allowSkillTest() {
+            this.showSkillTestRetakeModify[this.filteredFlag] = true
+            this.allowedSkillTestAttempt[this.filteredFlag] = this.skillTestMainRetake.main_retake
+        },
         async updateScore(data, index) {
             this.setScore.score = this.newScore[data.letter]
             this.setScore.skill_test_id = data.id
@@ -705,6 +910,17 @@ export default {
                 this.getSkillTest()
                 swal.fire('Success', response.data.message, 'success')
                 this.skillTest[data.letter][index].error_message = false
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async markSkillTest(data, mark) {
+            try {
+                this.setMark.mark = mark
+                this.setMark.skill_test_id = data.id
+                const response = await axios.post(`/api/skill-test-mark/modify`, this.setMark)
+                this.getSkillTest()
+                swal.fire('Success', response.data.message, 'success')
             } catch (error) {
                 console.log(error)
             }
@@ -755,12 +971,22 @@ export default {
                 this.weaknessesDataLoading = false
             }
         },
-        async allowRetakeSkillTest(data, item) {
+        // async allowRetakeSkillTest(data, item) {
+        //     try {
+        //         const response = await axios.put(`/api/retake/skill-test/allow/${data.id}`, { allowed_retake: this.allowedSkillTestAttempt[item] })
+        //         swal.fire('Success', response.data.message, 'success')
+        //         this.getSkillTest()
+        //         this.showSkillTestRetakeModify[item] = false
+        //     } catch (error) {
+        //         console.log(error)
+        //     }
+        // },
+        async allowRetakeSkillTest() {
             try {
-                const response = await axios.put(`/api/retake/skill-test/allow/${data.id}`, { allowed_retake: this.allowedSkillTestAttempt[item] })
+                const response = await axios.put(`/api/retake/skill-test/allow/${this.skillTestMainRetake.id}?flag=${this.flag}`, { allowed_retake: this.allowedSkillTestAttempt[this.filteredFlag] })
                 swal.fire('Success', response.data.message, 'success')
                 this.getSkillTest()
-                this.showSkillTestRetakeModify[item] = false
+                this.showSkillTestRetakeModify[this.filteredFlag] = false
             } catch (error) {
                 console.log(error)
             }
@@ -774,6 +1000,28 @@ export default {
             } catch (error) {
                 console.log(error)
             }
+        },
+        async getPassingPercentage() {
+            try {
+                const response = await axios.get(`/api/passing-percentage/get`)
+                this.passingPercentage = response.data
+                this.selectedPercentage.skill_test = response.data['skill_test'].percentage
+                this.selectedPercentage.quiz = response.data['quiz'].percentage
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async updatePassingPercentage(flag) {
+            setTimeout(async () => {
+                try {
+                    await axios.put(`/api/passing-percentage/update/${this.passingPercentage[flag].id}`, { percentage: this.selectedPercentage[flag] })
+                } catch (error) {
+                    console.log(error)
+                }
+            }, 500)
+        },
+        calculatePercentage(score, perfectScore = 10) {
+            return Math.round((score / perfectScore) * 100)
         }
     }
 }
@@ -844,4 +1092,13 @@ export default {
         }
     }
 }
-</style>
+
+.zoom-button {
+    transition: transform .2s;
+    /* Animation */
+}
+
+.zoom-button:hover {
+    transform: scale(1.1);
+    /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+}</style>

@@ -11,14 +11,21 @@ use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
-    public function getProfile() {
-        return Student::select('students.*', 'users.*')
-        ->join('users', 'students.user_id', '=', 'users.id')
-        ->where('students.user_id', Auth::user()->id)
-        ->first();
+    public function getProfile(Request $request)
+    {
+        if ($request->query('student_id')) {
+            return Student::where('id', $request->query('student_id'))
+                ->first();
+        } else {
+            return Student::select('students.*', 'users.*')
+                ->join('users', 'students.user_id', '=', 'users.id')
+                ->where('students.user_id', Auth::user()->id)
+                ->first();
+        }
     }
 
-    public function updateProfile(ProfileUpdateRequest $request) {
+    public function updateProfile(ProfileUpdateRequest $request)
+    {
         $student = Student::where('user_id', Auth::user()->id)->first();
         $student->update([
             'first_name' => $request->first_name,

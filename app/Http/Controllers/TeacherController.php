@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TeacherRequest;
+use App\Models\PassingPercentage;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
@@ -40,6 +41,21 @@ class TeacherController extends Controller
             // 'user_id' => $user->id,
             // 'unhashed' => $request->password
         ]);
+
+        $defaultPercentage = [
+            [
+                'teacher_id' => $teacher->id,
+                'flag' => 'skill_test',
+                'percentage' => 50
+            ],
+            [
+                'teacher_id' => $teacher->id,
+                'flag' => 'quiz',
+                'percentage' => 50
+            ],
+        ];
+
+        PassingPercentage::insert($defaultPercentage);
 
         if ($teacher) {
             return response()->json([

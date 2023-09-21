@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckAccessIdController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PassingPercentageController;
 use App\Http\Controllers\PerfectScoreController;
 use App\Http\Controllers\QuizReportController;
 use App\Http\Controllers\SkillTestController;
@@ -57,6 +58,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('quiz/reports/get', [GameController::class, 'getQuizReports']);
 
+    Route::get('skill-test/reports/get', [SkillTestController::class, 'getAllSkillTests']);
+
     Route::get('quiz-reports/get', [GameController::class, 'allGameRecords']);
 
     Route::get('/certificates/student/{studentId}/game-id/{gameFlag}', [CertificateController::class, 'getCertificates']);
@@ -83,6 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('perfect-score/modify', [PerfectScoreController::class, 'modifyPerfectScore']);
 
     Route::post('skill-test-score/modify', [SkillTestController::class, 'updateScore']);
+    Route::post('skill-test-mark/modify', [SkillTestController::class, 'updateMark']);
 
     Route::get('notifications/get', [NotificationController::class, 'getNotifications']);
     Route::put('retake/skill-test/allow/{retakeId}', [SkillTestController::class, 'allowRetake']);
@@ -173,6 +177,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/notification/update/{notificationId}',  [NotificationController::class, 'updateNotification']);
 
     Route::get('/available-ratake/quiz/get',  [QuizReportController::class, 'getAvailableQuizRetakes']);
+
+    Route::get('/passing-percentage/get',  [PassingPercentageController::class, 'index']);
+    Route::get('/passing-percentage/all/get',  [PassingPercentageController::class, 'getAllPassingPercentage']);
+    Route::put('/passing-percentage/update/{id}',  [PassingPercentageController::class, 'updatePassingPercentage']);
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);

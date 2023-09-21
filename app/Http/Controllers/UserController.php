@@ -53,7 +53,7 @@ class UserController extends Controller
                 foreach ($itemKeys as $key => $group) {
                     $groupedObjects2 = [];
 
-                    foreach ($skillTests as $object2) {
+                    foreach ($group as $object2) {
                         $flag2 = $object2['letter'];
 
                         if (!isset($groupedObjects2[$flag2])) {
