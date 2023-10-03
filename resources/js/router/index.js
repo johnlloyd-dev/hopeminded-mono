@@ -35,7 +35,7 @@ const vowelConsonants = () => import("../components/student/textbook/VowelConson
 
 const studentManagement = () => import("../components/teacher/main/StudentManagement.vue");
 const textbookManagement = () => import("../components/teacher/main/TextbookManagement.vue");
-const quizManagement = () => import("../components/teacher/main/QuizManagement.vue");
+const activityManagement = () => import("../components/teacher/main/ActivityManagement.vue");
 const studentsView = () => import("../components/admin/layouts/Students.vue");
 
 const teacherManagement = () => import("../components/admin/main/TeacherManagement.vue");
@@ -260,11 +260,11 @@ const routes = [
         },
     },
     {
-        name: "quiz-management",
-        path: "/quiz-management",
-        component: quizManagement,
+        name: "activity-management",
+        path: "/activity-management",
+        component: activityManagement,
         meta: {
-            title: `Quiz Management`,
+            title: `Activity Management`,
         },
     },
     {

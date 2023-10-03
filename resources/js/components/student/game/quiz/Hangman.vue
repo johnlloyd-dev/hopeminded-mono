@@ -350,6 +350,8 @@ export default {
                 this.strikes = [{ key: Math.floor(Math.random() * 100), icon: '🚫', guess: letter }, ...this.strikes]
 
                 this.storeQuizMistakes(letter, image, 'wrong')
+            } else {
+                this.storeQuizMistakes(letter, image, 'correct')
             }
 
             if (this.strikeout) {
@@ -364,7 +366,7 @@ export default {
                 this.gameOver = true
                 this.score++
                 this.setMainScore()
-                this.storeQuizMistakes(letter, image, 'correct')
+
                 if (this.score == 9) {
                     this.show = true
                     this.text = `Congratulations! You finished all 3 levels. Your score is ${this.hangmanGame.score}.`

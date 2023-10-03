@@ -97,3 +97,9 @@ body {
     background-color: rgb(245, 245, 245);
 }
 
+.text-ellipsis {
+    white-space: nowrap;      /* Prevent text from wrapping to the next line */
+    overflow: hidden;         /* Hide any overflowing content */
+    text-overflow: ellipsis;  /* Display an ellipsis (...) for overflowed text */
+    width: 200px;             /* Adjust the container width as needed */
+}

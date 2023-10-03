@@ -51,12 +51,12 @@
                         <td class="fw-bold">{{ item.object }}</td>
                         <td>
                             <div class="row">
-                                <div class="col-6">
-                                    <span class="fw-bold">
+                                <div class="col-10">
+                                    <p style="width: 350px;" class="fw-bold text-truncate">
                                         {{ item.image_url }}
-                                    </span>
+                                    </p>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-2">
                                     <button @click="viewMedia('image', item.image_url)"
                                         class="btn btn-sm btn-primary rounded-0">
                                         <i class="fas fa-external-link-alt"></i>
@@ -66,12 +66,12 @@
                         </td>
                         <td class="fw-bold">
                             <div class="row">
-                                <div class="col-6">
-                                    <span class="fw-bold">
+                                <div class="col-10">
+                                    <p style="width: 350px;" class="fw-bold text-truncate">
                                         {{ item.video_url }}
-                                    </span>
+                                    </p>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-2">
                                     <button @click="viewMedia('video', item.video_url)"
                                         class="btn btn-sm btn-primary rounded-0">
                                         <i class="fas fa-external-link-alt"></i>

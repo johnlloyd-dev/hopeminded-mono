@@ -6,6 +6,43 @@
                 <div class="d-flex justify-content-center">
                     <div class="card rounded-0 py-5 px-5" style="width: 100%;">
                         <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="card-title">Quiz and Skill Test Reports </h4>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" class="btn-check" v-model="gameFlag" value="hangman-game" id="hangmanGame" autocomplete="off"
+                                    :checked="gameFlag == 'hangman-game'">
+                                <label class="btn btn-outline-dark fw-bold rounded-0"
+                                    :class="gameFlag == 'hangman-game' ? 'text-white' : 'text-black'" for="hangmanGame">
+                                    <h5 class="fw-bold">Alphabets/Words</h5>
+                                    <h6 class="text-start">Hangman Game</h6>
+                                </label>
+
+                                <input type="radio" class="btn-check" v-model="gameFlag" value="typing-balloon" id="typingBalloon" autocomplete="off"
+                                    :checked="gameFlag == 'typing-balloon'">
+                                <label class="btn btn-outline-dark fw-bold rounded-0"
+                                    :class="gameFlag == 'typing-balloon' ? 'text-white' : 'text-black'" for="typingBalloon">
+                                    <h5 class="fw-bold">Vowels/Consonants</h5>
+                                    <h6 class="text-start">Typing Balloon</h6>
+                                </label>
+
+                                <input type="radio" class="btn-check" v-model="gameFlag" value="memory-game" id="memoryGame" autocomplete="off"
+                                    :checked="gameFlag == 'memory-game'">
+                                <label class="btn btn-outline-dark fw-bold rounded-0"
+                                    :class="gameFlag == 'memory-game' ? 'text-white' : 'text-black'" for="memoryGame">
+                                    <h5 class="fw-bold">Alphabets/Letters</h5>
+                                    <h6 class="text-start">Memory Game</h6>
+                                </label>
+                            </div>
+                        </div>
+                        <Statistics :game-flag="gameFlag"></Statistics>
+
+
+
+
+
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Quiz Answer Keys </h4>
                         </div>
                         <div class="main-content mt-3">
@@ -35,11 +72,16 @@
 </template>
 
 <script>
+import Statistics from '../layouts/Statistics.vue'
 export default {
+    components: {
+        Statistics
+    },
     data() {
         return {
             collapsed: false,
             keyFlag: 0,
+            gameFlag: 'hangman-game'
         }
     },
     methods: {

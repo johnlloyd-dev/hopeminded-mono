@@ -468,7 +468,7 @@
                         <p v-if="isLoading">Loading...</p>
                         <p v-if="!isLoading && certificates.length === 0">No certificates added</p>
                         <li v-else v-for="item in certificates" :key="item.id" class="list-group-item">
-                            <a :href="item.file_url" download style="margin-right: 20px">{{ item.file }}</a>
+                            <a target="_blank" :href="item.file_url" download style="margin-right: 20px">{{ item.file_name }}</a>
                             <button type="button" @click="deleteCertificate(item.id, item.file)"
                                 class="btn btn-danger btn-sm rounded-0"><i class="fas fa-trash-alt"></i></button>
                         </li>
@@ -583,13 +583,13 @@
                                                                         :key="item2.id">
                                                                         <td>
                                                                             <img width="100"
-                                                                                :src="'/' + item2.attributes.object_image">
+                                                                                :src="item2.attributes.object_image">
                                                                         </td>
                                                                         <td>{{ item2.attributes.object_text }}</td>
                                                                         <td>{{ item2.attributes.answer }}</td>
                                                                         <td>
                                                                             <img width="100"
-                                                                                :src="'/' + item2.attributes.answer_image">
+                                                                                :src="item2.attributes.answer_image">
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -619,9 +619,36 @@
                                                                         <td>{{ item2.attributes.alphabet }}</td>
                                                                         <td>
                                                                             <img width="100"
-                                                                                :src="'/' + item2.attributes.object_image">
+                                                                                :src="item2.attributes.object_image">
                                                                         </td>
                                                                         <td>{{ item2.attributes.object }}</td>
+                                                                        <td>{{ item2.attributes.answer }}</td>
+                                                                        <td>
+                                                                            <img width="100"
+                                                                                :src="item2.attributes.answer_image">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </template>
+                                                        <template v-else>
+                                                            <table class="table table-bordered table-responsive">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="width: 20%">Clicked Key/Alphabet</th>
+                                                                        <th style="width: 20%">Key/Alphabet Image</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody v-if="!item.length">
+                                                                    <tr>
+                                                                        <td colspan="4" class="text-center fw-bold">No data
+                                                                            found</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tbody v-else>
+                                                                    <tr :class="item2.attributes.mark === 'wrong' ? 'table-danger' : 'table-success'"
+                                                                        class="fw-bold" v-for="item2 in item"
+                                                                        :key="item2.id">
                                                                         <td>{{ item2.attributes.answer }}</td>
                                                                         <td>
                                                                             <img width="100"
@@ -652,28 +679,54 @@
                                         aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                                         <div class="accordion-body">
                                             <template v-if="Object.keys(weaknessesData).length">
-                                                <table class="table table-bordered table-responsive">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="width: 20%">Object Image</th>
-                                                            <th style="width: 20%">Object Name</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody v-if="!weaknessesData.answer_key.length">
-                                                        <tr>
-                                                            <td colspan="2" class="text-center fw-bold">No data found</td>
-                                                        </tr>
-                                                    </tbody>
-                                                    <tbody v-else>
-                                                        <tr class="fw-bold"
-                                                            v-for="(item, index) in weaknessesData.answer_key" :key="index">
-                                                            <td>
-                                                                <img width="100" :src="'/' + item.image">
-                                                            </td>
-                                                            <td>{{ item.word.toUpperCase() }}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                                <template v-if="flag === 'alphabet-letters'">
+                                                    <table class="table table-bordered table-responsive">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20%">Object Image</th>
+                                                                <th style="width: 20%">Object Name</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody v-if="!weaknessesData.answer_key.length">
+                                                            <tr>
+                                                                <td colspan="2" class="text-center fw-bold">No data found</td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tbody v-else>
+                                                            <tr class="fw-bold"
+                                                                v-for="(item, index) in weaknessesData.answer_key" :key="index">
+                                                                <td>
+                                                                    <img width="100" :src="item.image">
+                                                                </td>
+                                                                <td>{{ item.word.toUpperCase() }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+                                                <template v-else>
+                                                    <table class="table table-bordered table-responsive">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20%">Alphabet</th>
+                                                                <th style="width: 20%">Image</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody v-if="!weaknessesData.answer_key.length">
+                                                            <tr>
+                                                                <td colspan="2" class="text-center fw-bold">No data found</td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tbody v-else>
+                                                            <tr class="fw-bold"
+                                                                v-for="(item, index) in weaknessesData.answer_key" :key="index">
+                                                                <td>{{ item.letter.toUpperCase() }}</td>
+                                                                <td>
+                                                                    <img width="100" :src="item.image">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
                                             </template>
                                             <template v-else>
                                                 <div>
@@ -758,6 +811,7 @@ export default {
             this.isLoading = true
             this.showSkillTestRetakeModify = {}
             this.showQuizRetakeModify = {}
+            this.weaknessesData = {}
             await this.getSkillTest()
             await this.getCertificates()
             await this.getPassingPercentage()

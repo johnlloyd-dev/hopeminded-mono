@@ -67,6 +67,7 @@ class GameController extends Controller
         $gameInfo = Game::where('flag', $flag)->first();
         $quizReport = QuizReport::where('student_id', $student->id)
             ->where('game_id', $gameInfo->id)
+            ->where('flag', 'quiz')
             ->get();
         $attemptNumber = count($quizReport) != 0 ? $quizReport[0]->attempt_number + 1 : 1;
         $quiz = QuizReport::create([
@@ -87,25 +88,27 @@ class GameController extends Controller
         else
             $textbookName = 'Alphabets/Letters';
 
-        if (count($quizReport) > 0) {
-            $retake = Retake::where('student_id', $student->id)->where('flag', 'quiz')->where('textbook_flag', $gameInfo->textbook_flag)->first();
-            if ($retake) {
-                if ($retake->allowed_retake > 0) {
-                    $retake->update(['allowed_retake' => $retake->allowed_retake - 1]);
-                } else {
-                    $retake->update(['allowed_retake' => 0]);
+        if (!$request->get('flag')) {
+            if (count($quizReport) > 0) {
+                $retake = Retake::where('student_id', $student->id)->where('flag', 'quiz')->where('textbook_flag', $gameInfo->textbook_flag)->first();
+                if ($retake) {
+                    if ($retake->allowed_retake > 0) {
+                        $retake->update(['allowed_retake' => $retake->allowed_retake - 1]);
+                    } else {
+                        $retake->update(['allowed_retake' => 0]);
+                    }
                 }
+            } else {
+                Retake::create([
+                    'allowed_retake' => 0,
+                    'student_id' => $student->id,
+                    'flag' => 'quiz',
+                    'textbook_flag' => $gameInfo->textbook_flag,
+                    'attributes' => json_encode((object)[
+                        'game_id' => $gameInfo->id
+                    ])
+                ]);
             }
-        } else {
-            Retake::create([
-                'allowed_retake' => 0,
-                'student_id' => $student->id,
-                'flag' => 'quiz',
-                'textbook_flag' => $gameInfo->textbook_flag,
-                'attributes' => json_encode((object)[
-                    'game_id' => $gameInfo->id
-                ])
-            ]);
         }
 
         Notification::create([
@@ -216,7 +219,7 @@ class GameController extends Controller
                 return $data;
             });
         if (count($quizReport['data'])) {
-            if ($quizReport['data'][0]->flag === 'hangman-game' || $quizReport['data'][0]->flag === 'typing-balloon') {
+            if ($quizReport['data'][0]->game_flag === 'hangman-game' || $quizReport['data'][0]->game_flag === 'typing-balloon') {
                 $jsonFile = Storage::path('public/json/balloon-game.json');
                 $jsonData = json_decode(file_get_contents($jsonFile), true);
                 $quizReport['answer_key'] = $jsonData;

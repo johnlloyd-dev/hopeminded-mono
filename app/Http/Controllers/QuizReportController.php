@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\QuizMistake;
 use App\Models\QuizReport;
 use App\Models\Retake;
+use App\Models\SkillTest;
 use App\Models\Student;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class QuizReportController extends Controller
 {
@@ -103,5 +107,144 @@ class QuizReportController extends Controller
         }
 
         return $groupedRetakes;
+    }
+
+    public function getStatistics(Request $request)
+    {
+        $quizMistakes = QuizMistake::select('quiz_mistakes.*')
+            ->where('game_flag', $request->query('game_flag'))
+            ->join('students', function ($query) {
+                $query->on('students.id', '=', 'quiz_mistakes.student_id')
+                    ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
+            })
+            ->get()
+            ->map(function ($data) {
+                $data->attributes = json_decode($data->attributes);
+
+                return $data;
+            });
+
+        $skillTestMistakes = SkillTest::select('skill_tests.*')
+            ->where('flag', $request->query('textbook_flag'))
+            ->join('students', function ($query) {
+                $query->on('students.id', '=', 'skill_tests.student_id')
+                    ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
+            })
+            ->get();
+
+        // Initialize an empty result array to store the grouped data
+        $result = [];
+
+        foreach ($quizMistakes as $item) {
+            $alphabet = $item->attributes->alphabet;
+            $mark = $item->attributes->mark;
+
+            // Check if the alphabet exists in the result array
+            if (!isset($result[$alphabet])) {
+                $result[$alphabet] = [
+                    'correct' => 0,
+                    'wrong' => 0,
+                ];
+            }
+
+            // Update the counts based on the mark
+            if ($mark === 'correct') {
+                $result[$alphabet]['correct']++;
+            } elseif ($mark === 'wrong') {
+                $result[$alphabet]['wrong']++;
+            }
+        }
+
+        // Initialize an empty result array to store the grouped data
+        $result2 = [];
+
+        foreach ($skillTestMistakes as $item) {
+            $alphabet = strtoupper($item->letter);
+            $mark = $item->status;
+
+            // Check if the alphabet exists in the result array
+            if (!isset($result2[$alphabet])) {
+                $result2[$alphabet] = [
+                    'correct' => 0,
+                    'wrong' => 0,
+                    'pending' => 0
+                ];
+            }
+
+            // Update the counts based on the mark
+            if ($mark === 'correct') {
+                $result2[$alphabet]['correct']++;
+            } elseif ($mark === 'wrong') {
+                $result2[$alphabet]['wrong']++;
+            } elseif ($mark === 'pending') {
+                $result2[$alphabet]['pending']++;
+            }
+        }
+
+        return [
+            'quiz' => $result,
+            'skill_test' => $result2
+        ];
+
+        return $result;
+    }
+
+    public function getStatisticsSummary(Request $request)
+    {
+        $quizMistakes = QuizMistake::select('quiz_mistakes.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
+            ->where('game_flag', $request->query('game_flag'))
+            ->whereJsonContains('attributes', ['alphabet' => $request->query('alphabet')])
+            ->join('students', function ($query) {
+                $query->on('students.id', '=', 'quiz_mistakes.student_id')
+                    ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
+            })
+            ->get()
+            ->map(function ($data) {
+                $data->attributes = json_decode($data->attributes);
+
+                return $data;
+            });
+
+        $skillTestMistakes = SkillTest::select('skill_tests.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
+            ->where('flag', $request->query('textbook_flag'))
+            ->where('letter', strtolower($request->query('alphabet')))
+            ->join('students', function ($query) {
+                $query->on('students.id', '=', 'skill_tests.student_id')
+                    ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
+            })
+            ->get()
+            ->map(function ($data) {
+                $data->alphabet = strtoupper($data->letter);
+
+                return $data;
+            });
+
+        $grouped = $quizMistakes->groupBy('full_name');
+
+        $grouped2 = $skillTestMistakes->groupBy('full_name');
+
+        $summary = $grouped->map(function ($group) {
+            return [
+                'student_id' => $group->first()->student_id,
+                'full_name' => $group->first()->full_name,
+                'wrong_count' => $group->where('attributes.mark', 'wrong')->count(),
+                'correct_count' => $group->where('attributes.mark', 'correct')->count(),
+            ];
+        });
+
+        $summary2 = $grouped2->map(function ($group) {
+            return [
+                'student_id' => $group->first()->student_id,
+                'full_name' => $group->first()->full_name,
+                'wrong_count' => $group->where('status', 'wrong')->count(),
+                'correct_count' => $group->where('status', 'correct')->count(),
+                'pending_count' => $group->where('status', 'pending')->count(),
+            ];
+        });
+
+        return [
+            'quiz' => $summary,
+            'skill_test' => $summary2
+        ];
     }
 }

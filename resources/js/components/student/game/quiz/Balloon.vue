@@ -26,6 +26,20 @@
 <script>
 import swal from 'sweetalert2'
 import { mapGetters, mapActions } from 'vuex'
+
+const allowedStrikes = 3 //If you set this and maxLength both too high, the puzzle will be impossible to lose.
+
+const defaultStrikes = [];
+
+for (let i = 0; i < allowedStrikes; i++) {
+    const key = Math.floor(Math.random() * 100); // Generate a random number between 0 and 99
+
+    defaultStrikes.push({
+        key: key,
+        icon: '⚪',
+        guess: ''
+    });
+}
 export default {
     data() {
         return {
@@ -75,6 +89,12 @@ export default {
             typingBalloon: {
                 highestLevel: 1,
                 score: 0
+            },
+            strikes: [...defaultStrikes],
+            quizMistake: {
+                quiz_report_id: null,
+                flag: null,
+                attributes: {}
             }
         };
     },
@@ -84,6 +104,12 @@ export default {
         }),
         menuFlag() {
             return this.$store.state.menuFlag;
+        },
+        badGuesses() {
+            return this.strikes.filter(s => s.guess).map(s => s.guess)
+        },
+        strikeout() {
+            return this.badGuesses.length >= allowedStrikes
         },
     },
     mounted() {
@@ -267,6 +293,14 @@ export default {
             this.ctx.strokeStyle = "black";
             this.ctx.fillText(`Level ${this.flag + 1}`, 756, 100);
 
+            this.ctx.font = "bold 20px Century Gothic";
+            this.ctx.strokeStyle = "black";
+            this.ctx.fillText(`Strikes: `, 100, 100);
+            for (let m = 0; m < this.strikes.length; m++) {
+                const x = (m+1)*25
+                this.ctx.fillText(`${this.strikes[m].icon}`, (145 + x), 100);
+            }
+
             // this.ctx.font = "25px Century Gothic";
             // this.ctx.strokeStyle = "black";
             // this.ctx.fillText(`Chances:`, 7, 25);
@@ -379,7 +413,13 @@ export default {
                     this.array[this.h].word = "";
                     this.array[this.h].url = '';
                 }
+                this.strikes = [...defaultStrikes]
                 this.updateQuizInfo()
+                const answer_alphabet = char
+                const answer_image = this.theme.find(data => {
+                    return data.letter = char
+                }).image
+                this.storeQuizMistakes(answer_alphabet, answer_image, 'correct')
                 if (this.typingBalloon.score == (this.array.length + this.previousScore)) {
                     if (this.typingBalloon.score == 26) {
                         this.show = true
@@ -391,6 +431,25 @@ export default {
                         this.text = `You finished level ${this.flag + 1}. Proceed to level ${this.flag + 2}.`
                         this.nextButtonText = `Level ${this.flag + 2}`
                     }
+                }
+            } else {
+                this.strikes.pop()
+                this.strikes = [{ key: Math.floor(Math.random() * 100), icon: '🚫', guess: char }, ...this.strikes]
+
+                const answer_alphabet = char
+                const answer_image = this.theme.find(data => {
+                    return data.letter = char
+                }).image
+                this.storeQuizMistakes(answer_alphabet, answer_image, 'wrong')
+
+                if (this.strikeout) {
+                    this.data = []
+                    this.array = []
+                    this.ctx.clearRect(0, 0, innerWidth, innerHeight);
+                    this.show = true
+                    this.text = `Game Over. Your score is ${this.typingBalloon.score}.`
+                    this.nextButtonText = 'Replay'
+                    this.cancelButtonText = 'Exit'
                 }
             }
         },
@@ -409,6 +468,7 @@ export default {
             }
             this.show = false
             this.previousScore += this.typingBalloon.score
+            this.strikes = [...defaultStrikes]
             this.initBalloons()
             this.animate();
         },
@@ -416,7 +476,24 @@ export default {
             this.show = false
             window.removeEventListener("keyup", this.handleKeyUp, true); // Succeeds
             this.$router.push('/student-textbook')
-        }
+        },
+        storeQuizMistakes(answerAlphabet, answerImage, mark) {
+            this.quizMistake.quiz_report_id = this.quizInfo.id
+            this.quizMistake.flag = 'typing-balloon'
+            const attributes = {
+                answer: answerAlphabet,
+                answer_image: answerImage,
+                mark: mark
+            }
+
+            this.quizMistake.attributes = JSON.stringify(attributes)
+
+            try {
+                axios.post(`/api/quiz-mistake/store`, this.quizMistake)
+            } catch (error) {
+                console.log(error)
+            }
+        },
     }
 };
 </script>

@@ -9,6 +9,7 @@ use App\Models\Teacher;
 use App\Models\Textbook;
 use App\Rules\UniqueDependingOnFlag;
 use Closure;
+use DateTime;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,8 +33,8 @@ class TextbookController extends Controller
             ->orderBy('letter', 'ASC')
             ->get()
             ->map(function ($textbooks) {
-                $textbooks->image_url = Storage::url(json_decode($textbooks->image));
-                $textbooks->video_url = Storage::url(json_decode($textbooks->video));
+                $textbooks->image_url = json_decode($textbooks->image);
+                $textbooks->video_url = json_decode($textbooks->video);
                 return $textbooks;
             })->toArray();
 
@@ -63,8 +64,8 @@ class TextbookController extends Controller
             ->orderBy('letter', 'ASC')
             ->get()
             ->map(function ($textbooks) {
-                $textbooks->image_url = Storage::url(json_decode($textbooks->image));
-                $textbooks->video_url = Storage::url(json_decode($textbooks->video));
+                $textbooks->image_url = json_decode($textbooks->image);
+                $textbooks->video_url = json_decode($textbooks->video);
                 return $textbooks;
             })->toArray();
     }
@@ -82,8 +83,8 @@ class TextbookController extends Controller
             ->orderBy('letter', 'ASC')
             ->get()
             ->map(function ($textbooks) {
-                $textbooks->image_url = Storage::url(json_decode($textbooks->image));
-                $textbooks->video_url = Storage::url(json_decode($textbooks->video));
+                $textbooks->image_url = json_decode($textbooks->image);
+                $textbooks->video_url = json_decode($textbooks->video);
                 return $textbooks;
             })->toArray();
     }
@@ -110,17 +111,53 @@ class TextbookController extends Controller
                 $storagePath = 'alphabets-letters';
             } else if ($request->flag == 'vowel-consonants') {
                 $storagePath = 'vowels-consonants';
+            } else {
+                $storagePath = 'alphabets-words';
             }
 
-            // return $storagePath;
+            $expiresAt = new DateTime();
+            $expiresAt->modify('+1 year');
 
-            $imageFile = $request->file('image');
-            $imageFileName = $imageFile->getClientOriginalName();
-            $imagePath = $imageFile->storeAs($storagePath . '/images', $imageFileName, 'public');
+            $image = $request->file('image'); //image file from frontend
+            $video = $request->file('video'); //video file from frontend
 
-            $videoFile = $request->file('video');
-            $videoFileName = $videoFile->getClientOriginalName();
-            $videoPath = $videoFile->storeAs($storagePath . '/videos', $videoFileName, 'public');
+            $firebase_image_path = $storagePath . "/images/";
+            $firebase_video_path = $storagePath . "/videos/";
+
+            $imageName = strtoupper($request->letter) . rand(100000, 999999);
+            $videoName = strtoupper($request->letter) . rand(100000, 999999);
+
+            $localfolder = public_path('firebase-temp-uploads') . '/';
+
+            $imageExtension = $image->getClientOriginalExtension();
+            $videoExtension = $video->getClientOriginalExtension();
+
+            $imageFile      = $imageName . '.' . $imageExtension;
+            $videoFile      = $videoName . '.' . $videoExtension;
+
+            $image->move($localfolder, $imageFile);
+            $video->move($localfolder, $videoFile);
+
+            $imageUploadedfile = fopen($localfolder . $imageFile, 'r');
+            $videoUploadedfile = fopen($localfolder . $videoFile, 'r');
+
+            $imagePath = app('firebase.storage')->getBucket()->upload($imageUploadedfile, [
+                'name' => $firebase_image_path . $imageFile
+            ])->signedUrl($expiresAt);
+            $videoPath = app('firebase.storage')->getBucket()->upload($videoUploadedfile, [
+                'name' => $firebase_video_path . $videoFile
+            ])->signedUrl($expiresAt);
+
+            unlink($localfolder . $imageFile);
+            unlink($localfolder . $videoFile);
+
+            // $imageFile = $request->file('image');
+            // $imageFileName = $imageFile->getClientOriginalName();
+            // $imagePath = $imageFile->storeAs($storagePath . '/images', $imageFileName, 'public');
+
+            // $videoFile = $request->file('video');
+            // $videoFileName = $videoFile->getClientOriginalName();
+            // $videoPath = $videoFile->storeAs($storagePath . '/videos', $videoFileName, 'public');
 
             $alphabetType = in_array($request->letter, ['a', 'e', 'i', 'o', 'u']) ? 'vowel' : 'consonant';
 

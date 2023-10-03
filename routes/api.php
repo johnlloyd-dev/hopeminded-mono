@@ -181,6 +181,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/passing-percentage/get',  [PassingPercentageController::class, 'index']);
     Route::get('/passing-percentage/all/get',  [PassingPercentageController::class, 'getAllPassingPercentage']);
     Route::put('/passing-percentage/update/{id}',  [PassingPercentageController::class, 'updatePassingPercentage']);
+
+    Route::get('/quiz-statistics',  [QuizReportController::class, 'getStatistics']);
+    Route::get('/quiz-statistics/summary',  [QuizReportController::class, 'getStatisticsSummary']);
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);

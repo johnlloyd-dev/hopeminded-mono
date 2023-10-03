@@ -18,7 +18,7 @@
                     <tbody v-else>
                         <tr>
                             <td class="fw-bold text-center">{{ items.object.toUpperCase() }}</td>
-                            <td class="text-center"><img :src="`/storage/${items.image}`" width="150" alt="Letter Hand Sign"></td>
+                            <td class="text-center"><img :src="items.image" width="150" alt="Letter Hand Sign"></td>
                         </tr>
                     </tbody>
                 </table>

@@ -82,7 +82,7 @@
                                                             class="list-group rounded-0">
                                                             <li class="list-group-item">
                                                                 <a style="margin-right: 30px;" :href="item.file_url"
-                                                                    download>{{ item.file }}</a>
+                                                                    download>{{ item.file_name }}</a>
                                                                 <button type="button" @click="viewFile(item.file_url)"
                                                                     class="btn btn-primary rounded-0 btn-sm">
                                                                     View Certificate

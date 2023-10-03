@@ -69,8 +69,8 @@ export default {
                     icon: 'fa-solid fa-book-open-reader',
                 },
                 {
-                    href: '/quiz-management',
-                    title: 'Quiz Management',
+                    href: '/activity-management',
+                    title: 'Activity Management',
                     icon: 'fa-solid fa-pen-to-square',
                 },
             ],
