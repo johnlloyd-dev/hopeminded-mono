@@ -136,7 +136,8 @@ class QuizReportController extends Controller
         $result = [];
 
         foreach ($quizMistakes as $item) {
-            $alphabet = $item->attributes->alphabet;
+            $gameFlag = $item->game_flag;
+            $alphabet = $gameFlag !== 'typing-balloon' ? $item->attributes->alphabet : strtoupper($item->attributes->answer);
             $mark = $item->attributes->mark;
 
             // Check if the alphabet exists in the result array
@@ -192,11 +193,16 @@ class QuizReportController extends Controller
     public function getStatisticsSummary(Request $request)
     {
         $quizMistakes = QuizMistake::select('quiz_mistakes.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
-            ->where('game_flag', $request->query('game_flag'))
-            ->whereJsonContains('attributes', ['alphabet' => $request->query('alphabet')])
             ->join('students', function ($query) {
                 $query->on('students.id', '=', 'quiz_mistakes.student_id')
                     ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
+            })
+            ->where('game_flag', $request->query('game_flag'))
+            ->when($request->query('game_flag') === 'typing-balloon', function ($query) use ($request) {
+                $query->whereJsonContains('attributes', ['answer' => strtolower($request->query('alphabet'))]);
+            })
+            ->when($request->query('game_flag') !== 'typing-balloon', function ($query) use ($request) {
+                $query->whereJsonContains('attributes', ['alphabet' => $request->query('alphabet')]);
             })
             ->get()
             ->map(function ($data) {
@@ -206,12 +212,12 @@ class QuizReportController extends Controller
             });
 
         $skillTestMistakes = SkillTest::select('skill_tests.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
-            ->where('flag', $request->query('textbook_flag'))
-            ->where('letter', strtolower($request->query('alphabet')))
             ->join('students', function ($query) {
                 $query->on('students.id', '=', 'skill_tests.student_id')
                     ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
             })
+            ->where('flag', $request->query('textbook_flag'))
+            ->where('letter', strtolower($request->query('alphabet')))
             ->get()
             ->map(function ($data) {
                 $data->alphabet = strtoupper($data->letter);

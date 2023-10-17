@@ -140,7 +140,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button @click.prevent="submitAlphabet" type="button" class="btn-primary rounded-0 btn">
+                        <button :disabled="isProcessing" @click.prevent="submitAlphabet" type="button" class="btn-primary rounded-0 btn">
                             Submit
                         </button>
                     </div>
@@ -260,6 +260,7 @@ export default {
             if(this.alphabetContent.video != null)
                 data.append('video', this.alphabetContent.video)
             try {
+                this.isProcessing = true
                 const response = await axios.post(`/api/textbook/add?chapter=${this.selectedChapter}`, data, {
                     headers: { 'content-type': 'multipart/form-data' }
                 })
@@ -276,6 +277,8 @@ export default {
                 }
             } catch (error) {
                 this.errors = error.response.data.errors
+            } finally {
+                this.isProcessing = false
             }
         },
         deleteConfirmation(textbookId) {

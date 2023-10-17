@@ -57,6 +57,10 @@
                                                 <h5 class="mb-0">Object: <span class="fw-bold text-danger">{{
                                                     skillTest[item][0].object }}</span></h5>
                                             </div>
+                                            <div v-if="skillTestRetake.hasOwnProperty(item)"
+                                                class="col-2 d-flex align-items-center">
+                                                <h5 class="mb-0">AllowedRetake: <span class="fw-bold text-danger">[ {{ skillTestRetake.hasOwnProperty(item) ? skillTestRetake[item].allowed_retake : 0 }} ]</span></h5>
+                                            </div>
                                             <!-- <div v-if="skillTest.hasOwnProperty(item)"
                                                 class="col-5 d-flex align-items-center">
                                                 <h5 class="mb-0">Allowed Retake:</h5>
@@ -226,46 +230,74 @@
                                     ? 'FAILED' : 'PASSED' }}</span>
                         </h6>
                     </div>
-                    <div class="w-50 ms-5 text-center">
-                        <div style="height: 100%" class="border border-secondary rounded p-3 text-center d-flex align-items-center justify-content-center flex-column">
-                            <h4 class="text-center fw-bold">Allowed Retake: <span class="fw-bold text-danger">{{ Object.keys(skillTestMainRetake).length ? skillTestMainRetake.main_retake : 0 }}</span></h4>
+                    <div class="w-50 ms-5">
+                        <div style="height: 100%" class="border border-secondary rounded p-3">
                             <template
                                 v-if="!showSkillTestRetakeModify.hasOwnProperty(filteredFlag) || showSkillTestRetakeModify[filteredFlag] == false">
+                                <!-- <h4 class="text-center fw-bold">Allowed Retake: <span class="fw-bold text-danger">{{
+                                    Object.keys(skillTestMainRetake).length ? skillTestMainRetake.main_retake : 0
+                                }}</span></h4> -->
                                 <!-- <button @click="showSkillTestRetakeModify[filteredFlag] = true"
                                     :disabled="Object.keys(skillTest).length !== 26"
                                     class="btn btn-secondary border border-secondary p-4">
                                     <i class="fas fa-edit fa-lg h1"></i>
                                 </button> -->
-                                <button @click="allowSkillTest()"
-                                    class="btn btn-secondary border border-secondary p-4">
-                                    <i class="fas fa-edit fa-lg h1"></i>
-                                </button>
-                                <p class="fw-bold alert alert-warning mt-3 mb-0 text-start"
-                                    role="alert">Note:
+                                <div class="text-center">
+                                    <button @click="allowSkillTest()" class="btn btn-secondary border border-secondary p-4">
+                                        <i class="fas fa-edit fa-lg h1"></i>
+                                    </button>
+                                    <p class="text-center fw-bold h4 mt-1">Update Retake</p>
+                                    <p class="fw-bold alert alert-warning mt-3 mb-0 text-start" role="alert">Note:
                                     <ul class="text-justify">
                                         <li>Button is disabled if the submitted skill tests are not complete.</li>
-                                        <li>By updating the allowed retake for skill test, it will allow student to retake/resubmit skill tests for each alphabet.</li>
+                                        <li>By updating the allowed retake for skill test, it will allow student to
+                                            retake/resubmit skill tests for each alphabet.</li>
                                     </ul>
                                     </p>
+                                </div>
                             </template>
                             <template v-else-if="showSkillTestRetakeModify[filteredFlag] == true">
-                                <form
-                                    @submit.prevent="allowRetakeSkillTest()"
-                                    class="text-center">
-                                    <div class="mb-3">
-                                        <input style="font-size: 30px;" type="number" v-model="allowedSkillTestAttempt[filteredFlag]"
-                                            class="form-control" min="1">
+                                <div class="alert alert-warning" role="alert">
+                                    <h6 class="fw-bold">-Display-</h6>
+                                    <p class="fw-bold"><input class="form-check-input me-1" type="checkbox" disabled
+                                            id="flexCheckDefault">Alphabet <span class="text-danger">(Total Allowed
+                                            Retake)</span></p>
+                                    <p class="mb-0">Note: Some checkboxes are disabled if student did not submit a skill test for the
+                                        alphabet yet.</p>
+                                </div>
+                                <form @submit.prevent="allowRetakeSkillTest()">
+                                    <div class="form-check ms-1">
+                                        <input @change="selectAll()" :disabled="!Object.keys(skillTestRetake).length" v-model="selectAllSkillTestRetake" class="form-check-input" type="checkbox"
+                                            id="flexCheckDefault">
+                                        <label class="form-check-label fw-bold" for="flexCheckDefault">
+                                            Select All
+                                        </label>
                                     </div>
-                                    <button :disabled="allowedSkillTestAttempt[filteredFlag] < 1"
-                                        type="submit"
-                                        class="btn btn-primary border-0 me-1 btn-lg">
-                                        <i class="fas fa-save fa-lg"></i>
-                                    </button>
-                                    <button @click="showSkillTestRetakeModify[filteredFlag] = false"
-                                        type="button"
-                                        class="btn btn-secondary border-0 ms-1 btn-lg">
-                                        <i class="fas fa-close fa-lg"></i>
-                                    </button>
+                                    <div class="row mb-3">
+                                        <div v-for="(item) in allAphabets" :key="item" class="col-lg-2">
+                                            <div class="form-check d-flex justify-content-around">
+                                                <input :disabled="!skillTestRetake.hasOwnProperty(item)" v-model="allowedskillTestRetake" class="form-check-input" type="checkbox" :value="item"
+                                                    id="flexCheckDefault">
+                                                <label class="form-check-label fw-bold" for="flexCheckDefault">
+                                                    {{ item.toUpperCase() }} <span class="text-danger">( {{ skillTestRetake.hasOwnProperty(item) ? skillTestRetake[item].allowed_retake : 0 }} )</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center d-flex justify-content-center align-items-center">
+                                        <div class="text-center me-3">
+                                            <input type="number" v-model="allowedSkillTestAttempt[filteredFlag]"
+                                                class="form-control" min="0">
+                                        </div>
+                                        <button :disabled="allowedSkillTestAttempt[filteredFlag] < 0 || allowedskillTestRetake.length === 0" type="submit"
+                                            class="btn btn-primary border-0 me-1">
+                                            <i class="fas fa-save fa-lg"></i>
+                                        </button>
+                                        <button @click="showSkillTestRetakeModify[filteredFlag] = false" type="button"
+                                            class="btn btn-secondary border-0 ms-1">
+                                            <i class="fas fa-close fa-lg"></i>
+                                        </button>
+                                    </div>
                                 </form>
                             </template>
                         </div>
@@ -389,21 +421,25 @@
                         </h6>
                     </div>
                     <div class="ms-5 w-50 text-center">
-                        <div style="height: 96%" class="border border-secondary rounded p-3 text-center d-flex align-items-center justify-content-center flex-column">
-                            <h4 class="fw-bold">Allowed Retake: <span class="fw-bold text-danger">{{ quizReportRetake[filteredFlag].allowed_retake }}</span></h4>
-                            <template v-if="!showQuizRetakeModify.hasOwnProperty(filteredFlag) || showQuizRetakeModify[filteredFlag] == false">
+                        <div style="height: 96%"
+                            class="border border-secondary rounded p-3 text-center d-flex align-items-center justify-content-center flex-column">
+                            <h4 class="fw-bold">Allowed Retake: <span class="fw-bold text-danger">{{
+                                quizReportRetake[filteredFlag].allowed_retake }}</span></h4>
+                            <template
+                                v-if="!showQuizRetakeModify.hasOwnProperty(filteredFlag) || showQuizRetakeModify[filteredFlag] == false">
                                 <button @click="allowQuiz()" class="btn btn-secondary border border-secondary p-4">
                                     <i class="fas fa-edit fa-lg h1"></i>
                                 </button>
                             </template>
-                            <template v-else-if="showQuizRetakeModify.hasOwnProperty(filteredFlag) && showQuizRetakeModify[filteredFlag] == true">
+                            <template
+                                v-else-if="showQuizRetakeModify.hasOwnProperty(filteredFlag) && showQuizRetakeModify[filteredFlag] == true">
                                 <form @submit.prevent="allowRetakeQuiz(quizReportRetake[filteredFlag], filteredFlag)"
                                     class="text-center">
                                     <div class="mb-3">
-                                        <input style="font-size: 30px;" type="number" v-model="allowedQuizAttempt[filteredFlag]"
-                                            class="form-control" min="1">
+                                        <input style="font-size: 30px;" type="number"
+                                            v-model="allowedQuizAttempt[filteredFlag]" class="form-control" min="0">
                                     </div>
-                                    <button :disabled="allowedQuizAttempt[filteredFlag] < 1" type="submit"
+                                    <button :disabled="allowedQuizAttempt[filteredFlag] < 0" type="submit"
                                         class="btn btn-primary btn-lg border-0 me-1">
                                         <i class="fas fa-save fa-lg"></i>
                                     </button>
@@ -468,7 +504,8 @@
                         <p v-if="isLoading">Loading...</p>
                         <p v-if="!isLoading && certificates.length === 0">No certificates added</p>
                         <li v-else v-for="item in certificates" :key="item.id" class="list-group-item">
-                            <a target="_blank" :href="item.file_url" download style="margin-right: 20px">{{ item.file_name }}</a>
+                            <a target="_blank" :href="item.file_url" download style="margin-right: 20px">{{ item.file_name
+                            }}</a>
                             <button type="button" @click="deleteCertificate(item.id, item.file)"
                                 class="btn btn-danger btn-sm rounded-0"><i class="fas fa-trash-alt"></i></button>
                         </li>
@@ -496,7 +533,7 @@
             <!-- Modal -->
             <div class="modal fade rounded-0" id="weaknessModal" tabindex="-1" aria-labelledby="weaknessModalLabel"
                 aria-hidden="true">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog modal-fullscreen">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Weaknesses</h5>
@@ -635,6 +672,8 @@
                                                             <table class="table table-bordered table-responsive">
                                                                 <thead>
                                                                     <tr>
+                                                                        <!-- <th style="width: 5%">No.</th>
+                                                                        <th style="width: 75%">Selections/To Guess</th> -->
                                                                         <th style="width: 20%">Clicked Key/Alphabet</th>
                                                                         <th style="width: 20%">Key/Alphabet Image</th>
                                                                     </tr>
@@ -649,9 +688,18 @@
                                                                     <tr :class="item2.attributes.mark === 'wrong' ? 'table-danger' : 'table-success'"
                                                                         class="fw-bold" v-for="item2 in item"
                                                                         :key="item2.id">
+                                                                        <!-- <td>{{ index+1 }}</td> -->
+                                                                        <!-- <td>
+                                                                            <div class="row">
+                                                                                <div v-for="option in item2.attributes.options" :key="option.letter" class="col-1">
+                                                                                    <img style="width: 50px" :src="option.image" :alt="option.letter">
+                                                                                    <p class="text-center">{{ option.letter }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td> -->
                                                                         <td>{{ item2.attributes.answer }}</td>
                                                                         <td>
-                                                                            <img width="100"
+                                                                            <img style="width: 50px"
                                                                                 :src="item2.attributes.answer_image">
                                                                         </td>
                                                                     </tr>
@@ -689,12 +737,14 @@
                                                         </thead>
                                                         <tbody v-if="!weaknessesData.answer_key.length">
                                                             <tr>
-                                                                <td colspan="2" class="text-center fw-bold">No data found</td>
+                                                                <td colspan="2" class="text-center fw-bold">No data found
+                                                                </td>
                                                             </tr>
                                                         </tbody>
                                                         <tbody v-else>
                                                             <tr class="fw-bold"
-                                                                v-for="(item, index) in weaknessesData.answer_key" :key="index">
+                                                                v-for="(item, index) in weaknessesData.answer_key"
+                                                                :key="index">
                                                                 <td>
                                                                     <img width="100" :src="item.image">
                                                                 </td>
@@ -713,12 +763,14 @@
                                                         </thead>
                                                         <tbody v-if="!weaknessesData.answer_key.length">
                                                             <tr>
-                                                                <td colspan="2" class="text-center fw-bold">No data found</td>
+                                                                <td colspan="2" class="text-center fw-bold">No data found
+                                                                </td>
                                                             </tr>
                                                         </tbody>
                                                         <tbody v-else>
                                                             <tr class="fw-bold"
-                                                                v-for="(item, index) in weaknessesData.answer_key" :key="index">
+                                                                v-for="(item, index) in weaknessesData.answer_key"
+                                                                :key="index">
                                                                 <td>{{ item.letter.toUpperCase() }}</td>
                                                                 <td>
                                                                     <img width="100" :src="item.image">
@@ -779,6 +831,7 @@ export default {
             weaknessesData: {},
             skillTest: {},
             newScore: {},
+            allowedskillTestRetake: [],
             allowedSkillTestAttempt: {},
             allowedQuizAttempt: {},
             highestScore: [],
@@ -786,6 +839,7 @@ export default {
             showSkillTestRetakeModify: {},
             showQuizRetakeModify: {},
             skillTestMainRetake: {},
+            selectAllSkillTestRetake: false,
             certificate: {
                 file: null
             },
@@ -804,6 +858,7 @@ export default {
     created() {
         this.getSkillTest()
         this.getCertificates()
+        this.getPassingPercentage()
     },
     watch: {
         async flag() {
@@ -812,9 +867,9 @@ export default {
             this.showSkillTestRetakeModify = {}
             this.showQuizRetakeModify = {}
             this.weaknessesData = {}
-            await this.getSkillTest()
-            await this.getCertificates()
-            await this.getPassingPercentage()
+            this.getSkillTest()
+            this.getCertificates()
+            this.getPassingPercentage()
         }
     },
     computed: {
@@ -860,6 +915,15 @@ export default {
         }
     },
     methods: {
+        selectAll() {
+            if (this.selectAllSkillTestRetake) {
+                const retakes = this.skillTestRetake
+
+                this.allowedskillTestRetake = Object.keys(retakes)
+            } else {
+                this.allowedskillTestRetake = []
+            }
+        },
         async getSkillTest() {
             this.isLoading = true
             this.highestScore = []
@@ -948,7 +1012,8 @@ export default {
         },
         allowSkillTest() {
             this.showSkillTestRetakeModify[this.filteredFlag] = true
-            this.allowedSkillTestAttempt[this.filteredFlag] = this.skillTestMainRetake.main_retake
+            this.allowedSkillTestAttempt[this.filteredFlag] = 0
+            this.allowedskillTestRetake = []
         },
         async updateScore(data, index) {
             this.setScore.score = this.newScore[data.letter]
@@ -1037,10 +1102,9 @@ export default {
         // },
         async allowRetakeSkillTest() {
             try {
-                const response = await axios.put(`/api/retake/skill-test/allow/${this.skillTestMainRetake.id}?flag=${this.flag}`, { allowed_retake: this.allowedSkillTestAttempt[this.filteredFlag] })
+                const response = await axios.put(`/api/retake/skill-test/allow/${this.studentId}?flag=${this.flag}`, { allowed_retake: this.allowedSkillTestAttempt[this.filteredFlag], alphabets: this.allowedskillTestRetake })
                 swal.fire('Success', response.data.message, 'success')
                 this.getSkillTest()
-                this.showSkillTestRetakeModify[this.filteredFlag] = false
             } catch (error) {
                 console.log(error)
             }

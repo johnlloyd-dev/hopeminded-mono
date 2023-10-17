@@ -89,14 +89,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('skill-test-mark/modify', [SkillTestController::class, 'updateMark']);
 
     Route::get('notifications/get', [NotificationController::class, 'getNotifications']);
-    Route::put('retake/skill-test/allow/{retakeId}', [SkillTestController::class, 'allowRetake']);
+    Route::put('retake/skill-test/allow/{retakeId}', [SkillTestController::class, 'allow                                                                                                                                                                                                                                                                                                                                                                                                                Retake']);
     Route::put('retake/quiz/allow/{retakeId}', [GameController::class, 'allowRetake']);
 
     Route::post('/logout', [LogoutController::class, 'logout']);
 
     Route::post('seed', function () {
-        Textbook::query()->delete();
         $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        Textbook::where('teacher_id', $teacherId)->delete();
         $jsonFile = Storage::path('public/json/alphabets-with-letters.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 

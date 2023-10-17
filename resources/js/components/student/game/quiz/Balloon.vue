@@ -66,6 +66,7 @@ export default {
             gameIsOver: false,
             isExit: false,
             theme: [],
+            allThemes: [],
             selectColor: [
                 "#DB291D",
                 "#F85F68",
@@ -225,6 +226,7 @@ export default {
             axios.get('storage/json/balloon-game.json')
                 .then(response => {
                     this.theme = response.data
+                    this.allThemes = response.data
                     this.c = this.$refs.canvas;
                     this.ctx = this.c.getContext("2d");
                     this.c.height = window.innerHeight * 0.98;
@@ -253,7 +255,7 @@ export default {
                 let dy;
                 switch (this.flag) {
                     case 0:
-                        dy = (this.flag + 1);
+                        dy = (this.flag + 0.002);
                         break;
                     case 1:
                         dy = (this.flag + .1);
@@ -394,6 +396,15 @@ export default {
                     }
                 }
             }
+
+            const theme = this.allThemes
+            const alphabetData = theme.find(data => {
+                return data.letter === char
+            })
+
+            const answerAlphabet = char
+            const answerImage = alphabetData.image
+
             if (this.array[this.h].text.substring(0, 1) === char) {
                 let word = this.array[this.h].text.substring(0, 1);
                 this.array[this.h].word = word;
@@ -415,11 +426,9 @@ export default {
                 }
                 this.strikes = [...defaultStrikes]
                 this.updateQuizInfo()
-                const answer_alphabet = char
-                const answer_image = this.theme.find(data => {
-                    return data.letter = char
-                }).image
-                this.storeQuizMistakes(answer_alphabet, answer_image, 'correct')
+
+                this.storeQuizMistakes(answerAlphabet, answerImage, 'correct')
+
                 if (this.typingBalloon.score == (this.array.length + this.previousScore)) {
                     if (this.typingBalloon.score == 26) {
                         this.show = true
@@ -436,11 +445,7 @@ export default {
                 this.strikes.pop()
                 this.strikes = [{ key: Math.floor(Math.random() * 100), icon: '🚫', guess: char }, ...this.strikes]
 
-                const answer_alphabet = char
-                const answer_image = this.theme.find(data => {
-                    return data.letter = char
-                }).image
-                this.storeQuizMistakes(answer_alphabet, answer_image, 'wrong')
+                this.storeQuizMistakes(answerAlphabet, answerImage, 'wrong')
 
                 if (this.strikeout) {
                     this.data = []
@@ -483,6 +488,7 @@ export default {
             const attributes = {
                 answer: answerAlphabet,
                 answer_image: answerImage,
+                options: this.theme[this.flag],
                 mark: mark
             }
 

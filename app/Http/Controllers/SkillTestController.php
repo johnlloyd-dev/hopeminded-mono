@@ -153,6 +153,7 @@ class SkillTestController extends Controller
 
             $retake = Retake::where('student_id', $studentId)
                 ->where('flag', 'skill_test')
+                ->where('textbook_flag', $flag)
                 ->get()
                 ->map(function ($data) {
                     $data->attributes = json_decode($data->attributes);
@@ -301,16 +302,14 @@ class SkillTestController extends Controller
         ]);
     }
 
-    public function allowRetake(Request $request, $retakeId)
+    public function allowRetake(Request $request, $studentId)
     {
-        $mainRetake = PivotRetakes::find($retakeId);
-
-        $mainRetake->main_retake = $request->input('allowed_retake');
-        $mainRetake->save();
-
-        $retakes = Retake::where('student_id', $mainRetake->student_id)
+        $alphabets = $request->input('alphabets');
+        $retakes = Retake::where('student_id', $studentId)
             ->where('flag', 'skill_test')
-            ->where('textbook_flag', $request->query('flag'));
+            ->where('textbook_flag', $request->query('flag'))
+            ->whereIn('attributes->alphabet', $alphabets);
+
         $retakes->update(['allowed_retake' => $request->input('allowed_retake')]);
         $newRetakes = $retakes->first();
 
