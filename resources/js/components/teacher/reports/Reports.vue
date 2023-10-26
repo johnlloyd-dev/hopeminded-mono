@@ -162,7 +162,7 @@ export default {
         async getSkillTest() {
             this.isLoading = true
             try {
-                const data = await axios.get(`/api/skill-test/fetch/${this.studentId}/${this.flag}`)
+                const data = await axios.get(`/api/skill-test/fetch/${this.flag}?student_id=${this.studentId}`)
                 const mergedObject = data.data.reduce((result, item) => {
                     const { letter, ...rest } = item;
 

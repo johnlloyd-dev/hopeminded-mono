@@ -103,16 +103,22 @@ class SkillTestController extends Controller
         ]);
     }
 
-    public function getSkillTest($studentId, $flag)
+    public function getSkillTest(Request $request, $flag)
     {
-        if ($studentId == null || $studentId == 'null') {
+        $retakes = [];
+        $skillTests = [];
+        $highestScores = [];
+
+        if (!$request->get('student_id')) {
             $studentId = Student::where('user_id', Auth::user()->id)->first()->id;
+        } else {
+            $studentId = $request->get('student_id');
         }
-        $skillTest['data'] = SkillTest::where('student_id', $studentId)
+
+        $skillTests = SkillTest::where('student_id', $studentId)
             ->where('flag', $flag)
             ->get()
             ->map(function ($skill_test) use ($studentId) {
-                // $teacher_id = Student::where('id', $studentId)->first()->teacher_id;
                 $perfect_score = PerfectScore::where('student_id', $studentId)->first()->score ?? 10;
                 $score = (int)$skill_test->score;
                 $percentage = ((int)$skill_test->score / $perfect_score) * 100;
@@ -121,37 +127,21 @@ class SkillTestController extends Controller
                 $skill_test->perfect_score = $perfect_score;
                 $skill_test->percentage = $percentage;
                 $skill_test->mark = $score > round($passing_score) ? 'Passed' : 'Failed';
+
                 return $skill_test;
-            })
-            ->toArray();
+            });
 
 
-        if (count($skillTest['data'])) {
-            $groupedObjects = [];
+        if (count($skillTests)) {
+            $itemKeys = $skillTests->groupBy('letter');
 
-            foreach ($skillTest['data'] as $object) {
-                $letter = $object['letter'];
+            $highestScores = [];
+            $itemKeys->each(function ($group, $letter) use (&$highestScores) {
+                $highestScore = $group->max('score');
+                $highestScores[$letter] = $highestScore;
+            });
 
-                if (!isset($groupedObjects[$letter])) {
-                    $groupedObjects[$letter] = [];
-                }
-
-                $groupedObjects[$letter][] = $object;
-            }
-            $itemKeys = $groupedObjects;
-            $highest_scores = [];
-
-            foreach ($itemKeys as $key => $group) {
-                $totalScores = array_column($group, 'score');
-                $totalScores = array_map('intval', $totalScores);
-
-                $highest_score = max($totalScores);
-                $highest_scores[$key] = $highest_score;
-            }
-
-            $skillTest['highest_score'] = $highest_scores;
-
-            $retake = Retake::where('student_id', $studentId)
+            $retakes = Retake::where('student_id', $studentId)
                 ->where('flag', 'skill_test')
                 ->where('textbook_flag', $flag)
                 ->get()
@@ -159,89 +149,52 @@ class SkillTestController extends Controller
                     $data->attributes = json_decode($data->attributes);
                     return $data;
                 })
-                ->toArray();
-
-            $groupedRetakes = [];
-            foreach ($retake as $data) {
-                if (isset($data['attributes']->alphabet)) {
-                    $alphabet = $data['attributes']->alphabet;
-                    if (!isset($groupedRetakes[$alphabet])) {
-                        $groupedRetakes[$alphabet] = [];
-                    }
-                    $groupedRetakes[$alphabet] = $data;
-                }
-            }
-
-            $skillTest['retake'] = $groupedRetakes;
-            $skillTest['main_retake'] = PivotRetakes::where('student_id', $studentId)->where('textbook_flag', $flag)->first();
+                ->groupBy(function ($item) {
+                    return $item->attributes->alphabet;
+                })
+                ->map(function ($group) {
+                    return $group->first();
+                });
         }
 
-        return $skillTest;
+        return (object)[
+            'data' => $skillTests,
+            'retake' => $retakes,
+            'highest_score' => $highestScores
+        ];
     }
 
     public function getAllSkillTests()
     {
         $skillTest = [];
-        $studentId = Student::where('user_id', Auth::user()->id)->first()->id;
-        $teacherId = Student::find($studentId)->teacher_id;
-        $passingPercentage = PassingPercentage::where('teacher_id', $teacherId)->first()->percentage;
-        $skillTests = SkillTest::where('student_id', $studentId)
-            ->get()
-            ->toArray();
+        $student = Student::where('user_id', Auth::user()->id)->first();
 
+        if ($student) {
+            $studentId = $student->id;
+            $teacherId = $student->teacher_id;
+            $passingPercentage = PassingPercentage::where('teacher_id', $teacherId)->first()->percentage;
+            $skillTests = SkillTest::where('student_id', $studentId)->get();
 
-        $newData = [];
-        if (count($skillTests)) {
-            $groupedObjects = [];
+            if ($skillTests->isNotEmpty()) {
+                $itemKeys = $skillTests->groupBy('flag');
 
-            foreach ($skillTests as $object) {
-                $flag = $object['flag'];
+                $itemKeys->each(function ($group, $letter) use ($passingPercentage, &$skillTest) {
+                    $alphabetGroup = $group->groupBy('letter');
+                    $average = $group->avg('score');
+                    $submitted = $alphabetGroup->count();
+                    $percentage = ($average / 10) * 100;
+                    $mark = ($percentage >= $passingPercentage) ? 'Passed' : 'Failed';
 
-                if (!isset($groupedObjects[$flag])) {
-                    $groupedObjects[$flag] = [];
-                }
-
-                $groupedObjects[$flag][] = $object;
-            }
-            $itemKeys = $groupedObjects;
-            $highest_scores = [];
-
-            foreach ($itemKeys as $key => $group) {
-                $groupedObjects2 = [];
-
-                foreach ($group as $object2) {
-                    $flag2 = $object2['letter'];
-
-                    if (!isset($groupedObjects2[$flag2])) {
-                        $groupedObjects2[$flag2] = [];
-                    }
-
-                    $groupedObjects2[$flag2][] = $object2;
-                }
-                $itemKeys2 = $groupedObjects2;
-                $average = [];
-                foreach ($itemKeys2 as $key2 => $group2) {
-                    $totalScores = array_column($group2, 'score');
-                    $totalScores = array_map('intval', $totalScores);
-
-                    $highest_score = max($totalScores);
-                    $highest_scores[$key][$key2] = $highest_score;
-
-                    array_push($average, $highest_score);;
-                }
-                $newAverage = array_sum($average) / count($average);
-                $newData[$key]['average'] = $newAverage;
-                $newData[$key]['submitted'] = count($average);
-
-                $percentage = ($newAverage / 10) * 100;
-                $newData[$key]['percentage'] = $percentage;
-                $newData[$key]['passing_percentage'] = $passingPercentage;
-
-                $mark = $percentage > $passingPercentage ? 'Passed' : 'Failed';
-                $newData[$key]['mark'] = $mark;
+                    $skillTest['data'][$letter] = [
+                        'average' => $average,
+                        'submitted' => $submitted,
+                        'percentage' => $percentage,
+                        'passing_percentage' => $passingPercentage,
+                        'mark' => $mark,
+                    ];
+                });
             }
         }
-        $skillTest['data'] = $newData;
 
         return $skillTest;
     }

@@ -168,7 +168,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('/skill-test/upload', [SkillTestController::class, 'addSkillTest']);
-    Route::get('/skill-test/fetch/{studentId}/{flag}', [SkillTestController::class, 'getSkillTest']);
+    Route::get('/skill-test/fetch/{flag}', [SkillTestController::class, 'getSkillTest']);
     Route::put('/skill-test/update/{skillTestId}', [SkillTestController::class, 'updateSkillTest']);
     Route::post('/quiz-mistake/store',  [GameController::class, 'addQuizMistakeRecord']);
 

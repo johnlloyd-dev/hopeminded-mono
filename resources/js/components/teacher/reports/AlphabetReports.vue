@@ -928,7 +928,7 @@ export default {
             this.isLoading = true
             this.highestScore = []
             try {
-                const data = await axios.get(`/api/skill-test/fetch/${this.studentId}/${this.flag}`)
+                const data = await axios.get(`/api/skill-test/fetch/${this.flag}?student_id=${this.studentId}`)
                 const mergedObject = data.data.data.reduce((result, item) => {
                     const { letter, ...rest } = item;
 

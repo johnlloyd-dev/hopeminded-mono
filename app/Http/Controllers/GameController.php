@@ -44,10 +44,10 @@ class GameController extends Controller
                 ->where('game_id', $request->gameId)
                 ->get();
             $retake = [];
-            if (count($report)) {
+            if ($report->count()) {
                 $retake = Retake::where('student_id', $student->id)
                     ->where('flag', 'quiz')
-                    ->whereRaw('JSON_UNQUOTE(JSON_EXTRACT(attributes, "$.game_id")) = ?', [$request->gameId])
+                    ->whereJsonContains('attributes->game_id', $request->gameId)
                     ->get()
                     ->map(function ($data) {
                         $data->attributes = json_decode($data->attributes);

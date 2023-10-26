@@ -35,12 +35,8 @@
                                 </label>
                             </div>
                         </div>
+                        <BarChart />
                         <Statistics :game-flag="gameFlag"></Statistics>
-
-
-
-
-
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Quiz Answer Keys </h4>
@@ -73,9 +69,11 @@
 
 <script>
 import Statistics from '../layouts/Statistics.vue'
+import BarChart from '../layouts/BarChart.vue'
 export default {
     components: {
-        Statistics
+        Statistics,
+        BarChart
     },
     data() {
         return {

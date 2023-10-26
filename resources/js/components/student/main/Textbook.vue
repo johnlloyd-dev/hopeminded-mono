@@ -148,9 +148,9 @@ export default {
         async getSkillTest() {
             this.isProcessing = true
             try {
-                const data1 = await axios.get(`/api/skill-test/fetch/${null}/alphabet-letters?flag=student`)
-                const data2 = await axios.get(`/api/skill-test/fetch/${null}/vowel-consonants?flag=student`)
-                const data3 = await axios.get(`/api/skill-test/fetch/${null}/alphabet-words?flag=student`)
+                const data1 = await axios.get(`/api/skill-test/fetch/alphabet-letters`)
+                const data2 = await axios.get(`/api/skill-test/fetch/vowel-consonants`)
+                const data3 = await axios.get(`/api/skill-test/fetch/alphabet-words`)
 
                 if(data1.status === 200 && data2.status === 200 && data3.status === 200) {
                     this.skillTestAL = data1.data
