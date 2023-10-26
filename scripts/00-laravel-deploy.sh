@@ -3,7 +3,7 @@ echo "Running composer"
 composer clearcache
 composer global require hirak/prestissimo
 
-echo "composer install"
+echo "Compose installing"
 composer install
 
 echo "Caching config..."
@@ -16,4 +16,4 @@ echo "Running migrations..."
 php artisan migrate --force
 php artisan db::seed
 
-echo "done deploying commands"
+echo "Done deploying commands"
