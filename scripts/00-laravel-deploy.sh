@@ -13,4 +13,4 @@ echo "Running migrations..."
 php artisan migrate --force
 php artisan db::seed
 
-echo "done deploying"
+echo "done deploying commands"
