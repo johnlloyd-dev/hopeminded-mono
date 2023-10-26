@@ -4,8 +4,7 @@ composer clearcache
 composer global require hirak/prestissimo
 
 echo "Compose installing"
-composer install
-compose update
+composer install --no-dev --working-dir=/var/www/html
 
 echo "Caching config..."
 php artisan config:cache
