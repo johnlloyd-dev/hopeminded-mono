@@ -13,10 +13,13 @@ echo "Running migrations..."
 php artisan migrate --force
 php artisan db::seed
 
+echo "Cleaning Cache..."
 npm cache clean --force
 
+echo "npm install"
 npm install
 
+echo "npm run build"
 npm run build
 
 echo "done deploying"
