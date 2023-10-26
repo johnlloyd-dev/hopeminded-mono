@@ -5,6 +5,7 @@ composer global require hirak/prestissimo
 
 echo "Compose installing"
 composer install
+compose update
 
 echo "Caching config..."
 php artisan config:cache
