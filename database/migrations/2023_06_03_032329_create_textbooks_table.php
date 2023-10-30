@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('flag');
             $table->foreignId('teacher_id')->constrained('teachers');
             $table->string('letter');
-            $table->string('object');
-            $table->string('image');
-            $table->string('video');
+            $table->string('object')->nullable();
+            $table->jsonb('image')->nullable();
+            $table->jsonb('video')->nullable();
             $table->timestamps();
         });
     }
