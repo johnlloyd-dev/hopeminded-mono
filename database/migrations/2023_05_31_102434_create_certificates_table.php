@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained('students');
             $table->string('textbook_flag');
             $table->string('game_flag');
-            $table->string('file');
+            $table->jsonb('file');
             $table->timestamps();
         });
     }
