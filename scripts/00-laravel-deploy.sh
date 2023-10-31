@@ -15,6 +15,6 @@ php artisan route:cache
 echo "Running migrations..."
 php artisan migrate:fresh --seed
 
-yarn build
+npm run build
 
 echo "Done deploying commands"
