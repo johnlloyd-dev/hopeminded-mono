@@ -15,4 +15,10 @@ php artisan route:cache
 echo "Running migrations..."
 php artisan migrate:fresh --seed
 
+npm install
+
+npm run build
+
+npm run production
+
 echo "Done deploying commands"
