@@ -3,40 +3,30 @@
         <SkeletonLoader></SkeletonLoader>
     </template>
     <div v-else class="row">
-        <template v-for="alphabet in alphabets" :key="alphabet">
-            <div class="col-lg-4 col-sm-6 mb-3">
-                <div class="card" style="width: 18rem;">
-                    <div class="card-header">
-                        <h3 class="card-title fw-bold mb-0 text-center">{{ alphabet.toUpperCase() }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="quiz-records mb-3">
-                            <h5 class="fw-bold">Quiz</h5>
-                            <p class="card-text mb-0">Wrong Answers: <span class="fw-bold text-danger">{{
-                                Object.keys(quizStatistics).length && quizStatistics.hasOwnProperty(alphabet.toUpperCase()) ?
-                                quizStatistics[alphabet.toUpperCase()].wrong : 0 }}</span></p>
-                            <p class="card-text mb-0">Correct Answers: <span class="fw-bold text-success">{{
-                                Object.keys(quizStatistics).length && quizStatistics.hasOwnProperty(alphabet.toUpperCase()) ?
-                                quizStatistics[alphabet.toUpperCase()].correct : 0 }}</span></p>
-                        </div>
-                        <div class="skill-test-records mb-3">
-                            <h5 class="fw-bold">Skill Test</h5>
-                            <p class="card-text mb-0">Wrong Answers: <span class="fw-bold text-danger">{{
-                                Object.keys(skillTestStatistics).length && skillTestStatistics.hasOwnProperty(alphabet.toUpperCase()) ?
-                                skillTestStatistics[alphabet.toUpperCase()].wrong : 0 }}</span></p>
-                            <p class="card-text mb-0">Correct Answers: <span class="fw-bold text-success">{{
-                                Object.keys(skillTestStatistics).length && skillTestStatistics.hasOwnProperty(alphabet.toUpperCase()) ?
-                                skillTestStatistics[alphabet.toUpperCase()].correct : 0 }}</span></p>
-                            <p class="card-text mb-0">Unmarked/Pending: <span class="fw-bold text-warning">{{
-                                Object.keys(skillTestStatistics).length && skillTestStatistics.hasOwnProperty(alphabet.toUpperCase()) ?
-                                skillTestStatistics[alphabet.toUpperCase()].pending : 0 }}</span></p>
-                        </div>
-                        <a href="javascript:;" @click="viewStatisticsSummary(alphabet.toUpperCase())"
-                            class="btn btn-primary rounded-0">View All Records</a>
-                    </div>
+        <div v-for="alphabet in alphabets" :key="alphabet" class="col-lg-1 col-md-3 col-sm-4">
+            <button @click="viewGraph(alphabet)" style="width: 50px;" :class="active === alphabet ? 'btn-warning' : ' btn-primary'"
+                class="btn mb-2 fw-bold">
+                {{ alphabet.toUpperCase() }}
+            </button>
+        </div>
+    </div>
+    <hr>
+    <div class="d-flex justify-content-center">
+        <div class="card w-75">
+            <div class="card-body">
+                <div class="quiz-graph">
+                    <h5 class="fw-bold">Quiz</h5>
+                    <BarChart v-if="Object.keys(quizChartData).length" :chartData="quizChartData"/>
                 </div>
+                <hr>
+                <div class="quiz-graph">
+                    <h5 class="fw-bold">Skill Test</h5>
+                    <BarChart v-if="Object.keys(skillTestChartData).length" :chartData="skillTestChartData"/>
+                </div>
+                <a href="javascript:;" @click="viewStatisticsSummary(this.active.toUpperCase())"
+                        class="btn btn-primary rounded-0 mt-5">View All Records</a>
             </div>
-        </template>
+        </div>
     </div>
     <div class="statistics-summary">
         <div class="modal fade" id="statisticsModal" tabindex="-1" aria-labelledby="statisticsModalLabel"
@@ -69,12 +59,13 @@
                                     </template>
                                     <template v-else>
                                         <tr v-for="(item, index) in Object.values(quizStatisticsSummary)" :key="index">
-                                            <th scope="row">{{ index+1 }}</th>
+                                            <th scope="row">{{ index + 1 }}</th>
                                             <th scope="row">{{ item.full_name }}</th>
                                             <td>{{ item.correct_count }}</td>
                                             <td>{{ item.wrong_count }}</td>
                                             <td>
-                                                <button @click="viewAllRecords(item.student_id)" class="btn btn-success rounded-0">
+                                                <button @click="viewAllRecords(item.student_id)"
+                                                    class="btn btn-success rounded-0">
                                                     View Student Reports
                                                 </button>
                                             </td>
@@ -105,13 +96,14 @@
                                     </template>
                                     <template v-else>
                                         <tr v-for="(item, index) in Object.values(skillTestStatisticsSummary)" :key="index">
-                                            <th scope="row">{{ index+1 }}</th>
+                                            <th scope="row">{{ index + 1 }}</th>
                                             <th scope="row">{{ item.full_name }}</th>
                                             <td>{{ item.correct_count }}</td>
                                             <td>{{ item.wrong_count }}</td>
                                             <td>{{ item.pending_count }}</td>
                                             <td>
-                                                <button @click="viewAllRecords(item.student_id)" class="btn btn-success rounded-0">
+                                                <button @click="viewAllRecords(item.student_id)"
+                                                    class="btn btn-success rounded-0">
                                                     View Student Reports
                                                 </button>
                                             </td>
@@ -132,20 +124,26 @@
 
 <script>
 import SkeletonLoader from "../layouts/SkeletonLoader.vue"
+import BarChart from '../layouts/BarChart.vue'
 export default {
     name: 'Statistics',
     components: {
-        SkeletonLoader
+        SkeletonLoader,
+        BarChart
     },
     props: ['gameFlag'],
     data() {
         return {
+            active: null,
+            quizChartData: {},
+            skillTestChartData: {},
             quizStatistics: {},
             skillTestStatistics: {},
             quizStatisticsSummary: {},
             skillTestStatisticsSummary: {},
             isLoading: false,
             selectedAlphabet: null,
+            vowelAlphabets: ['a', 'e', 'i', 'o', 'u'],
             textbookFlag: 'alphabet-words'
         }
     },
@@ -177,6 +175,8 @@ export default {
                 const response = await axios.get(`/api/quiz-statistics?game_flag=${this.gameFlag}&textbook_flag=${this.textbookFlag}`)
                 this.quizStatistics = response.data.quiz
                 this.skillTestStatistics = response.data.skill_test
+                this.active = 'a'
+                this.viewGraph(this.active)
             } catch (error) {
                 console.log(error)
             } finally {
@@ -200,6 +200,52 @@ export default {
         viewAllRecords(student_id) {
             $('#statisticsModal').modal('hide')
             this.$router.push(`/student-quiz-report/${student_id}`)
+        },
+        viewGraph(alphabet) {
+            this.active = alphabet
+            const selectedAlphabet = alphabet.toUpperCase()
+
+            // Quiz
+            let quizWrong = 0
+            let quizCorrect = 0
+
+            if (Object.keys(this.quizStatistics).length && this.quizStatistics.hasOwnProperty(selectedAlphabet)) {
+                quizWrong = this.quizStatistics[selectedAlphabet].wrong
+                quizCorrect = this.quizStatistics[selectedAlphabet].correct
+            }
+
+            this.quizChartData = {
+                labels: ['Wrong Answers', 'Correct Answers'],
+                datasets: [
+                    {
+                        data: [quizWrong, quizCorrect],
+                        label: 'Quiz',
+                        backgroundColor: '#d771d6',
+                    }
+                ]
+            }
+
+            // Skill Test
+            let skillTestWrong = 0
+            let skillTestCorrect = 0
+            let skillTestPending = 0
+
+            if (Object.keys(this.skillTestStatistics).length && this.skillTestStatistics.hasOwnProperty(selectedAlphabet)) {
+                skillTestWrong = this.skillTestStatistics[selectedAlphabet].wrong
+                skillTestCorrect = this.skillTestStatistics[selectedAlphabet].correct
+                skillTestPending = this.skillTestStatistics[selectedAlphabet].pending
+            }
+
+            this.skillTestChartData = {
+                labels: ['Wrong Answers', 'Correct Answers', 'Pending/Unmarked'],
+                datasets: [
+                    {
+                        data: [skillTestWrong, skillTestCorrect, skillTestPending],
+                        label: 'Skill Test',
+                        backgroundColor: '#1a9c8b',
+                    }
+                ]
+            }
         }
     },
 }

@@ -35,7 +35,6 @@
                                 </label>
                             </div>
                         </div>
-                        <BarChart />
                         <Statistics :game-flag="gameFlag"></Statistics>
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
