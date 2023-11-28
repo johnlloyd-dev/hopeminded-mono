@@ -1,93 +1,99 @@
 <template>
-    <div id="overlay"></div>
-    <div class="mt-3" style="z-index: 9999">
-        <div v-if="!disabledGame" id="app" @keyup="handleKeyPress">
-            <div class="row w-100">
-                <div class="col-6">
-                    <h4 class="text-start fw-bold ms-4">Highest Score: {{ highestScore }}
-                    </h4>
-                </div>
-                <div class="col-6">
-                    <h4 class="text-end fw-bold me-4">Score: {{ hangmanGame.score }}
-                    </h4>
-                </div>
-            </div>
-            <div class="mx-5 mt-4">
-                <div class="row">
+    <div v-if="!gameLoading">
+        <div id="overlay"></div>
+        <div class="mt-3" style="z-index: 9999">
+            <div v-if="!disabledGame" id="app" @keyup="handleKeyPress">
+                <div class="row w-100">
                     <div class="col-6">
-                        <p id="quote" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
-                            <span v-for="word in splitQuote" :key="word">
-                                <template v-for="letter in word">{{ isRevealed(letter) }}</template>
-                            </span>
-                            <small v-if="gameOver">
-                                —{{ quoteAuthor }}
-                            </small>
-                        </p>
+                        <h4 class="text-start fw-bold ms-4">Highest Score: {{ highestScore }}
+                        </h4>
                     </div>
                     <div class="col-6">
-                        <div v-if="flag == 0">
-                            <div id="quote2" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
-                                <div class="col-lg-12 d-flex justify-content-center align-items-center">
-                                    <img width="160" class="rounded" :src="currentData.image" alt="hangman image">
+                        <h4 class="text-end fw-bold me-4">Score: {{ hangmanGame.score }}
+                        </h4>
+                    </div>
+                </div>
+                <div class="mx-5 mt-4">
+                    <div class="row">
+                        <div class="col-6">
+                            <p id="quote" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
+                                <span v-for="word in splitQuote" :key="word">
+                                    <template v-for="letter in word">{{ isRevealed(letter) }}</template>
+                                </span>
+                                <small v-if="gameOver">
+                                    —{{ quoteAuthor }}
+                                </small>
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <div v-if="flag == 0">
+                                <div id="quote2" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
+                                    <div class="col-lg-12 d-flex justify-content-center align-items-center">
+                                        <img width="160" class="rounded" :src="currentData.image" alt="hangman image">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div v-else>
-                            <div id="quote2" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
-                                <div class="row p-1">
-                                    <div v-for="data in currentData.image" :key="data.image"
-                                        class="d-flex justify-content-center align-items-center"
-                                        :class="`col-${12 / currentData.image.length}`">
-                                        <img width="160" height="110" class="rounded" :src="data" alt="hangman image">
+                            <div v-else>
+                                <div id="quote2" :class="{ 'strike': strikeout, 'highlight': puzzleComplete }">
+                                    <div class="row p-1">
+                                        <div v-for="data in currentData.image" :key="data.image"
+                                            class="d-flex justify-content-center align-items-center"
+                                            :class="`col-${12 / currentData.image.length}`">
+                                            <img width="160" height="110" class="rounded" :src="data" alt="hangman image">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="container z-50">
-                <div class="status">
-                    <h2>Strikes:</h2>
-                    <ul class="status">
-                        <li v-for="strike in strikes" :key="strike">{{ strike.icon }}</li>
-                    </ul>
-                </div>
+                <div class="container z-50">
+                    <div class="status">
+                        <h2>Strikes:</h2>
+                        <ul class="status">
+                            <li v-for="strike in strikes" :key="strike">{{ strike.icon }}</li>
+                        </ul>
+                    </div>
 
-                <div id="button-board">
-                    <button v-for="letter in letters" @click="guess(letter.letter)" :key="letter.letter"
-                        :class="{ 'strike': badGuesses.includes(letter.letter), 'highlight': guesses.includes(letter.letter) }"
-                        :disabled="guesses.includes(letter.letter) || gameOver || disabled">
-                        <img :src="letter.image" class="letter" :class="{ 'riser': guesses.includes(letter.letter) }" />
-                        <span class="background"></span>
-                    </button>
-                </div>
-                <button v-if="puzzleComplete" @click="nextTest" :class="{ 'highlight': gameOver }">Next - Test {{ test + 1
-                }}</button>
-
-                <div class="status">
-                    <p>{{ message }}</p>
-                </div>
-            </div>
-        </div>
-        <div v-else class="bg-white position-relative" style="height: 100vh">
-            <div class="spinner-grow position-absolute top-50 start-50 translate-middle" style="width: 5rem; height: 5rem;"
-                role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-        <div v-show="show" id="container">
-            <div class="container-inner">
-                <div class="content">
-                    <p>{{ text }}</p>
-                </div>
-                <div class="buttons">
-                    <button @click="nextLevel()" v-if="!hideNextButton" type="button" class="confirm">{{ nextButtonText
+                    <div id="button-board">
+                        <button v-for="letter in letters" @click="guess(letter.letter)" :key="letter.letter"
+                            :class="{ 'strike': badGuesses.includes(letter.letter), 'highlight': guesses.includes(letter.letter) }"
+                            :disabled="guesses.includes(letter.letter) || gameOver || disabled">
+                            <img :src="letter.image" class="letter" :class="{ 'riser': guesses.includes(letter.letter) }" />
+                            <span class="background"></span>
+                        </button>
+                    </div>
+                    <button v-if="puzzleComplete" @click="nextTest" :class="{ 'highlight': gameOver }">Next - Test {{ test +
+                        1
                     }}</button>
-                    <button @click="cancelExit()" type="button" class="cancel">{{ cancelButtonText }}</button>
+
+                    <div class="status">
+                        <p>{{ message }}</p>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="bg-white position-relative" style="height: 100vh">
+                <div class="spinner-grow position-absolute top-50 start-50 translate-middle"
+                    style="width: 5rem; height: 5rem;" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+            <div v-show="show" id="container">
+                <div class="container-inner">
+                    <div class="content">
+                        <p>{{ text }}</p>
+                    </div>
+                    <div class="buttons">
+                        <button @click="nextLevel()" v-if="!hideNextButton" type="button" class="confirm">{{ nextButtonText
+                        }}</button>
+                        <button @click="cancelExit()" type="button" class="cancel">{{ cancelButtonText }}</button>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+    <div v-else>
+        <p>Loading...</p>
     </div>
 </template>
 
@@ -139,7 +145,8 @@ export default {
         hangmanGame: {
             highestLevel: 1,
             score: 0
-        }
+        },
+        gameLoading: false
     }),
     mounted() {
         this.initQuizInfo()
@@ -153,7 +160,7 @@ export default {
             const data = await axios.get(`/api/quiz-reports/get?gameId=${1}&flag=tutorial`)
             if (data.data) {
                 const record = data.data
-                if(record.length) {
+                if (record.length) {
                     const scores = record.map(data => {
                         return data.total_score
                     })
@@ -195,7 +202,8 @@ export default {
             axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=1&flag=tutorial`, this.hangmanGame)
         },
         fetchWords() {
-            axios.get('/storage/json/hangman-game.json')
+            this.gameLoading = true
+            axios.get('json/hangman-game.json')
                 .then((response) => {
                     this.words = response.data.filter(item => {
                         return item.word.length != 3
@@ -203,6 +211,7 @@ export default {
                     this.divideCards()
                     this.pickAQuote()
                     this.disabled = false
+                    this.gameLoading = false
                 })
         },
         divideCards() {
@@ -257,27 +266,27 @@ export default {
                     this.cancelButtonText = 'Exit'
                 } else {
                     swal.fire({
-                            text: `Great. Proceed to next object.`,
-                            showCancelButton: true,
-                            confirmButtonText: `Got it.`,
-                            cancelButtonText: 'Exit',
-                            icon: 'info',
-                            width: 600,
-                            padding: '3em',
-                            backdrop: `
+                        text: `Great. Proceed to next object.`,
+                        showCancelButton: true,
+                        confirmButtonText: `Got it.`,
+                        cancelButtonText: 'Exit',
+                        icon: 'info',
+                        width: 600,
+                        padding: '3em',
+                        backdrop: `
                                 gray
                                 url("https://sweetalert2.github.io/images/nyan-cat.gif")
                                 left top
                                 no-repeat
                             `
-                        }).then((result) => {
-                            if (result.value) {
-                                this.nextTest()
-                            } else if (result.dismiss === swal.DismissReason.cancel) {
-                                window.location.href = '/student-dashboard'
-                                return
-                            }
-                        })
+                    }).then((result) => {
+                        if (result.value) {
+                            this.nextTest()
+                        } else if (result.dismiss === swal.DismissReason.cancel) {
+                            window.location.href = '/student-dashboard'
+                            return
+                        }
+                    })
                 }
             }
         },
@@ -307,34 +316,17 @@ export default {
             this.updateQuizInfo()
         },
         setLetters() {
-            this.letters = [
-                { letter: 'A', image: 'storage/hand-signs/A.png' },
-                { letter: 'B', image: 'storage/hand-signs/B.png' },
-                { letter: 'C', image: 'storage/hand-signs/C.png' },
-                { letter: 'D', image: 'storage/hand-signs/D.png' },
-                { letter: 'E', image: 'storage/hand-signs/E.png' },
-                { letter: 'F', image: 'storage/hand-signs/F.png' },
-                { letter: 'G', image: 'storage/hand-signs/G.png' },
-                { letter: 'H', image: 'storage/hand-signs/H.png' },
-                { letter: 'I', image: 'storage/hand-signs/I.png' },
-                { letter: 'J', image: 'storage/hand-signs/J.png' },
-                { letter: 'K', image: 'storage/hand-signs/K.png' },
-                { letter: 'L', image: 'storage/hand-signs/L.png' },
-                { letter: 'M', image: 'storage/hand-signs/M.png' },
-                { letter: 'N', image: 'storage/hand-signs/N.png' },
-                { letter: 'O', image: 'storage/hand-signs/O.png' },
-                { letter: 'P', image: 'storage/hand-signs/P.png' },
-                { letter: 'Q', image: 'storage/hand-signs/Q.png' },
-                { letter: 'R', image: 'storage/hand-signs/R.png' },
-                { letter: 'S', image: 'storage/hand-signs/S.png' },
-                { letter: 'T', image: 'storage/hand-signs/T.png' },
-                { letter: 'U', image: 'storage/hand-signs/U.png' },
-                { letter: 'V', image: 'storage/hand-signs/V.png' },
-                { letter: 'W', image: 'storage/hand-signs/W.png' },
-                { letter: 'X', image: 'storage/hand-signs/X.png' },
-                { letter: 'Y', image: 'storage/hand-signs/Y.png' },
-                { letter: 'Z', image: 'storage/hand-signs/Z.png' },
-            ]
+            this.gameLoading = true
+            axios.get('json/balloon-game.json')
+                .then((response) => {
+                    this.letters = response.data.map(item => {
+                        return {
+                            letter: item.letter.toUpperCase(),
+                            image: item.image
+                        }
+                    })
+                    this.gameLoading = false
+                })
         }
     },
     computed: {

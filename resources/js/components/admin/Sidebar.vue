@@ -29,7 +29,7 @@ export default {
             menu: [
                 {
                     href: '/teacher-management',
-                    title: 'Techer Management',
+                    title: 'Teacher Management',
                     icon: 'fa-solid fa-users',
                 },
             ],

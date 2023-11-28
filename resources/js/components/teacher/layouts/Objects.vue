@@ -43,7 +43,7 @@ export default {
     },
     methods: {
         async getHandSigns() {
-            const alphabetLetters = await axios.get('/storage/json/alphabets-with-words.json')
+            const alphabetLetters = await axios.get('json/alphabets-with-words.json')
             this.data = alphabetLetters.data
         },
     },

@@ -261,7 +261,7 @@ export default {
             axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=1`, this.hangmanGame)
         },
         fetchWords() {
-            axios.get('/storage/json/hangman-game.json')
+            axios.get('json/hangman-game.json')
                 .then((response) => {
                     this.words = response.data.filter(item => {
                         return item.word.length != 3
@@ -470,34 +470,15 @@ export default {
             }
         },
         setLetters() {
-            this.letters = [
-                { letter: 'A', image: 'storage/hand-signs/A.png' },
-                { letter: 'B', image: 'storage/hand-signs/B.png' },
-                { letter: 'C', image: 'storage/hand-signs/C.png' },
-                { letter: 'D', image: 'storage/hand-signs/D.png' },
-                { letter: 'E', image: 'storage/hand-signs/E.png' },
-                { letter: 'F', image: 'storage/hand-signs/F.png' },
-                { letter: 'G', image: 'storage/hand-signs/G.png' },
-                { letter: 'H', image: 'storage/hand-signs/H.png' },
-                { letter: 'I', image: 'storage/hand-signs/I.png' },
-                { letter: 'J', image: 'storage/hand-signs/J.png' },
-                { letter: 'K', image: 'storage/hand-signs/K.png' },
-                { letter: 'L', image: 'storage/hand-signs/L.png' },
-                { letter: 'M', image: 'storage/hand-signs/M.png' },
-                { letter: 'N', image: 'storage/hand-signs/N.png' },
-                { letter: 'O', image: 'storage/hand-signs/O.png' },
-                { letter: 'P', image: 'storage/hand-signs/P.png' },
-                { letter: 'Q', image: 'storage/hand-signs/Q.png' },
-                { letter: 'R', image: 'storage/hand-signs/R.png' },
-                { letter: 'S', image: 'storage/hand-signs/S.png' },
-                { letter: 'T', image: 'storage/hand-signs/T.png' },
-                { letter: 'U', image: 'storage/hand-signs/U.png' },
-                { letter: 'V', image: 'storage/hand-signs/V.png' },
-                { letter: 'W', image: 'storage/hand-signs/W.png' },
-                { letter: 'X', image: 'storage/hand-signs/X.png' },
-                { letter: 'Y', image: 'storage/hand-signs/Y.png' },
-                { letter: 'Z', image: 'storage/hand-signs/Z.png' },
-            ]
+            axios.get('json/balloon-game.json')
+                .then((response) => {
+                    this.letters = response.data.map(item => {
+                        return {
+                            letter: item.letter.toUpperCase(),
+                            image: item.image
+                        }
+                    })
+                })
         }
     },
     computed: {

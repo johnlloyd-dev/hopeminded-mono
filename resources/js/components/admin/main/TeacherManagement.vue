@@ -25,13 +25,13 @@
                                 <td>{{ teacher.middle_name }}</td>
                                 <td>{{ teacher.last_name }}</td>
                                 <td>
-                                    <p class="fw-bold p-2">{{ teacher.status == 'active' ? "ACTIVE" : "INACTIVE" }}</p>
+                                    <p class="fw-bold p-2">{{ teacher.status ? (teacher.status == 'active' ? "ACTIVE" : "INACTIVE") : "NOT YET REGISTERED" }}</p>
                                 </td>
                                 <td class="d-flex flex-column">
                                     <button @click="viewStudents(teacher.id)" class="btn btn-secondary rounded-0 mb-3">
                                         <span>View Students </span><i class="fas fa-external-link-alt"></i>
                                     </button>
-                                    <button @click="toggleConfirmationModal(teacher)" :class="teacher.status == 'active' ? 'btn-danger' : 'btn-success'" class="btn rounded-0 fw-bold">
+                                    <button v-if="teacher.status" @click="toggleConfirmationModal(teacher)" :class="teacher.status == 'active' ? 'btn-danger' : 'btn-success'" class="btn rounded-0 fw-bold">
                                         <span>{{ teacher.status == 'active' ? "Deactivate " : "Activate " }} </span>
                                         <i :class="teacher.status == 'active' ? 'fa-toggle-off' : 'fa-toggle-on'" class="fas"></i>
                                     </button>

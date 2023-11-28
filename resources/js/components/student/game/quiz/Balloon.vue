@@ -223,7 +223,7 @@ export default {
             axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=2`, this.typingBalloon)
         },
         fetchThemes() {
-            axios.get('storage/json/balloon-game.json')
+            axios.get('json/balloon-game.json')
                 .then(response => {
                     this.theme = response.data
                     this.allThemes = response.data
@@ -255,7 +255,7 @@ export default {
                 let dy;
                 switch (this.flag) {
                     case 0:
-                        dy = (this.flag + 0.002);
+                        dy = (this.flag + 1);
                         break;
                     case 1:
                         dy = (this.flag + .1);

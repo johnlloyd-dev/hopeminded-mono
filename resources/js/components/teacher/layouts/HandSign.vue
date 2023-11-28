@@ -39,7 +39,7 @@ export default {
     },
     methods: {
         async getHandSigns() {
-            const alphabetLetters = await axios.get('/storage/json/balloon-game.json')
+            const alphabetLetters = await axios.get('json/balloon-game.json')
             this.data = alphabetLetters.data
         },
     },

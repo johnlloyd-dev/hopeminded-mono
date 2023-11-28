@@ -97,7 +97,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('seed', function () {
         $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         Textbook::where('teacher_id', $teacherId)->delete();
-        $jsonFile = Storage::path('public/json/alphabets-with-letters.json');
+        $jsonFile = public_path('json/alphabets-with-letters.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 
         foreach ($jsonData as $data) {
@@ -118,7 +118,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ]);
         }
 
-        $jsonFile = Storage::path('public/json/vowel-consonants.json');
+        $jsonFile = public_path('json/vowel-consonants.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 
         foreach ($jsonData as $json) {
@@ -141,7 +141,7 @@ Route::middleware('auth:sanctum')->group(function () {
             }
         }
 
-        $jsonFile = Storage::path('public/json/alphabets-with-words.json');
+        $jsonFile = public_path('json/alphabets-with-words.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 
         foreach ($jsonData as $data) {

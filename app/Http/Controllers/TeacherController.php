@@ -16,7 +16,7 @@ class TeacherController extends Controller
 {
     public function getTeachers()
     {
-        return User::join('teachers', function ($join) {
+        return Teacher::leftJoin('users', function ($join) {
             $join->on('users.id', '=', 'teachers.user_id');
         })
             ->select('users.status', 'teachers.*')
