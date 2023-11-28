@@ -19,4 +19,9 @@ class Student extends Model
         'user_id',
         'unhashed'
     ];
+
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class);
+    }
 }

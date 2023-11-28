@@ -14,6 +14,7 @@
                                 <th scope="col">First Name</th>
                                 <th scope="col">Middle Name</th>
                                 <th scope="col">Last Name</th>
+                                <th scope="col">Status</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
@@ -23,9 +24,16 @@
                                 <td>{{ teacher.first_name }}</td>
                                 <td>{{ teacher.middle_name }}</td>
                                 <td>{{ teacher.last_name }}</td>
-                                <td class="d-flex justify-content-center">
-                                    <button @click="viewStudents(teacher.id)" class="btn btn-success rounded-0">
+                                <td>
+                                    <p class="fw-bold p-2">{{ teacher.status == 'active' ? "ACTIVE" : "INACTIVE" }}</p>
+                                </td>
+                                <td class="d-flex flex-column">
+                                    <button @click="viewStudents(teacher.id)" class="btn btn-secondary rounded-0 mb-3">
                                         <span>View Students </span><i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <button @click="toggleConfirmationModal(teacher)" :class="teacher.status == 'active' ? 'btn-danger' : 'btn-success'" class="btn rounded-0 fw-bold">
+                                        <span>{{ teacher.status == 'active' ? "Deactivate " : "Activate " }} </span>
+                                        <i :class="teacher.status == 'active' ? 'fa-toggle-off' : 'fa-toggle-on'" class="fas"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -112,6 +120,33 @@
                 </div>
             </div>
         </div>
+
+        <!-- Update Teacher Confirmation Modal -->
+        <div class="modal fade" id="updateStatusConfirmation" data-bs-backdrop="static" tabindex="-1"
+            aria-labelledby="updateStatusConfirmationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%"
+                            class="logo" alt="Hopeminded Logo">
+                        <h5 class="modal-title" id="updateStatusConfirmationModalLabel">Update Status Confirmation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="fw-bold">Do you want to proceed in {{ statusPrompt.status == 'active' ? 'deactivating' : 'activating' }} this student's account?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button v-if="!isLoading" type="button" @click.prevent="updateTeacherStatus(statusPrompt.user_id)"
+                            style="font-weight: bold; width: 120px;" class="btn btn-primary">Proceed</button>
+                        <button type="button" v-else disabled style="font-weight: bold; width: 120px;"
+                            class="btn btn-primary pb-0">
+                            <Loading />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -133,7 +168,8 @@ export default {
                 email: null,
                 username: null,
                 password: null
-            }
+            },
+            statusPrompt: {}
         }
     },
     components: {
@@ -196,6 +232,27 @@ export default {
 
             this.auth.accessId = accessID;
 
+        },
+        toggleConfirmationModal(teacher) {
+            this.statusPrompt.status = teacher.status
+            this.statusPrompt.user_id = teacher.user_id
+            $('#updateStatusConfirmation').modal('show')
+        },
+        async updateTeacherStatus(userId) {
+            try {
+                this.isLoading = true
+                const response = await axios.put(`/api/status/update/user/${userId}`)
+
+                if (response.status == 200 || response.status == 201) {
+                    $('#updateStatusConfirmation').modal('hide')
+                    swal.fire('Success', response.data.message, 'success')
+                    this.getTeachers();
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.isLoading = false
+            }
         },
     }
 }

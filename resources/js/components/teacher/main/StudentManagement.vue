@@ -11,8 +11,9 @@
                         <thead>
                             <tr>
                                 <th scope="col">Student</th>
-                                <th style="width: 30%" scope="col">Skill Test Report</th>
-                                <th scope="col">Quiz Report</th>
+                                <th style="width: 25%" scope="col">Skill Test Report</th>
+                                <th style="width: 25%" scope="col">Quiz Report</th>
+                                <th scope="col">Status</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -136,9 +137,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-center">
-                                    <button @click="viewReport(student.id)" class="btn btn-success rounded-0">
-                                        <span>Student Report </span><i class="fas fa-external-link-alt"></i>
+                                <td>
+                                    <p class="fw-bold p-2">{{ student.status == 'active' ? "ACTIVE" : "INACTIVE" }}</p>
+                                </td>
+                                <td class="d-flex flex-column">
+                                    <button @click="viewReport(student.id)" class="btn btn-secondary fw-bold rounded-0 mb-3">
+                                        <span>Reports </span><i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <button @click="toggleConfirmationModal(student)" :class="student.status == 'active' ? 'btn-danger' : 'btn-success'" class="btn rounded-0 fw-bold">
+                                        <span>{{ student.status == 'active' ? "Deactivate " : "Activate " }} </span>
+                                        <i :class="student.status == 'active' ? 'fa-toggle-off' : 'fa-toggle-on'" class="fas"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -234,6 +242,33 @@
                 </div>
             </div>
         </div>
+
+        <!-- Update Student Confirmation Modal -->
+        <div class="modal fade" id="updateStatusConfirmation" data-bs-backdrop="static" tabindex="-1"
+            aria-labelledby="updateStatusConfirmationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%"
+                            class="logo" alt="Hopeminded Logo">
+                        <h5 class="modal-title" id="updateStatusConfirmationModalLabel">Update Status Confirmation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="fw-bold">Do you want to proceed in {{ statusPrompt.status == 'active' ? 'deactivating' : 'activating' }} this student's account?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button v-if="!isLoading" type="button" @click.prevent="updateStudentStatus(statusPrompt.user_id)"
+                            style="font-weight: bold; width: 120px;" class="btn btn-primary">Proceed</button>
+                        <button type="button" v-else disabled style="font-weight: bold; width: 120px;"
+                            class="btn btn-primary pb-0">
+                            <Loading />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -256,7 +291,8 @@ export default {
                 email: null,
                 username: null,
                 password: null
-            }
+            },
+            statusPrompt: {}
         }
     },
     components: {
@@ -293,6 +329,27 @@ export default {
             this.$router.push({
                 path: `/student-quiz-report/${studentId}`
             });
+        },
+        toggleConfirmationModal(student) {
+            this.statusPrompt.status = student.status
+            this.statusPrompt.user_id = student.user_id
+            $('#updateStatusConfirmation').modal('show')
+        },
+        async updateStudentStatus(userId) {
+            try {
+                this.isLoading = true
+                const response = await axios.put(`/api/status/update/user/${userId}`)
+
+                if (response.status == 200 || response.status == 201) {
+                    $('#updateStatusConfirmation').modal('hide')
+                    swal.fire('Success', response.data.message, 'success')
+                    this.getStudents();
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.isLoading = false
+            }
         },
         generateAccessID() {
             var characters = '0123456789';

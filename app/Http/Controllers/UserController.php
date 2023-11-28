@@ -119,11 +119,19 @@ class UserController extends Controller
         }
     }
 
-    public function editStudent()
+    public function updateStatus($userId)
     {
-    }
+        $user = User::find($userId);
+        $currentStatus = $user->status;
+        $newStatus = $currentStatus == 'active' ? 'inactive' : 'active';
 
-    public function deleteStudent()
-    {
+        if ($user) {
+            $user->status = $newStatus;
+            $user->save();
+        }
+
+        return response()->json([
+            'message' => 'User status has been updated successfully.'
+        ]);
     }
 }

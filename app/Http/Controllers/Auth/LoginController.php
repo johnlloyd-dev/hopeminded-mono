@@ -18,10 +18,15 @@ class LoginController extends Controller
     {
         $user = User::where('username', $request->username)->first();
         if ($user) {
-            if (Hash::check($request->password, $user->password)) {
+            if ($user->status == 'inactive') {
+                $toContact = $user->user_flag == 'teacher' ? 'admin' : 'teacher';
+                return response()->json([
+                    'username' => ["Your account is currently deactivated/inactive. Please contact your {$toContact} regarding with this matter."]
+                ], 401);
+            } else if (Hash::check($request->password, $user->password)) {
                 if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
                     $auth = $request->user();
-                    if($auth->user_flag != 'admin') {
+                    if ($auth->user_flag != 'admin') {
                         switch ($auth->user_flag) {
                             case 'student':
                                 $owner = Student::where('user_id', $auth->id)->first();

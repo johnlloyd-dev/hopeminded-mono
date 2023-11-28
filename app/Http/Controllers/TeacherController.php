@@ -16,13 +16,13 @@ class TeacherController extends Controller
 {
     public function getTeachers()
     {
-        // return User::join('teachers', function (JoinClause $join) {
-        //     $join->on('users.id', '=', 'teachers.user_id');
-        // })
-        //     ->select('users.*', 'teachers.*')
-        //     ->get();
+        return User::join('teachers', function ($join) {
+            $join->on('users.id', '=', 'teachers.user_id');
+        })
+            ->select('users.status', 'teachers.*')
+            ->get();
 
-        return Teacher::get();
+        // return Teacher::get();
     }
 
     public function addTeacher(TeacherRequest $request)

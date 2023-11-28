@@ -199,10 +199,12 @@ class QuizReportController extends Controller
             })
             ->where('game_flag', $request->query('game_flag'))
             ->when($request->query('game_flag') === 'typing-balloon', function ($query) use ($request) {
-                $query->whereJsonContains('attributes', ['answer' => strtolower($request->query('alphabet'))]);
+                // $query->whereJsonContains('attributes', ['answer' => strtolower($request->query('alphabet'))]);
+                $query->whereRaw("JSON_EXTRACT(attributes, '$.answer') = ?", [strtolower($request->query('alphabet'))]);
             })
             ->when($request->query('game_flag') !== 'typing-balloon', function ($query) use ($request) {
-                $query->whereJsonContains('attributes', ['alphabet' => $request->query('alphabet')]);
+                // $query->whereJsonContains('attributes', ['alphabet' => $request->query('alphabet')]);
+                $query->whereRaw("JSON_EXTRACT(attributes, '$.alphabet') = ?", [$request->query('alphabet')]);
             })
             ->get()
             ->map(function ($data) {

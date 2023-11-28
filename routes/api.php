@@ -89,7 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('skill-test-mark/modify', [SkillTestController::class, 'updateMark']);
 
     Route::get('notifications/get', [NotificationController::class, 'getNotifications']);
-    Route::put('retake/skill-test/allow/{retakeId}', [SkillTestController::class, 'allow                                                                                                                                                                                                                                                                                                                                                                                                                Retake']);
+    Route::put('retake/skill-test/allow/{retakeId}', [SkillTestController::class, 'allowRetake']);
     Route::put('retake/quiz/allow/{retakeId}', [GameController::class, 'allowRetake']);
 
     Route::post('/logout', [LogoutController::class, 'logout']);
@@ -184,6 +184,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/quiz-statistics',  [QuizReportController::class, 'getStatistics']);
     Route::get('/quiz-statistics/summary',  [QuizReportController::class, 'getStatisticsSummary']);
+
+    Route::put('/status/update/user/{userId}',  [UserController::class, 'updateStatus']);
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);
