@@ -570,9 +570,7 @@
                                     <div class="alert alert-warning" role="alert">
                                         <span class="fw-bold text-black">Note: </span>
                                         <p class="fw-bold">
-                                            Hangman game is played by selecting the correct
-                                            alphabet symbol based on the object image and text presented. If the selected
-                                            alphabet sign did not match to the object name, it will be considered wrong.
+                                            {{ weaknessesNote }}
                                         </p>
                                         <h6 class="fw-bold text-black">Legend: </h6>
                                         <ul>
@@ -912,6 +910,15 @@ export default {
                 score: 0,
                 display: 0
             };
+        },
+        weaknessesNote() {
+            if (this.flag == 'alphabet-letters') {
+                return "The memory game involves selecting two identical cards and then selecting the corresponding hand symbol for the letter that represents the object on the card."
+            } else if (this.flag == 'vowel-consonants') {
+                return "The Typing Balloon game is played by pressing the corresponding alphabet key on the keyboard for each letter shown in the balloon."
+            } else {
+                return "The Hangman game involves selecting the correct alphabet symbol based on the object image and accompanying text. If the chosen alphabet does not match the object's name, it will be considered incorrect."
+            }
         }
     },
     methods: {

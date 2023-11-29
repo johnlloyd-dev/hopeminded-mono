@@ -221,11 +221,11 @@ class GameController extends Controller
             });
         if (count($quizReport['data'])) {
             if ($quizReport['data'][0]->game_flag === 'hangman-game' || $quizReport['data'][0]->game_flag === 'typing-balloon') {
-                $jsonFile = Storage::path('public/json/balloon-game.json');
+                $jsonFile = public_path('json/balloon-game.json');
                 $jsonData = json_decode(file_get_contents($jsonFile), true);
                 $quizReport['answer_key'] = $jsonData;
             } else {
-                $jsonFile = Storage::path('public/json/hangman-game.json');
+                $jsonFile = public_path('json/hangman-game.json');
                 $jsonData = json_decode(file_get_contents($jsonFile), true);
                 $quizReport['answer_key'] = $jsonData;
             }
