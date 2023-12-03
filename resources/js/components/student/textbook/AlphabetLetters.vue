@@ -19,7 +19,7 @@
                                 </div>
                                 <hr class="w-75">
                                 <!-- <button :disabled="Object.keys(skillTest).length < 5" -->
-                                <button :disabled="Object.keys(skillTest).length < 0 || (availableQuizRetakes.hasOwnProperty(filteredFlag) && availableQuizRetakes[filteredFlag].allowed_retake === 0)"
+                                <button :disabled="Object.keys(skillTest).length < 5 || (availableQuizRetakes.hasOwnProperty(filteredFlag) && availableQuizRetakes[filteredFlag].allowed_retake === 0)"
                                     @click="$router.push('/quiz-memory-game')"
                                     class="btn btn-danger btn-lg rounded-0 w-75 fw-bold">{{ availableQuizRetakes.hasOwnProperty(filteredFlag) ? 'Retake Quiz' : 'Take Quiz' }}</button>
                                 <h6 class="fw-bold" v-if="availableQuizRetakes.hasOwnProperty(filteredFlag)">Available Retake: <span class="text-danger">{{ availableQuizRetakes.hasOwnProperty(filteredFlag) ? availableQuizRetakes[filteredFlag].allowed_retake : 0 }}</span></h6>

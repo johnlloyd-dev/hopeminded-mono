@@ -132,6 +132,7 @@ class SkillTestController extends Controller
             });
 
 
+        $itemKeys = collect([]);
         if (count($skillTests)) {
             $itemKeys = $skillTests->groupBy('letter');
 
@@ -159,6 +160,7 @@ class SkillTestController extends Controller
 
         return (object)[
             'data' => $skillTests,
+            'data_items' => $itemKeys->keys(),
             'retake' => $retakes,
             'highest_score' => $highestScores
         ];

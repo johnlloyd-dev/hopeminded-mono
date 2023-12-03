@@ -137,7 +137,7 @@ class QuizReportController extends Controller
 
         foreach ($quizMistakes as $item) {
             $gameFlag = $item->game_flag;
-            $alphabet = $gameFlag !== 'typing-balloon' ? $item->attributes->alphabet : strtoupper($item->attributes->answer);
+            $alphabet = $gameFlag == 'memory-game' ? $item->attributes->alphabet : strtoupper($item->attributes->answer);
             $mark = $item->attributes->mark;
 
             // Check if the alphabet exists in the result array
@@ -149,9 +149,9 @@ class QuizReportController extends Controller
             }
 
             // Update the counts based on the mark
-            if ($mark === 'correct') {
+            if ($mark == 'correct') {
                 $result[$alphabet]['correct']++;
-            } elseif ($mark === 'wrong') {
+            } elseif ($mark == 'wrong') {
                 $result[$alphabet]['wrong']++;
             }
         }

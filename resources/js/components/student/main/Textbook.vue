@@ -45,7 +45,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.length < 0 || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.data_items && skillTestAL.data_items.length < 5 || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/vc.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Vowels/Consonants</h5>
@@ -58,7 +58,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div :class="{ 'opacity-75 pe-none': skillTestVC.length < 0 || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': (skillTestAL.data_items && skillTestVC.data_items.length < 5) || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/words.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Alphabets/Words</h5>
@@ -107,9 +107,15 @@ export default {
             imgSrc: null,
             isSwitching: false,
             isProcessing: false,
-            skillTestAL: [],
-            skillTestAW: [],
-            skillTestVC: [],
+            skillTestAL: {
+                data: []
+            },
+            skillTestAW: {
+                data: []
+            },
+            skillTestVC: {
+                data: []
+            },
         };
     },
     mounted() {
@@ -157,6 +163,7 @@ export default {
                     this.skillTestVC = data2.data
                     this.skillTestAW = data3.data
                 }
+
             } catch (error) {
                 console.log(error)
             } finally {
