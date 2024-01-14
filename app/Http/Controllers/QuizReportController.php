@@ -192,67 +192,66 @@ class QuizReportController extends Controller
 
     public function getStatisticsSummary(Request $request)
     {
-        $quizMistakes = QuizMistake::select('quiz_mistakes.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
-            ->join('students', function ($query) {
-                $query->on('students.id', '=', 'quiz_mistakes.student_id')
-                    ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
-            })
-            ->where('game_flag', $request->query('game_flag'))
-            ->when($request->query('game_flag') === 'typing-balloon', function ($query) use ($request) {
-                // $query->whereJsonContains('attributes', ['answer' => strtolower($request->query('alphabet'))]);
-                $query->whereRaw("JSON_EXTRACT(attributes, '$.answer') = ?", [strtolower($request->query('alphabet'))]);
-            })
-            ->when($request->query('game_flag') !== 'typing-balloon', function ($query) use ($request) {
-                // $query->whereJsonContains('attributes', ['alphabet' => $request->query('alphabet')]);
-                $query->whereRaw("JSON_EXTRACT(attributes, '$.alphabet') = ?", [$request->query('alphabet')]);
-            })
-            ->get()
-            ->map(function ($data) {
-                $data->attributes = json_decode($data->attributes);
+        if ($request->query('category') == 'quiz') {
+            return QuizMistake::select('quiz_mistakes.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
+                ->join('students', function ($query) {
+                    $query->on('students.id', '=', 'quiz_mistakes.student_id')
+                        ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
+                })
+                ->where('game_flag', $request->query('game_flag'))
+                ->whereRaw("JSON_EXTRACT(attributes, '$.mark') = ?", [$request->query('flag')])
+                ->get()
+                ->map(function ($data) use ($request) {
+                    $data->attributes = json_decode($data->attributes);
 
-                return $data;
-            });
+                    if ($request->query('game_flag') != 'memory-game') {
+                        $data->attributes->alphabet = $data->attributes->answer;
+                    }
 
-        $skillTestMistakes = SkillTest::select('skill_tests.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
-            ->join('students', function ($query) {
-                $query->on('students.id', '=', 'skill_tests.student_id')
-                    ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
-            })
-            ->where('flag', $request->query('textbook_flag'))
-            ->where('letter', strtolower($request->query('alphabet')))
-            ->get()
-            ->map(function ($data) {
-                $data->alphabet = strtoupper($data->letter);
+                    $data->attributes->alphabet = strtolower($data->attributes->alphabet);
 
-                return $data;
-            });
+                    return $data;
+                })
+                ->groupBy(function ($item) {
+                    return $item->attributes->alphabet;
+                })
+                ->map(function ($group) {
+                    return $group->groupBy('full_name')
+                        ->map(function ($student) {
+                            return [
+                                'student_id' => $student->pluck('student_id')->unique()->first(),
+                                'full_name' => $student->pluck('full_name')->unique()->first(),
+                                'count' => $student->count()
+                            ];
+                        })->values();
+                });
+        } else {
+            return SkillTest::select('skill_tests.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
+                ->join('students', function ($query) {
+                    $query->on('students.id', '=', 'skill_tests.student_id')
+                        ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
+                })
+                ->where('flag', $request->query('textbook_flag'))
+                ->where('status', $request->query('flag'))
+                ->get()
+                ->map(function ($data) {
+                    $data->alphabet = $data->letter;
 
-        $grouped = $quizMistakes->groupBy('full_name');
-
-        $grouped2 = $skillTestMistakes->groupBy('full_name');
-
-        $summary = $grouped->map(function ($group) {
-            return [
-                'student_id' => $group->first()->student_id,
-                'full_name' => $group->first()->full_name,
-                'wrong_count' => $group->where('attributes.mark', 'wrong')->count(),
-                'correct_count' => $group->where('attributes.mark', 'correct')->count(),
-            ];
-        });
-
-        $summary2 = $grouped2->map(function ($group) {
-            return [
-                'student_id' => $group->first()->student_id,
-                'full_name' => $group->first()->full_name,
-                'wrong_count' => $group->where('status', 'wrong')->count(),
-                'correct_count' => $group->where('status', 'correct')->count(),
-                'pending_count' => $group->where('status', 'pending')->count(),
-            ];
-        });
-
-        return [
-            'quiz' => $summary,
-            'skill_test' => $summary2
-        ];
+                    return $data;
+                })
+                ->groupBy(function ($item) {
+                    return $item->alphabet;
+                })
+                ->map(function ($group) {
+                    return $group->groupBy('full_name')
+                        ->map(function ($student) {
+                            return [
+                                'student_id' => $student->pluck('student_id')->unique()->first(),
+                                'full_name' => $student->pluck('full_name')->unique()->first(),
+                                'count' => $student->count()
+                            ];
+                        })->values();
+                });
+        }
     }
 }

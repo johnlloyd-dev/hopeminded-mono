@@ -34,11 +34,11 @@
                                     @click="forgotPassword">Forgot
                                     password?</a></span>
                         </div>
-                        <hr>
+                        <!-- <hr>
                         <h6 class="text-dark fw-bold">FOR TEACHERS</h6>
                         <span style="font-weight: bold" class="text-dark">Don't have an account yet? <a
                                 class="cursor-pointer" style="font-weight: bold"
-                                @click="redirectRegister">Register</a></span>
+                                @click="redirectRegister">Register</a></span> -->
                     </div>
                 </form>
                 <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel"

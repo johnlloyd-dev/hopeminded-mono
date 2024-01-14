@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TeacherRequest;
+use App\Mail\UserCredentialsMail;
 use App\Models\PassingPercentage;
 use App\Models\Student;
 use App\Models\Teacher;
@@ -11,6 +12,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class TeacherController extends Controller
 {
@@ -27,19 +29,20 @@ class TeacherController extends Controller
 
     public function addTeacher(TeacherRequest $request)
     {
-        // $user = User::create([
-        //     'username' => $request->username,
-        //     'password' => Hash::make($request->password),
-        //     'user_flag' => 'teacher'
-        // ]);
+        $user = User::create([
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
+            'user_flag' => 'teacher'
+        ]);
+
         $teacher = Teacher::create([
-            'access_id' => 'HM-' . $request->accessId,
+            // 'access_id' => 'HM-' . $request->accessId,
             'first_name' => $request->firstName,
             'middle_name' => $request->middleName,
             'last_name' => $request->lastName,
             'email' => $request->email,
-            // 'user_id' => $user->id,
-            // 'unhashed' => $request->password
+            'user_id' => $user->id,
+            'unhashed' => $request->password
         ]);
 
         $defaultPercentage = [
@@ -55,7 +58,13 @@ class TeacherController extends Controller
             ],
         ];
 
+        $mailData = [
+            'username' => $user->username,
+            'password' => $request->password
+        ];
+
         PassingPercentage::insert($defaultPercentage);
+        Mail::to($request->email)->send(new UserCredentialsMail($mailData));
 
         if ($teacher) {
             return response()->json([

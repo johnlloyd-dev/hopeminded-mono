@@ -23,7 +23,7 @@ class TeacherRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'accessId' => 'required|unique:teachers,access_id',
+            // 'accessId' => 'required|unique:teachers,access_id',
             'firstName' => 'required',
             'middleName' => 'required',
             'lastName' => 'required',
@@ -33,8 +33,8 @@ class TeacherRequest extends FormRequest
                 Rule::unique('teachers', 'email'),
                 Rule::unique('students', 'email'),
             ],
-            // 'username' => 'required|unique:users,username',
-            // 'password' => 'required',1
+            'username' => 'required|unique:users,username',
+            'password' => 'required|min:8'
         ];
     }
 }

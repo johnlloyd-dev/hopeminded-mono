@@ -1,116 +1,85 @@
 <template>
-    <template v-if="isLoading">
-        <SkeletonLoader></SkeletonLoader>
-    </template>
-    <div v-else class="row">
-        <div v-for="alphabet in alphabets" :key="alphabet" class="col-lg-1 col-md-3 col-sm-4">
-            <button @click="viewGraph(alphabet)" style="width: 50px;" :class="active === alphabet ? 'btn-warning' : ' btn-primary'"
-                class="btn mb-2 fw-bold">
-                {{ alphabet.toUpperCase() }}
-            </button>
+    <div class="d-flex align-items-center flex-column">
+        <div class="card w-75 mb-3">
+            <div class="card-body">
+                <div class="quiz-graph mb-3">
+                    <h5 class="fw-bold">Quiz Statistics</h5>
+                    <BarChart v-if="Object.keys(quizChartData).length" :chartData="quizChartData" />
+                </div>
+                <div class="d-flex flex-column w-50">
+                    <button @click="viewStatisticsSummary('quiz', 'wrong')"
+                        class="btn btn-success rounded-0 mb-1 fw-bold d-flex justify-content-between align-items-center">View
+                        students with wrong answers <i class="fas fa-chevron-circle-right"></i></button>
+                    <button @click="viewStatisticsSummary('quiz', 'correct')"
+                        class="btn btn-secondary rounded-0 fw-bold d-flex justify-content-between align-items-center">View
+                        students with correct answers <i class="fas fa-chevron-circle-right"></i></button>
+                </div>
+            </div>
         </div>
-    </div>
-    <hr>
-    <div class="d-flex justify-content-center">
         <div class="card w-75">
             <div class="card-body">
-                <div class="quiz-graph">
-                    <h5 class="fw-bold">Quiz</h5>
-                    <BarChart v-if="Object.keys(quizChartData).length" :chartData="quizChartData"/>
+                <div class="quiz-graph mb-3">
+                    <h5 class="fw-bold">Skill Test Statistics</h5>
+                    <BarChart v-if="Object.keys(skillTestChartData).length" :chartData="skillTestChartData" />
                 </div>
-                <hr>
-                <div class="quiz-graph">
-                    <h5 class="fw-bold">Skill Test</h5>
-                    <BarChart v-if="Object.keys(skillTestChartData).length" :chartData="skillTestChartData"/>
+                <div class="d-flex flex-column w-50">
+                    <button @click="viewStatisticsSummary('skill_test', 'wrong')"
+                        class="btn btn-success rounded-0 mb-1 fw-bold d-flex justify-content-between align-items-center">View
+                        students with wrong answers <i class="fas fa-chevron-circle-right"></i></button>
+                    <button @click="viewStatisticsSummary('skill_test', 'correct')"
+                        class="btn btn-secondary rounded-0 mb-1 fw-bold d-flex justify-content-between align-items-center">View
+                        students with correct answers <i class="fas fa-chevron-circle-right"></i></button>
+                    <botton @click="viewStatisticsSummary('skill_test', 'pending')"
+                        class="btn btn-primary rounded-0 fw-bold d-flex justify-content-between align-items-center">View
+                        students with unmarked answers <i class="fas fa-chevron-circle-right"></i></botton>
                 </div>
-                <a href="javascript:;" @click="viewStatisticsSummary(this.active.toUpperCase())"
-                        class="btn btn-primary rounded-0 mt-5">View All Records</a>
             </div>
         </div>
     </div>
     <div class="statistics-summary">
-        <div class="modal fade" id="statisticsModal" tabindex="-1" aria-labelledby="statisticsModalLabel"
+        <div class="modal fade" id="statisticsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="statisticsModalLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="statisticsModalLabel">Statistics Summary - Alphabet<span
-                                class="fw-bold h3 text-danger"> ({{ selectedAlphabet }})</span></h5>
+                        <h5 class="modal-title" id="statisticsModalLabel">Statistics</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-1">
                             <h5 class="fw-bold">Quiz Records</h5>
-                            <table class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 15%" scope="col">Item No.</th>
-                                        <th style="width: 30%" scope="col">Student Name</th>
-                                        <th style="width: 15%" scope="col">Correct</th>
-                                        <th style="width: 15%" scope="col">Wrong</th>
-                                        <th scope="col">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template v-if="!Object.keys(quizStatisticsSummary).length">
-                                        <tr>
-                                            <th class="text-center" scope="row" colspan="5">No records found</th>
-                                        </tr>
-                                    </template>
-                                    <template v-else>
-                                        <tr v-for="(item, index) in Object.values(quizStatisticsSummary)" :key="index">
-                                            <th scope="row">{{ index + 1 }}</th>
-                                            <th scope="row">{{ item.full_name }}</th>
-                                            <td>{{ item.correct_count }}</td>
-                                            <td>{{ item.wrong_count }}</td>
-                                            <td>
-                                                <button @click="viewAllRecords(item.student_id)"
-                                                    class="btn btn-success rounded-0">
-                                                    View Student Reports
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
-                        <hr>
-                        <div class="mt-1">
-                            <h5 class="fw-bold">Skill Test Records</h5>
-                            <table class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 15%" scope="col">Item No.</th>
-                                        <th style="width: 30%" scope="col">Student Name</th>
-                                        <th style="width: 10%" scope="col">Correct</th>
-                                        <th style="width: 10%" scope="col">Wrong</th>
-                                        <th style="width: 10%" scope="col">Pending</th>
-                                        <th scope="col">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template v-if="!Object.keys(skillTestStatisticsSummary).length">
-                                        <tr>
-                                            <th class="text-center" scope="row" colspan="6">No records found</th>
-                                        </tr>
-                                    </template>
-                                    <template v-else>
-                                        <tr v-for="(item, index) in Object.values(skillTestStatisticsSummary)" :key="index">
-                                            <th scope="row">{{ index + 1 }}</th>
-                                            <th scope="row">{{ item.full_name }}</th>
-                                            <td>{{ item.correct_count }}</td>
-                                            <td>{{ item.wrong_count }}</td>
-                                            <td>{{ item.pending_count }}</td>
-                                            <td>
-                                                <button @click="viewAllRecords(item.student_id)"
-                                                    class="btn btn-success rounded-0">
-                                                    View Student Reports
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
+                            <template v-for="(alphabet, index) of alphabets" :key="index">
+                                <div class="card rounded-0 mb-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0 fw-bold">{{ alphabet.toUpperCase() }}</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <table v-if="statisticsSummary.hasOwnProperty(alphabet)"
+                                            class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 30%" scope="col">Student Name</th>
+                                                    <th style="width: 30%" scope="col">Count</th>
+                                                    <th scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(item, index) in statisticsSummary[alphabet]" :key="index">
+                                                    <th style="width: 30%" scope="row">{{ item.full_name }}</th>
+                                                    <th style="width: 30%" scope="row">{{ item.count }}</th>
+                                                    <td>
+                                                        <button @click="viewAllRecords(item.student_id)"
+                                                            class="btn btn-success rounded-0">
+                                                            View Student Reports
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <p v-else class="text-center fw-bold mb-0">No records found</p>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -141,6 +110,7 @@ export default {
             skillTestStatistics: {},
             quizStatisticsSummary: {},
             skillTestStatisticsSummary: {},
+            statisticsSummary: [],
             isLoading: false,
             selectedAlphabet: null,
             vowelAlphabets: ['a', 'e', 'i', 'o', 'u'],
@@ -183,23 +153,29 @@ export default {
                 this.isLoading = false
             }
         },
-        viewStatisticsSummary(alphabet) {
-            this.getStatisticsSummary(alphabet)
-            this.selectedAlphabet = alphabet
+        async viewStatisticsSummary(category, flag) {
+            await this.getStatisticsSummary(category, flag)
+            // this.selectedAlphabet = alphabet
             $('#statisticsModal').modal('show')
         },
-        async getStatisticsSummary(alphabet) {
+        async getStatisticsSummary(category, flag) {
             try {
-                const response = await axios.get(`/api/quiz-statistics/summary?game_flag=${this.gameFlag}&textbook_flag=${this.textbookFlag}&alphabet=${alphabet}`)
-                this.quizStatisticsSummary = response.data.quiz
-                this.skillTestStatisticsSummary = response.data.skill_test
+                const params = {
+                    game_flag: this.gameFlag,
+                    textbook_flag: this.textbookFlag,
+                    category: category,
+                    flag: flag
+                }
+
+                const response = await axios.get('/api/quiz-statistics/summary', { params: params })
+                this.statisticsSummary = response.data
             } catch (error) {
                 console.log(error)
             }
         },
         viewAllRecords(student_id) {
-            $('#statisticsModal').modal('hide')
             this.$router.push(`/student-quiz-report/${student_id}`)
+            $('#statisticsModal').modal('hide')
         },
         viewGraph(alphabet) {
             this.active = alphabet
@@ -209,9 +185,11 @@ export default {
             let quizWrong = 0
             let quizCorrect = 0
 
-            if (Object.keys(this.quizStatistics).length && this.quizStatistics.hasOwnProperty(selectedAlphabet)) {
-                quizWrong = this.quizStatistics[selectedAlphabet].wrong
-                quizCorrect = this.quizStatistics[selectedAlphabet].correct
+            if (Object.keys(this.quizStatistics).length) {
+                const quizStatistics = Object.values(this.quizStatistics);
+
+                quizWrong = quizStatistics.reduce((result, mark) => result + mark.wrong, 0);
+                quizCorrect = quizStatistics.reduce((result, mark) => result + mark.correct, 0);
             }
 
             this.quizChartData = {
@@ -220,7 +198,7 @@ export default {
                     {
                         data: [quizWrong, quizCorrect],
                         label: 'Quiz',
-                        backgroundColor: '#d771d6',
+                        backgroundColor: ['#198754', '#6c757d'],
                     }
                 ]
             }
@@ -230,10 +208,12 @@ export default {
             let skillTestCorrect = 0
             let skillTestPending = 0
 
-            if (Object.keys(this.skillTestStatistics).length && this.skillTestStatistics.hasOwnProperty(selectedAlphabet)) {
-                skillTestWrong = this.skillTestStatistics[selectedAlphabet].wrong
-                skillTestCorrect = this.skillTestStatistics[selectedAlphabet].correct
-                skillTestPending = this.skillTestStatistics[selectedAlphabet].pending
+            if (Object.keys(this.skillTestStatistics).length) {
+                const skillTestStatistics = Object.values(this.skillTestStatistics);
+
+                skillTestWrong = skillTestStatistics.reduce((result, mark) => result + mark.wrong, 0);
+                skillTestCorrect = skillTestStatistics.reduce((result, mark) => result + mark.correct, 0);
+                skillTestPending = skillTestStatistics.reduce((result, mark) => result + mark.pending, 0);
             }
 
             this.skillTestChartData = {
@@ -242,7 +222,7 @@ export default {
                     {
                         data: [skillTestWrong, skillTestCorrect, skillTestPending],
                         label: 'Skill Test',
-                        backgroundColor: '#1a9c8b',
+                        backgroundColor: ['#198754', '#6c757d', '#007bff'],
                     }
                 ]
             }
@@ -251,4 +231,17 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.all-records-list:hover {
+    color: blue;
+    cursor: pointer;
+}
+
+.table-header-position {
+    position: fixed;
+    top: 0;
+    width: 73vw;
+    background-color: skyblue;
+    z-index: 999;
+}
+</style>
