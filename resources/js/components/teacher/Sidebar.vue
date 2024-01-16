@@ -73,6 +73,11 @@ export default {
                     title: 'Activity Management',
                     icon: 'fa-solid fa-pen-to-square',
                 },
+                {
+                    href: '/configuration',
+                    title: 'Configure Settings',
+                    icon: 'fas fa-cog',
+                }
             ],
             theme: 'white-theme'
         }

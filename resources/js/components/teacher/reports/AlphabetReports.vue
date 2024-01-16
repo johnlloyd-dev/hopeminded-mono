@@ -204,24 +204,16 @@
                             <span class="fw-bold ms-1 text-danger"
                                 v-if="Object.keys(skillTest).length !== 26">(INCOMPLETE)</span>
                         </p>
-                        <h6>Choose a percentage for a passing score:</h6>
-                        <div class="d-flex justify-content-around">
-                            <div v-for="(percentage, index) in percentages" :key="index" class="form-check">
-                                <input @click="updatePassingPercentage('skill_test')"
-                                    v-model="selectedPercentage.skill_test" :value="percentage.value"
-                                    class="form-check-input" type="radio" :id="`percentageOptions${index}`">
-                                <label class="form-check-label fw-bold" :for="`percentageOptions${index}`">
-                                    {{ percentage.name }}
-                                </label>
-                                <i v-if="percentage.value == selectedPercentage.skill_test"
-                                    class="fas fa-check fa-lg ms-1"></i>
-                            </div>
+                        <div class="d-flex flex-column">
+                            <p class="mb-0">Passing Percentage: <span class="fw-bold">{{ selectedPercentage.skill_test }}%</span></p>
+                            <small class="text-danger">This percentage is set in the <a href="javascript:;" @click="$router.push({ path: '/configuration' })" class="text-danger">Configure Settings</a> page.</small>
                         </div>
                         <hr>
                         <p :class="{ 'mb-0': Object.keys(skillTest).length !== 26 }">{{ Object.keys(skillTest).length !== 26
                             ? 'Partial Average' : 'Average' }}: <span class="fw-bold">{{ skillTestAverageScore.display }}</span></p>
-                        <p v-if="Object.keys(skillTest).length !== 26" class="fw-bold">Note: <span>This average is
-                                considered partial due to the student's incomplete skill test submissions.</span></p>
+                        <p v-if="Object.keys(skillTest).length !== 26">
+                            <small class="text-danger">This average is partial due to the student's incomplete skill test submissions.</small>
+                        </p>
                         <h6>Score Percentage: <span class="fw-bold">{{ calculatePercentage(skillTestAverageScore.score)
                         }}%</span></h6>
                         <h6>Mark: <span class="fw-bold"
@@ -398,17 +390,9 @@
                     <div class="w-50 me-5">
                         <h6 class="fw-bold">Quiz/Game Score Summary</h6>
                         <p>Attempts Taken: <span class="fw-bold">{{ reports.length }}</span></p>
-                        <h6>Choose a percentage for a passing score:</h6>
-                        <div class="d-flex justify-content-around">
-                            <div v-for="(percentage, index) in percentages" :key="index" class="form-check">
-                                <input @click="updatePassingPercentage('quiz')" v-model="selectedPercentage.quiz"
-                                    :value="percentage.value" class="form-check-input" type="radio"
-                                    :id="`percentageOptions${index}`">
-                                <label class="form-check-label fw-bold" :for="`percentageOptions${index}`">
-                                    {{ percentage.name }}
-                                </label>
-                                <i v-if="percentage.value == selectedPercentage.quiz" class="fas fa-check fa-lg ms-1"></i>
-                            </div>
+                        <div class="d-flex flex-column">
+                            <p class="mb-0">Passing Percentage: <span class="fw-bold">{{ selectedPercentage.quiz }}%</span></p>
+                            <small class="text-danger">This percentage is set in the <a href="javascript:;" @click="$router.push({ path: '/configuration' })" class="text-danger">Configure Settings</a> page.</small>
                         </div>
                         <hr>
                         <p>Highest Score: <span class="fw-bold">{{ quizAverageScore.display }}</span></p>

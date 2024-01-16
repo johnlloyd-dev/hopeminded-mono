@@ -42,7 +42,7 @@
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="statisticsModalLabel">Statistics</h5>
+                        <h5 class="modal-title" id="statisticsModalLabel">Statistics - {{ modalTitle }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -51,25 +51,25 @@
                             <template v-for="(alphabet, index) of alphabets" :key="index">
                                 <div class="card rounded-0 mb-3">
                                     <div class="card-header">
-                                        <h6 class="mb-0 fw-bold">{{ alphabet.toUpperCase() }}</h6>
+                                        <h5 class="mb-0 fw-bold">{{ alphabet.toUpperCase() }}</h5>
                                     </div>
                                     <div class="card-body">
                                         <table v-if="statisticsSummary.hasOwnProperty(alphabet)"
                                             class="table table-striped table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th style="width: 30%" scope="col">Student Name</th>
-                                                    <th style="width: 30%" scope="col">Count</th>
+                                                    <th style="width: 40%" scope="col">Student Name</th>
+                                                    <th style="width: 40%" scope="col">{{ tableHeader }}</th>
                                                     <th scope="col">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr v-for="(item, index) in statisticsSummary[alphabet]" :key="index">
-                                                    <th style="width: 30%" scope="row">{{ item.full_name }}</th>
-                                                    <th style="width: 30%" scope="row">{{ item.count }}</th>
+                                                    <td class="fw-bold text-black" scope="row">{{ item.full_name }}</td>
+                                                    <td class="fw-bold text-black" scope="row">{{ item.count }}</td>
                                                     <td>
                                                         <button @click="viewAllRecords(item.student_id)"
-                                                            class="btn btn-success rounded-0">
+                                                            class="btn btn-success btn-sm rounded-0">
                                                             View Student Reports
                                                         </button>
                                                     </td>
@@ -94,6 +94,40 @@
 <script>
 import SkeletonLoader from "../layouts/SkeletonLoader.vue"
 import BarChart from '../layouts/BarChart.vue'
+
+const modalData = [
+    {
+        category: 'quiz',
+        flag: 'correct',
+        title: 'Students with Correct Answers in their Quiz',
+        table_header: 'Number of Correct Answers'
+    },
+    {
+        category: 'quiz',
+        flag: 'wrong',
+        title: 'Students with Wrong Answers in their Quiz',
+        table_header: 'Number of Wrong Answers'
+    },
+    {
+        category: 'skill_test',
+        flag: 'correct',
+        title: 'Students with Correct Answers in their Skill Test',
+        table_header: 'Number of Correct Answers'
+    },
+    {
+        category: 'skill_test',
+        flag: 'wrong',
+        title: 'Students with Wrong Answers in their Skill Test',
+        table_header: 'Number of Wrong Answers'
+    },
+    {
+        category: 'skill_test',
+        flag: 'pending',
+        title: 'Students with Pending Answers in their Skill Test',
+        table_header: 'Number of Pending Answers'
+    },
+]
+
 export default {
     name: 'Statistics',
     components: {
@@ -114,7 +148,9 @@ export default {
             isLoading: false,
             selectedAlphabet: null,
             vowelAlphabets: ['a', 'e', 'i', 'o', 'u'],
-            textbookFlag: 'alphabet-words'
+            textbookFlag: 'alphabet-words',
+            modalTitle: null,
+            tableHeader: null
         }
     },
     watch: {
@@ -155,7 +191,9 @@ export default {
         },
         async viewStatisticsSummary(category, flag) {
             await this.getStatisticsSummary(category, flag)
-            // this.selectedAlphabet = alphabet
+            const modalDisplay = modalData.find(data => data.category == category && data.flag == flag);
+            this.modalTitle = modalDisplay.title;
+            this.tableHeader = modalDisplay.table_header;
             $('#statisticsModal').modal('show')
         },
         async getStatisticsSummary(category, flag) {
