@@ -239,13 +239,6 @@
                                         <i class="fas fa-edit fa-lg h1"></i>
                                     </button>
                                     <p class="text-center fw-bold h4 mt-1">Update Retake</p>
-                                    <p class="fw-bold alert alert-warning mt-3 mb-0 text-start" role="alert">Note:
-                                    <ul class="text-justify">
-                                        <li>Button is disabled if the submitted skill tests are not complete.</li>
-                                        <li>By updating the allowed retake for skill test, it will allow student to
-                                            retake/resubmit skill tests for each alphabet.</li>
-                                    </ul>
-                                    </p>
                                 </div>
                             </template>
                             <template v-else-if="showSkillTestRetakeModify[filteredFlag] == true">
@@ -466,8 +459,12 @@
                 <div class="card">
                     <img :src="certificate.file" alt="">
                     <div class="card-body">
-                        <h3 class="mb-3 fw-bold">Upload Certificates</h3>
-                        <form @submit.prevent="uploadCertificate" enctype="multipart/form-data">
+                        <h3 class="mb-3 fw-bold">Certificates</h3>
+                        <div class="d-flex flex-column w-25">
+                            <button type="button" @click="generatePDF()" class="btn btn-success rounded-0 mb-3 fw-bold">Preview PDF for {{ gameName }}</button>
+                            <button type="button" @click="uploadCertificate()" class="btn btn-primary rounded-0 fw-bold">Upload Certificate</button>
+                        </div>
+                        <!-- <form @submit.prevent="uploadCertificate" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <input ref="fileInput" accept="image/*, .doc, .docx, .pdf" name="file" @change="parseFile"
                                     type="file" class="form-control" id="certificate">
@@ -480,10 +477,10 @@
                                 class="btn btn-success rounded-0 pb-0">
                                 <Loading />
                             </button>
-                        </form>
-                        <hr>
+                        </form> -->
+                        <hr class="w-50">
                         <div class="certificates mt-3">
-                            <h5 class="fw-bold">Files</h5>
+                            <h5 class="fw-bold">Uploaded Certificates</h5>
                         </div>
                         <p v-if="isLoading">Loading...</p>
                         <p v-if="!isLoading && certificates.length === 0">No certificates added</p>
@@ -964,14 +961,17 @@ export default {
             try {
                 this.isProcessing = true
                 this.errors = []
-                let formData = new FormData();
-                formData.append("gameId", this.gameId);
-                formData.append("studentId", this.studentId);
-                formData.append("file", this.file);
-                const response = await axios.post('/api/certificate/upload', formData);
-                if (response.status) {
-                    this.file = null
-                    this.$refs.fileInput.value = '';
+                // let formData = new FormData();
+                // formData.append("gameId", this.gameId);
+                // formData.append("studentId", this.studentId);
+                // formData.append("file", this.file);
+                const response = await axios.post('/api/certificate/upload', {
+                    studentId: this.studentId,
+                    gameId: this.gameId,
+                    flag: this.flag
+                });
+
+                if (response.status == 200 || response.status == 201) {
                     swal.fire('Success', response.data.message, 'success')
                     this.getCertificates()
                 }
@@ -1131,7 +1131,10 @@ export default {
         },
         calculatePercentage(score, perfectScore = 10) {
             return Math.round((score / perfectScore) * 100)
-        }
+        },
+        generatePDF() {
+            window.open(`/api/certificate/pdf/generate?studentId=${this.studentId}&flag=${this.flag}`);
+        },
     }
 }
 </script>

@@ -13,7 +13,8 @@
                         <div class="passing-score">
                             <div class="mb-3">
                                 <h5 class="fw-bold">Passing Percentage</h5>
-                                <p>Set the passing score for quizzes and skill tests. Any changes will reflect to the students' score percentage. </p>
+                                <p>Set the passing score for quizzes and skill tests. Any changes will reflect to the
+                                    students' score percentage. </p>
                             </div>
                             <div class="card">
                                 <div class="card-body">
@@ -58,6 +59,39 @@
                                 </div>
                             </div>
                         </div>
+                        <hr class="w-50">
+                        <div class="allowed-skill-test">
+                            <div class="mb-3">
+                                <h5 class="fw-bold">Number of Skill Test Submissions</h5>
+                                <p>Set the required number of skill tests that a student must submit to be able to take a
+                                    quiz.
+                                </p>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div v-if="!isEdit" class="d-flex align-items-center">
+                                                <p class="mb-0">
+                                                    Required Number of Skill Test Submissions:
+                                                    <span class="fw-bold text-danger me-2">{{ quantityRequirement?.value ?? 0 }}</span>
+                                                    <i @click="isEdit = !isEdit" style="cursor: pointer" class="fas fa-edit"></i>
+                                                </p>
+                                            </div>
+                                            <div v-else>
+                                                <label for="exampleFormControlInput1" class="form-label">Please enter a
+                                                    number:</label>
+                                                <input v-model="value" type="text" class="form-control">
+                                                <div class="action-buttons mt-3">
+                                                    <button type="button" @click="updateQuantityRequirement()" class="btn btn-primary btn-sm me-3">Save <i class="fas fa-save"></i></button>
+                                                    <button type="button" @click="isEdit = !isEdit" class="btn btn-secondary btn-sm">Cancel <i class="fas fa-times-circle"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -66,6 +100,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import swal from 'sweetalert2'
 export default {
     components: {
@@ -74,7 +109,9 @@ export default {
     data() {
         return {
             collapsed: false,
+            quantityRequirementFlag: 'skill_test',
             passingPercentage: [],
+            value: 0,
             selectedPercentage: {
                 skill_test: null,
                 quiz: null
@@ -84,13 +121,25 @@ export default {
                 { name: '60%', value: 60 },
                 { name: '75%', value: 75 },
                 { name: '80%', value: 80 }
-            ]
+            ],
+            isEdit: false
         }
+    },
+    computed: {
+        ...mapGetters({
+            quantityRequirement: 'quantityRequirement'
+        })
     },
     created() {
         this.getPassingPercentage()
+        this.getQuantityRequirement(this.quantityRequirementFlag).then(() => {
+            this.value = this.quantityRequirement.value
+        })
     },
     methods: {
+        ...mapActions({
+            getQuantityRequirement: 'getQuantityRequiement'
+        }),
         onCollapse(isCollapsed) {
             if (isCollapsed) {
                 this.collapsed = true
@@ -115,6 +164,22 @@ export default {
 
                     if (response.status == 200 || response.status == 201) {
                         swal.fire('Success', response.data, 'success')
+                        this.getPassingPercentage()
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            }, 500)
+        },
+        async updateQuantityRequirement() {
+            setTimeout(async () => {
+                try {
+                    const response = await axios.put(`/api/quantity-requirement/update/${this.quantityRequirement.id}`, { value: this.value })
+
+                    if (response.status == 200 || response.status == 201) {
+                        swal.fire('Success', response.data, 'success')
+                        this.isEdit = !this.isEdit
+                        this.getQuantityRequirement(this.quantityRequirementFlag)
                     }
                 } catch (error) {
                     console.log(error)
@@ -266,5 +331,4 @@ export default {
         transform: scale(0.9);
         box-shadow: 0 0 0 0 rgba(90, 153, 212, 0);
     }
-}
-</style>
+}</style>

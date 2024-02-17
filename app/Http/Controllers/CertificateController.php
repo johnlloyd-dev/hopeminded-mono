@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\File;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CertificateController extends Controller
 {
@@ -39,61 +40,68 @@ class CertificateController extends Controller
 
     public function uploadFile(Request $request)
     {
-        $request->validate([
-            'file' => 'required|file|mimes:jpeg,png,pdf',
-            'studentId' => 'required|integer',
-            'gameId' => 'required|integer'
-        ]);
-        if ($request->hasFile('file')) {
-            // $file = $request->file('file');
-            // $fileName = $file->getClientOriginalName();
-            // $path = $file->storeAs('certificates', $fileName, 'public');
+        $flag = $request->input('flag');
+        $studentId = $request->input('studentId');
+        $gameId = $request->input('gameId');
 
-            $textbookFlag = null;
-            $gameFlag = Game::where('id', $request->gameId)->first()->flag;
+        $textbookFlag = $flag;
+        $gameFlag = Game::where('id', $gameId)->first()->flag;
 
-            switch ($request->gameId) {
-                case 1:
-                    $textbookFlag = 'alphabet-words';
-                    break;
-                case 2:
-                    $textbookFlag = 'vowel-consonants';
-                    break;
-                case 3:
-                    $textbookFlag = 'alphabet-letters';
-                    break;
-            }
+        $student = Student::find($studentId);
+        $studentName = $student->first_name . ' ' . ($student->middle_name ?? NULL) . ($student->middle_name ? ' ' : '') . $student->last_name;
 
-            $expiresAt = new DateTime();
-            $expiresAt->modify('+1 year');
+        $filterFlag = null;
+        switch ($flag) {
+            case 'alphabet-words':
+                $filterFlag = 'ALPHABETS/WORDS';
+                break;
 
-            $certificate = $request->file('file');
-            $firebase_storage_path = 'certificates/';
+            case 'vowel-consonants':
+                $filterFlag = 'VOWELS/CONSONANTS';
+                break;
 
-            $name = 'Certificate' . rand(100000, 999999) . '-' . $textbookFlag;
-            $localfolder = public_path('firebase-temp-uploads') . '/';
-            $extension = $certificate->getClientOriginalExtension();
-            $file      = $name . '.' . $extension;
-            $certificate->move($localfolder, $file);
-            $uploadedfile = fopen($localfolder . $file, 'r');
-            $path = app('firebase.storage')->getBucket()->upload($uploadedfile, [
-                'name' => $firebase_storage_path . $file
-            ])->signedUrl($expiresAt);
-            unlink($localfolder . $file);
-
-            Certificate::create([
-                'student_id' => $request->studentId,
-                'textbook_flag' => $textbookFlag,
-                'game_flag' => $gameFlag,
-                'file_name' => $file,
-                'file' => json_encode($path)
-            ]);
-
-
-            return response()->json(['message' => 'A certificate is added successfully.']);
+            default:
+                $filterFlag = 'ALPHABETS/LETTERS';
+                break;
         }
 
-        return response()->json(['error' => 'File not found.'], 400);
+        $data = [
+            'student_name' => $studentName,
+            'filtered_flag' => $filterFlag
+        ];
+
+        $pdf = Pdf::loadView('layouts.certificate', compact('data'))->setPaper('a4', 'landscape');
+
+        $expiresAt = new DateTime();
+        $expiresAt->modify('+1 year');
+
+        // $certificate = $pdf->output();
+        $firebase_storage_path = 'certificates/';
+
+        $name = 'Certificate' . rand(100000, 999999) . '-' . $textbookFlag . '.pdf';
+        $localfolder = public_path('firebase-temp-uploads') . '/' . $name;
+        // $extension = $certificate->getClientOriginalExtension();
+        // $file      = $name . '.' . $extension;
+
+        $pdf->save($localfolder);
+
+        // $certificate->move($localfolder, $file);
+        $uploadedfile = fopen($localfolder, 'r');
+        $path = app('firebase.storage')->getBucket()->upload($uploadedfile, [
+            'name' => $firebase_storage_path . $name
+        ])->signedUrl($expiresAt);
+        unlink($localfolder);
+
+        Certificate::create([
+            'student_id' => $request->studentId,
+            'textbook_flag' => $textbookFlag,
+            'game_flag' => $gameFlag,
+            'file_name' => $name,
+            'file' => json_encode($path)
+        ]);
+
+
+        return response()->json(['message' => 'A certificate is added successfully.']);
     }
 
     public function deleteCertificate(Request $request)

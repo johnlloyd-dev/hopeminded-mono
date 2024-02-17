@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TeacherRequest;
 use App\Mail\UserCredentialsMail;
 use App\Models\PassingPercentage;
+use App\Models\QuantityRequirement;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
@@ -58,12 +59,21 @@ class TeacherController extends Controller
             ],
         ];
 
+        $defaultSkillTestSubmission = [
+            [
+                'teacher_id' => $teacher->id,
+                'flag' => 'skill_test',
+                'value' => 26
+            ]
+        ];
+
         $mailData = [
             'username' => $user->username,
             'password' => $request->password
         ];
 
         PassingPercentage::insert($defaultPercentage);
+        QuantityRequirement::insert($defaultSkillTestSubmission);
         Mail::to($request->email)->send(new UserCredentialsMail($mailData));
 
         if ($teacher) {

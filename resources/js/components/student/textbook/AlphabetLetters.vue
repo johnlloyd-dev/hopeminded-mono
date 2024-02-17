@@ -19,7 +19,7 @@
                                 </div>
                                 <hr class="w-75">
                                 <!-- <button :disabled="Object.keys(skillTest).length < 5" -->
-                                <button :disabled="Object.keys(skillTest).length < 5 || (availableQuizRetakes.hasOwnProperty(filteredFlag) && availableQuizRetakes[filteredFlag].allowed_retake === 0)"
+                                <button :disabled="(Object.keys(skillTest).length < quantityRequirement?.value || !passedSkillTest) || (availableQuizRetakes.hasOwnProperty(filteredFlag) && availableQuizRetakes[filteredFlag].allowed_retake === 0)"
                                     @click="$router.push('/quiz-memory-game')"
                                     class="btn btn-danger btn-lg rounded-0 w-75 fw-bold">{{ availableQuizRetakes.hasOwnProperty(filteredFlag) ? 'Retake Quiz' : 'Take Quiz' }}</button>
                                 <h6 class="fw-bold" v-if="availableQuizRetakes.hasOwnProperty(filteredFlag)">Available Retake: <span class="text-danger">{{ availableQuizRetakes.hasOwnProperty(filteredFlag) ? availableQuizRetakes[filteredFlag].allowed_retake : 0 }}</span></h6>
@@ -309,6 +309,9 @@ export default {
                 letter: null,
             },
             flag: "alphabet-letters",
+            selectedPercentage: {
+                skill_test: 100
+            },
         };
     },
     async created() {
@@ -324,6 +327,8 @@ export default {
             $('#tutorialModal').modal('show')
             localStorage.setItem('tutorialFlag', true)
         }
+        this.getQuantityRequirement('skill_test')
+        this.getPassingPercentage()
     },
     beforeUnmount() {
         $('#skillTestModal').modal('hide')
@@ -332,7 +337,8 @@ export default {
     computed: {
         ...mapGetters({
             data: "alphabetLetters",
-            isLoading: "isLoading"
+            isLoading: "isLoading",
+            quantityRequirement: 'quantityRequirement'
         }),
         count() {
             return this.data.length;
@@ -345,11 +351,29 @@ export default {
         },
         filteredFlag() {
             return this.flag.replace(/-/g, "_");
+        },
+        skillTestAverageScore() {
+            if (Object.keys(this.highestScores).length) {
+                const scores = Object.values(this.highestScores);
+                const totalScore = scores.reduce(function (a, b) { return a + b; }, 0);
+                const count = scores.length
+
+                return {
+                    score: totalScore / count
+                };
+            }
+            return {
+                score: 0
+            };
+        },
+        passedSkillTest() {
+            return this.calculatePercentage(this.skillTestAverageScore.score) >= this.selectedPercentage.skill_test
         }
     },
     methods: {
         ...mapActions({
             getFlags: "setAlphabetLetters",
+            getQuantityRequirement: 'getQuantityRequiement'
         }),
         showTutorial() {
             this.tutorialModal = true
@@ -435,6 +459,18 @@ export default {
                     this.isProcessing = false;
                 });
         },
+        async getPassingPercentage() {
+            try {
+                const response = await axios.get(`/api/passing-percentage/get`)
+                this.passingPercentage = response.data
+                this.selectedPercentage.skill_test = response.data['skill_test'].percentage
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        calculatePercentage(score, perfectScore = 10) {
+            return Math.round((score / perfectScore) * 100)
+        }
     },
 };
 </script>

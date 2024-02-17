@@ -12,7 +12,15 @@ class PassingPercentageController extends Controller
 {
     public function index()
     {
-        $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        $teacherId = null;
+        $teacher = Teacher::where('user_id', Auth::user()->id)->first();
+
+        if ($teacher) {
+            $teacherId = $teacher->id;
+        } else {
+            $teacherId = Student::where('user_id', Auth::user()->id)->first()->teacher_id;
+        }
+
         $data = $this->getPassingPercentage($teacherId);
         $newData = [];
         foreach ($data as $item) {

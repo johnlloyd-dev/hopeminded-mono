@@ -9,7 +9,9 @@ use App\Http\Controllers\EmailController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PassingPercentageController;
+use App\Http\Controllers\PDFController;
 use App\Http\Controllers\PerfectScoreController;
+use App\Http\Controllers\QuantityRequirementController;
 use App\Http\Controllers\QuizReportController;
 use App\Http\Controllers\SkillTestController;
 use App\Http\Controllers\StudentController;
@@ -185,6 +187,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/quiz-statistics',  [QuizReportController::class, 'getStatistics']);
     Route::get('/quiz-statistics/summary',  [QuizReportController::class, 'getStatisticsSummary']);
 
+    Route::get('/quantity-requirements/get',  [QuantityRequirementController::class, 'index']);
+    Route::put('/quantity-requirement/update/{id}',  [QuantityRequirementController::class, 'updateQuantityRequirement']);
+
     Route::put('/status/update/user/{userId}',  [UserController::class, 'updateStatus']);
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
@@ -193,5 +198,5 @@ Route::get('/reset-password/form', function () {
     return redirect('/reset-password');
 });
 
-
+Route::get('/certificate/pdf/generate',  [PDFController::class, 'index']);
 Route::post('/reset-password', [EmailController::class, 'resetPassword']);

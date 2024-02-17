@@ -45,7 +45,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.data_items && skillTestAL.data_items.length < 5 || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.data_items && skillTestAL.data_items.length < quantityRequirement?.value || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/vc.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Vowels/Consonants</h5>
@@ -58,7 +58,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div :class="{ 'opacity-75 pe-none': (skillTestAL.data_items && skillTestVC.data_items.length < 5) || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': (skillTestAL.data_items && skillTestVC.data_items.length < quantityRequirement?.value) || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/words.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Alphabets/Words</h5>
@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import AlphabetsLetters from '../textbook/AlphabetLetters.vue'
 import AlphabetsWords from '../textbook/AlphabetWords.vue'
 import VowelConsonants from '../textbook/VowelConsonants.vue'
@@ -125,8 +126,17 @@ export default {
             this.selectedChapter = localStorage.getItem('selectedChapter')
         }
         this.getSkillTest()
+        this.getQuantityRequirement('skill_test')
+    },
+    computed: {
+        ...mapGetters({
+            quantityRequirement: 'quantityRequirement'
+        })
     },
     methods: {
+        ...mapActions({
+            getQuantityRequirement: 'getQuantityRequiement'
+        }),
         selectChapter(value) {
             this.selectedChapter = value
             localStorage.setItem('selectedChapter', value)
