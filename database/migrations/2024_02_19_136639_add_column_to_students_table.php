@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('quiz_reports', function (Blueprint $table) {
-            $table->integer('attempt_number')->nullable();
+        Schema::table('students', function (Blueprint $table) {
+            $table->foreignId('section_id')->after('is_registered')->nullable()->constrained('sections');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('quiz_reports', function (Blueprint $table) {
-            $table->dropColumn('attempt_number');
+        Schema::table('students', function (Blueprint $table) {
+            $table->dropColumn('section_id');
         });
     }
 };
