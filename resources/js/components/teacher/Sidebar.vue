@@ -64,6 +64,11 @@ export default {
                     icon: 'fa-solid fa-users',
                 },
                 {
+                    href: '/section-management',
+                    title: 'Section Management',
+                    icon: 'fa-solid fa-window-restore',
+                },
+                {
                     href: '/textbook-management',
                     title: 'Textbook Management',
                     icon: 'fa-solid fa-book-open-reader',

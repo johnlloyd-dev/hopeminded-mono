@@ -25,6 +25,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ExcelCSVController;
+use App\Http\Controllers\SectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -191,6 +193,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/quantity-requirement/update/{id}',  [QuantityRequirementController::class, 'updateQuantityRequirement']);
 
     Route::put('/status/update/user/{userId}',  [UserController::class, 'updateStatus']);
+
+    Route::get('excel-csv-file', [ExcelCSVController::class, 'index']);
+    Route::post('import-excel-csv-file', [ExcelCSVController::class, 'importExcelCSV']);
+    Route::get('export-excel-csv-file/{slug}', [ExcelCSVController::class, 'exportExcelCSV']);
+
+    Route::prefix('/sections')->group(function () {
+        Route::get('get', [SectionController::class, 'index']);
+        Route::post('add', [SectionController::class, 'addSection']);
+        Route::put('update/{id}', [SectionController::class, 'UpdateSection']);
+        Route::delete('delete/{id}', [SectionController::class, 'deleteSection']);
+    });
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);

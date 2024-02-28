@@ -34,6 +34,7 @@ const alphabetByWords = () => import("../components/student/textbook/AlphabetWor
 const vowelConsonants = () => import("../components/student/textbook/VowelConsonants.vue");
 
 const studentManagement = () => import("../components/teacher/main/StudentManagement.vue");
+const sectionManagement = () => import("../components/teacher/main/SectionManagement.vue");
 const textbookManagement = () => import("../components/teacher/main/TextbookManagement.vue");
 const activityManagement = () => import("../components/teacher/main/ActivityManagement.vue");
 const configuration = () => import("../components/teacher/main/Configuration.vue");
@@ -250,6 +251,14 @@ const routes = [
         component: textbookManagement,
         meta: {
             title: `Textbook Management`,
+        },
+    },
+    {
+        name: "section-management",
+        path: "/section-management",
+        component: sectionManagement,
+        meta: {
+            title: `Section Management`,
         },
     },
     {

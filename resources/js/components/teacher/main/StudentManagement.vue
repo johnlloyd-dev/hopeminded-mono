@@ -3,9 +3,11 @@
         <div class="d-flex">
             <teacher-sidebar-component @collapse="onCollapse" />
             <div :class="collapsed ? 'collapsed-menu' : 'not-collapsed-menu'" class="main-content mx-5 w-100 h-100 mt-5">
-                <button class="btn btn-secondary mb-3 rounded-0" data-bs-toggle="modal"
+                <button class="btn btn-secondary mb-3 rounded-0 me-3" data-bs-toggle="modal"
                     data-bs-target="#addStudentModal">Add
                     Student</button>
+                <button class="btn btn-success mb-3 rounded-0" data-bs-toggle="modal"
+                    data-bs-target="#importStudentModal">Import CSV</button>
                 <div class="d-flex justify-content-center">
                     <table class="table table-striped table-bordered">
                         <thead>
@@ -36,15 +38,34 @@
                                     <div class="collapse" :id="`personalInfoCollapse${index}`">
                                         <ul class="list-group">
                                             <li class="list-group-item">First Name: <span class="fw-bold">{{
-                                                student.first_name }}</span></li>
+                                                student.first_name }}</span>
+                                            </li>
                                             <li class="list-group-item">Middle Name: <span class="fw-bold">{{
-                                                student.middle_name }}</span></li>
+                                                student.middle_name }}</span>
+                                            </li>
                                             <li class="list-group-item">Last Name: <span class="fw-bold">{{
-                                                student.last_name }}</span></li>
-                                            <li class="list-group-item">Username: <span class="fw-bold">{{ student.username
-                                            }}</span></li>
-                                            <li class="list-group-item">Password: <span class="fw-bold">{{ student.unhashed
-                                            }}</span></li>
+                                                student.last_name }}</span>
+                                            </li>
+                                            <li class="list-group-item">Gender: <span class="fw-bold">{{
+                                                student.gender ? student.gender.charAt(0).toUpperCase() + student.gender.slice(1) : "N/A" }}</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <div>
+                                                    Section:
+                                                    <span class="fw-bold">
+                                                        {{ student.section ? student.section.charAt(0).toUpperCase() + student.section.slice(1) : "N/A" }}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <i style="cursor: pointer" class="fas fa-edit text-danger"></i>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">Username: <span class="fw-bold">{{
+                                                student.username }}</span>
+                                            </li>
+                                            <li class="list-group-item">Password: <span class="fw-bold">{{
+                                                student.unhashed }}</span>
+                                            </li>
                                         </ul>
                                     </div>
                                 </td>
@@ -242,6 +263,36 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="importStudentModal" data-bs-backdrop="static" tabindex="-1"
+            aria-labelledby="importStudentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%"
+                            class="logo" alt="Hopeminded Logo">
+                        <h5 class="modal-title" id="importStudentModalLabel">Import Student</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">CSV File</label>
+                            <input ref="csvFileInput" @change="handleCSVFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" type="file" class="form-control" id="csv_file">
+                            <small class="text-danger font-weight-bold" v-if="errors && errors.csv_file">{{
+                                errors.csv_file[0] }}</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button v-if="!importing" type="button" @click="importCSV()"
+                            style="font-weight: bold; width: 120px;" class="btn btn-primary">Import</button>
+                        <button type="button" v-else disabled style="font-weight: bold; width: 120px;"
+                            class="btn btn-primary pb-0">
+                            <Loading />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Update Student Confirmation Modal -->
         <div class="modal fade" id="updateStatusConfirmation" data-bs-backdrop="static" tabindex="-1"
@@ -292,7 +343,9 @@ export default {
                 username: null,
                 password: null
             },
-            statusPrompt: {}
+            statusPrompt: {},
+            csvFile: null,
+            importing: false
         }
     },
     components: {
@@ -388,6 +441,33 @@ export default {
         },
         getProgressPercentage(student, key) {
             return student.skill_test && student.skill_test[key] ? Object.keys(student.skill_test[key]).length : 0
+        },
+        handleCSVFile(event) {
+            this.csvFile = event.target.files[0]
+        },
+        async importCSV() {
+            this.errors = []
+            const data = new FormData()
+            data.append('csv_file', this.csvFile)
+            try {
+                this.importing = true
+                const response = await axios.post(`/api/import-excel-csv-file`, data, {
+                    headers: { 'content-type': 'multipart/form-data' }
+                })
+                if (response.status === 200) {
+                    this.$refs.csvFileInput.value = '';
+                    swal.fire('Success', response.data.message, 'success')
+                    this.getStudents()
+                    $('#importStudentModal').modal('hide');
+                } else {
+                    console.log(response)
+                }
+            } catch (error) {
+                console.log(error)
+                this.errors = error.response.data.errors
+            } finally {
+                this.importing = false
+            }
         }
     }
 }

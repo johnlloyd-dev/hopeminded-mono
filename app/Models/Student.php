@@ -17,7 +17,8 @@ class Student extends Model
         'is_registered',
         'teacher_id',
         'user_id',
-        'unhashed'
+        'unhashed',
+        'section_id'
     ];
 
     public function teacher()
