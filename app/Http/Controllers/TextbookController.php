@@ -44,7 +44,7 @@ class TextbookController extends Controller
         $consonants = array_filter($textbooks, function ($textbook) {
             return $textbook["type"] == 'consonant';
         });
-        if (count($vowels) || count($vowels)) {
+        if (count($vowels) || count($consonants)) {
             return [array_values($vowels), array_values($consonants)];
         } else {
             return [];
@@ -270,5 +270,79 @@ class TextbookController extends Controller
         $letter = request()->letter;
         $firstLetter = request()->objectName[0];
         return $firstLetter === $letter;
+    }
+
+    public function seedTextbook()
+    {
+        $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        Textbook::where('teacher_id', $teacherId)->delete();
+        $jsonFile = public_path('json/alphabets-with-letters.json');
+        $jsonData = json_decode(file_get_contents($jsonFile), true);
+
+        foreach ($jsonData as $data) {
+            if (in_array($data["letter"], ['a', 'e', 'i', 'o', 'u']))
+                $type = 'vowel';
+            else
+                $type = 'consonant';
+
+            Textbook::updateOrCreate([
+                'flag' => 'alphabet-letters',
+                'type' => $type,
+                'teacher_id' => $teacherId,
+                'letter' => $data["letter"],
+                'object' => $data["object"],
+                'image' => json_encode($data["image"]),
+                'video' => json_encode($data["video"]),
+                'chapter' => 1
+            ]);
+        }
+
+        $jsonFile = public_path('json/vowel-consonants.json');
+        $jsonData = json_decode(file_get_contents($jsonFile), true);
+
+        foreach ($jsonData as $json) {
+            foreach ($json as $data) {
+                if (in_array($data["letter"], ['a', 'e', 'i', 'o', 'u']))
+                    $type = 'vowel';
+                else
+                    $type = 'consonant';
+
+                Textbook::updateOrCreate([
+                    'flag' => 'vowel-consonants',
+                    'type' => $type,
+                    'teacher_id' => $teacherId,
+                    'letter' => $data["letter"],
+                    'object' => $data["object"],
+                    'image' => json_encode($data["image"]),
+                    'video' => json_encode($data["video"]),
+                    'chapter' => 1
+                ]);
+            }
+        }
+
+        $jsonFile = public_path('json/alphabets-with-words.json');
+        $jsonData = json_decode(file_get_contents($jsonFile), true);
+
+        foreach ($jsonData as $data) {
+            if (in_array($data["letter"], ['a', 'e', 'i', 'o', 'u']))
+                $type = 'vowel';
+            else
+                $type = 'consonant';
+
+            Textbook::updateOrCreate([
+                'flag' => 'alphabet-words',
+                'type' => $type,
+                'teacher_id' => $teacherId,
+                'letter' => $data["letter"],
+                'object' => $data["object"],
+                'image' => json_encode($data["image"]),
+                'video' => json_encode($data["video"]),
+                'chapter' => 1
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Textbooks are successfully inserted.'
+        ]);
     }
 }

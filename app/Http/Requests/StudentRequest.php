@@ -32,9 +32,7 @@ class StudentRequest extends FormRequest
                 'email',
                 Rule::unique('teachers', 'email'),
                 Rule::unique('students', 'email'),
-            ],
-            'username' => 'required|unique:users,username',
-            'password' => 'required'
+            ]
         ];
     }
 }

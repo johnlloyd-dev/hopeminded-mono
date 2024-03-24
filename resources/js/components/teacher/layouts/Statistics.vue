@@ -29,9 +29,9 @@
                     <button @click="viewStatisticsSummary('skill_test', 'correct')"
                         class="btn btn-secondary rounded-0 mb-1 fw-bold d-flex justify-content-between align-items-center">View
                         students with correct answers <i class="fas fa-chevron-circle-right"></i></button>
-                    <botton @click="viewStatisticsSummary('skill_test', 'pending')"
+                    <button @click="viewStatisticsSummary('skill_test', 'pending')"
                         class="btn btn-primary rounded-0 fw-bold d-flex justify-content-between align-items-center">View
-                        students with unmarked answers <i class="fas fa-chevron-circle-right"></i></botton>
+                        students with unmarked answers <i class="fas fa-chevron-circle-right"></i></button>
                 </div>
             </div>
         </div>

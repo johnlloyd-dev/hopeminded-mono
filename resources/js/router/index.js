@@ -8,7 +8,6 @@ const studentDashboard = () => import("../components/student/main/Dashboard.vue"
 const teacherDashboard = () => import("../components/teacher/main/Dashboard.vue");
 
 const studentTextbook = () => import("../components/student/main/Textbook.vue");
-const studentQuiz = () => import("../components/student/main/Quiz.vue");
 const studentReport = () => import("../components/student/main/Report.vue");
 const certificates = () => import("../components/student/main/Certificates.vue");
 const contact = () => import("../components/student/main/Contact.vue");
@@ -48,6 +47,8 @@ const viewTextbook = () => import("../components/teacher/layouts/Textbook.vue");
 
 const editProfile = () => import("../components/student/layouts/EditProfile.vue");
 
+const studentSection = () => import("../components/teacher/layouts/StudentSection.vue");
+
 const routes = [
     {
         name: "main-auth",
@@ -83,14 +84,6 @@ const routes = [
         component: studentTextbook,
         meta: {
             title: `Student Textbook`,
-        },
-    },
-    {
-        name: "student-quiz",
-        path: "/student-quiz",
-        component: studentQuiz,
-        meta: {
-            title: `Student Quiz`,
         },
     },
     {
@@ -331,6 +324,14 @@ const routes = [
         component: editProfile,
         meta: {
             title: `Edit Profile`,
+        },
+    },
+    {
+        name: "student-section",
+        path: "/section/:sectionId",
+        component: studentSection,
+        meta: {
+            title: `Section`,
         },
     },
 ];

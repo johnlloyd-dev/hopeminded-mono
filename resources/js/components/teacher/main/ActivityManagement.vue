@@ -38,6 +38,11 @@
                         <Statistics :game-flag="gameFlag"></Statistics>
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="card-title">Student Performance Report </h4>
+                        </div>
+                        <StudentPerformance/>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Quiz Answer Keys </h4>
                         </div>
                         <div class="main-content mt-3">
@@ -56,8 +61,16 @@
                                         for="btnradio2">Objects</label>
                                 </div>
                             </div>
-                            <hand-sign-component v-if="keyFlag == 0"></hand-sign-component>
-                            <object-component v-if="keyFlag == 1"></object-component>
+                            <a class="btn btn-secondary rounded-0 d-flex fw-bold justify-content-between align-items-center w-50" data-bs-toggle="collapse" href="#answerKeyCollapse" role="button" aria-expanded="false" aria-controls="answerKeyCollapse">
+                                <span>Show Answer Keys</span>
+                                <i class="fas fa-chevron-circle-down"></i>
+                            </a>
+                            <div class="collapse mt-3" id="answerKeyCollapse">
+                                <div class="card card-body">
+                                    <hand-sign-component v-if="keyFlag == 0"></hand-sign-component>
+                                    <object-component v-if="keyFlag == 1"></object-component>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -68,11 +81,13 @@
 
 <script>
 import Statistics from '../layouts/Statistics.vue'
+import StudentPerformance from '../layouts/StudentPerformance.vue'
 import BarChart from '../layouts/BarChart.vue'
 export default {
     components: {
         Statistics,
-        BarChart
+        BarChart,
+        StudentPerformance
     },
     data() {
         return {

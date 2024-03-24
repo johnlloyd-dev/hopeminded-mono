@@ -27,9 +27,9 @@
                         <tbody v-else-if="!isLoading && students.length !== 0">
                             <tr v-for="(student, index) in students" :key="student.id">
                                 <td class="w-25">
-                                    <span class="fw-bold">{{ `${student.last_name}, ${student.first_name}
+                                    <span class="fw-bold">{{ `${upperCaseFirst(student.last_name)}, ${upperCaseFirst(student.first_name)}
                                                                             ${student.middle_name ?
-                                            student.middle_name.charAt(0) + '.' : null}` }}</span>
+                                            upperCaseFirst(student.middle_name.charAt(0)) + '.' : null}` }}</span>
                                     <button class="btn border-0" type="button" data-bs-toggle="collapse"
                                         :data-bs-target="`#personalInfoCollapse${index}`" aria-expanded="false"
                                         aria-controls="personalInfoCollapse">
@@ -53,18 +53,23 @@
                                                 <div>
                                                     Section:
                                                     <span class="fw-bold">
-                                                        {{ student.section ? student.section.charAt(0).toUpperCase() + student.section.slice(1) : "N/A" }}
+                                                        {{ student.section ? student.section.name.charAt(0).toUpperCase() + student.section.name.slice(1) : "N/A" }}
                                                     </span>
                                                 </div>
                                                 <div>
-                                                    <i style="cursor: pointer" class="fas fa-edit text-danger"></i>
+                                                    <button type="button" class="btn p-0 border-0" id="dropdownSections" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-edit text-danger"></i>
+                                                    </button>
+                                                    <ul style="height: 200px; overflow-y: scroll;" class="dropdown-menu rounded-0" aria-labelledby="dropdownMenuButton1">
+                                                        <li class="bg-secondary fw-bold text-white ps-3">List of Sections</li>
+                                                        <li class="border p-1" v-for="(section, index) in sections" :key="index">
+                                                            <a @click="updateStudentSection(student, section)" :class="{active: student.section && student.section.id == section.id}" href="javascript:;" class="dropdown-item fw-bold">{{ section.name }}</a>
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </li>
                                             <li class="list-group-item">Username: <span class="fw-bold">{{
                                                 student.username }}</span>
-                                            </li>
-                                            <li class="list-group-item">Password: <span class="fw-bold">{{
-                                                student.unhashed }}</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -180,10 +185,10 @@
                     </table>
                 </div>
                 <div v-if="students.length !== 0" class="d-flex justify-content-around">
-                    <button :disabled="students.length <= 10" class="btn btn-secondary rounded-0">
+                    <button :disabled="!studentPaginator.prev_page_url" @click="getStudents('prev')" type="button" class="btn btn-secondary rounded-0">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button :disabled="students.length <= 10" class="btn btn-secondary rounded-0">
+                    <button :disabled="!studentPaginator.next_page_url" @click="getStudents('next')" type="button" class="btn btn-secondary rounded-0">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -236,18 +241,6 @@
                                 <input v-model="auth.email" type="email" class="form-control" id="email">
                                 <small class="text-danger font-weight-bold" v-if="errors && errors.email">{{
                                     errors.email[0] }}</small>
-                            </div>
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input v-model="auth.username" type="text" class="form-control" id="username">
-                                <small class="text-danger font-weight-bold" v-if="errors && errors.username">{{
-                                    errors.username[0] }}</small>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input v-model="auth.password" type="text" class="form-control" id="password">
-                                <small class="text-danger font-weight-bold" v-if="errors && errors.password">{{
-                                    errors.password[0] }}</small>
                             </div>
                         </form>
                     </div>
@@ -333,15 +326,16 @@ export default {
             collapsed: false,
             isLoading: false,
             students: [],
+            sections: [],
             errors: [],
+            page: 0,
+            studentPaginator: null,
             auth: {
                 firstName: null,
                 middleName: null,
                 lastName: null,
                 gender: null,
-                email: null,
-                username: null,
-                password: null
+                email: null
             },
             statusPrompt: {},
             csvFile: null,
@@ -353,6 +347,7 @@ export default {
     },
     mounted() {
         this.getStudents()
+        this.getSections()
         new Tooltip(document.body, {
             selector: "[data-bs-toggle='tooltip']",
         })
@@ -365,18 +360,39 @@ export default {
                 this.collapsed = false
             }
         },
-        async getStudents() {
-            this.isLoading = true
-            await axios.get('/api/users/students/get')
-                .then(response => {
-                    this.students = response.data
-                })
-                .catch(error => {
-                    console.log(error)
-                }).finally(() => {
-                    this.isLoading = false
-                })
+        async getStudents(next = null, remainToCurrentPage = true) {
+            try {
+                this.isLoading = true
+                let response = null
+                let url = null
 
+                if (next) {
+                    if (next == 'next') {
+                        url = this.studentPaginator.next_page_url;
+                    } else {
+                        url = this.studentPaginator.prev_page_url;
+                    }
+
+                    response = await axios.get(url)
+                } else {
+                    let page = 1;
+
+                    if (remainToCurrentPage && this.studentPaginator) {
+                        page = this.studentPaginator.current_page
+                    }
+
+                    response = await axios.get('/api/users/students/get', {
+                        params: { page: page }
+                    })
+                }
+
+                this.studentPaginator = response.data
+                this.students = response.data.data
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.isLoading = false
+            }
         },
         viewReport(studentId) {
             this.$router.push({
@@ -428,8 +444,6 @@ export default {
                     this.auth.middleName = null
                     this.auth.lastName = null
                     this.auth.gender = null
-                    this.auth.username = null
-                    this.auth.password = null
                     swal.fire('Success', response.data.message, 'success')
                 })
                 .catch(error => {
@@ -468,6 +482,26 @@ export default {
             } finally {
                 this.importing = false
             }
+        },
+        async getSections() {
+            try {
+                const { data } = await axios.get('api/sections/get');
+                this.sections = data;
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async updateStudentSection(student, section) {
+            try {
+                const response = await axios.put('api/students/section/update/' + student.id, {section_id: section.id});
+                swal.fire('Success', response.data.message, 'success')
+                this.getStudents()
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        upperCaseFirst(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
         }
     }
 }

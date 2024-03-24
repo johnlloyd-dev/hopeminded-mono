@@ -41,20 +41,16 @@ use App\Http\Controllers\SectionController;
 
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/register', [RegisterController::class, 'register']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return Auth::user();
     });
-    Route::post('/textbook/flag/add', [TextbookFlagController::class, 'storeFlags']);
     Route::get('/users/students/get', [UserController::class, 'getStudents']);
     Route::post('/users/students/add', [UserController::class, 'addStudent']);
 
     Route::get('/users/teachers/get', [TeacherController::class, 'getTeachers']);
     Route::post('/users/teachers/add', [TeacherController::class, 'addTeacher']);
-
-    Route::get('flags/{flag}', [TextbookFlagController::class, 'getFlags']);
-
-    Route::put('update-flag/{flag}', [TextbookFlagController::class, 'updateFlag']);
 
     Route::post('quiz/info/store/{flag}', [GameController::class, 'storeGameInfo']);
     Route::get('quiz/info/get', [GameController::class, 'getGameInfo']);
@@ -76,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('textbook/delete/{textbookId}', [TextbookController::class, 'deleteTextbook']);
 
     Route::get('quiz-report/student/{studentId}', [QuizReportController::class, 'getStudentQuizReport']);
+    Route::get('/skill-test/fetch/{flag}', [SkillTestController::class, 'getSkillTest']);
 
     Route::get('alphabets-letters/get', [TextbookController::class, 'getAlphabetsLetters']);
     Route::get('vowels-consonants/get', [TextbookController::class, 'getVowelsConsonants']);
@@ -98,81 +95,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [LogoutController::class, 'logout']);
 
-    Route::post('seed', function () {
-        $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
-        Textbook::where('teacher_id', $teacherId)->delete();
-        $jsonFile = public_path('json/alphabets-with-letters.json');
-        $jsonData = json_decode(file_get_contents($jsonFile), true);
-
-        foreach ($jsonData as $data) {
-            if (in_array($data["letter"], ['a', 'e', 'i', 'o', 'u']))
-                $type = 'vowel';
-            else
-                $type = 'consonant';
-
-            Textbook::updateOrCreate([
-                'flag' => 'alphabet-letters',
-                'type' => $type,
-                'teacher_id' => $teacherId,
-                'letter' => $data["letter"],
-                'object' => $data["object"],
-                'image' => json_encode($data["image"]),
-                'video' => json_encode($data["video"]),
-                'chapter' => 1
-            ]);
-        }
-
-        $jsonFile = public_path('json/vowel-consonants.json');
-        $jsonData = json_decode(file_get_contents($jsonFile), true);
-
-        foreach ($jsonData as $json) {
-            foreach ($json as $data) {
-                if (in_array($data["letter"], ['a', 'e', 'i', 'o', 'u']))
-                    $type = 'vowel';
-                else
-                    $type = 'consonant';
-
-                Textbook::updateOrCreate([
-                    'flag' => 'vowel-consonants',
-                    'type' => $type,
-                    'teacher_id' => $teacherId,
-                    'letter' => $data["letter"],
-                    'object' => $data["object"],
-                    'image' => json_encode($data["image"]),
-                    'video' => json_encode($data["video"]),
-                    'chapter' => 1
-                ]);
-            }
-        }
-
-        $jsonFile = public_path('json/alphabets-with-words.json');
-        $jsonData = json_decode(file_get_contents($jsonFile), true);
-
-        foreach ($jsonData as $data) {
-            if (in_array($data["letter"], ['a', 'e', 'i', 'o', 'u']))
-                $type = 'vowel';
-            else
-                $type = 'consonant';
-
-            Textbook::updateOrCreate([
-                'flag' => 'alphabet-words',
-                'type' => $type,
-                'teacher_id' => $teacherId,
-                'letter' => $data["letter"],
-                'object' => $data["object"],
-                'image' => json_encode($data["image"]),
-                'video' => json_encode($data["video"]),
-                'chapter' => 1
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Textbooks are successfully inserted.'
-        ]);
-    });
+    Route::post('seed', [TextbookController::class, 'seedTextbook']);
 
     Route::post('/skill-test/upload', [SkillTestController::class, 'addSkillTest']);
-    Route::get('/skill-test/fetch/{flag}', [SkillTestController::class, 'getSkillTest']);
     Route::put('/skill-test/update/{skillTestId}', [SkillTestController::class, 'updateSkillTest']);
     Route::post('/quiz-mistake/store',  [GameController::class, 'addQuizMistakeRecord']);
 
@@ -204,6 +129,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('update/{id}', [SectionController::class, 'UpdateSection']);
         Route::delete('delete/{id}', [SectionController::class, 'deleteSection']);
     });
+
+    Route::put('/students/section/update/{student}',  [StudentController::class, 'updateStudentSection']);
+
+    Route::put('/students/rank/top-ten',  [StudentController::class, 'getTop10Students']);
+    Route::get('/section/students',  [SectionController::class, 'getStudentsOfSection']);
+    Route::get('/section/students/not-in-section',  [SectionController::class, 'getStudentsNotInSection']);
+    Route::post('/section/students',  [SectionController::class, 'addStudentsToSection']);
+    Route::delete('/section/student/{studentId}',  [SectionController::class, 'removeStudentFromSection']);
 });
 Route::post('reset-password/send-link', [EmailController::class, 'sendResetPasswordLink']);
 Route::get('/check-access-id', [CheckAccessIdController::class, 'checkAccessId']);

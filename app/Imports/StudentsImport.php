@@ -19,17 +19,26 @@ class StudentsImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-        $username_exist = User::where('username', $row['username'])->first();
         $email_exist = Student::where('email', $row['email'])->first();
 
-        if ($username_exist || $email_exist) {
+        if ($email_exist) {
             return null;
         }
+
         $auth = Auth::user();
         $teacher = Teacher::where('user_id', $auth->id)->first();
+
+        $defaultUsername = "";
+        if (isset($row['last_name'])) {
+            $defaultUsername .= strtolower($row['last_name']) . "_";
+        }
+
+        $defaultUsername .= rand(100000, 999999);
+        $defaultPassword = "password";
+
         $user = User::create([
-            'username' => $row['username'],
-            'password' => Hash::make($row['password']),
+            'username' => preg_replace('/\s+/', '_', $defaultUsername),
+            'password' => Hash::make($defaultPassword),
             'user_flag' => 'student'
         ]);
 
@@ -40,8 +49,7 @@ class StudentsImport implements ToModel, WithHeadingRow
             'middle_name' => $row['middle_name'],
             'last_name' => $row['last_name'],
             'gender' => $row['gender'],
-            'email' => $row['email'],
-            'unhashed' => $row['password']
+            'email' => $row['email']
         ]);
     }
 }
