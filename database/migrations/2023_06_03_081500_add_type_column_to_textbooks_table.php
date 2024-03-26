@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('textbooks', function (Blueprint $table) {
+        Schema::table('textbook_alphabets', function (Blueprint $table) {
             $table->string('type')->nullable();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('textbooks', function (Blueprint $table) {
+        Schema::table('textbook_alphabets', function (Blueprint $table) {
             $table->dropColumn('type');
         });
     }

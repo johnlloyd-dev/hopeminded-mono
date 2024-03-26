@@ -2,14 +2,14 @@
     <div>
         <div class="row d-flex align-items-center mb-3 mt-5">
             <div class="col-2">
-                <h3 class="fw-bold">Alphabet/Words</h3>
+                <h3 class="fw-bold">Numbers</h3>
             </div>
             <div class="col-2">
                 <h3 class="fw-bold">Chapter {{ selectedChapter }}</h3>
             </div>
             <div class="col-8">
-                <button data-bs-toggle="modal" data-bs-target="#addAlphabetModal" class="btn btn-success rounded-0 fw-bold">
-                    Add Alphabet
+                <button data-bs-toggle="modal" data-bs-target="#addNumberModal" class="btn btn-success rounded-0 fw-bold">
+                    Add Number
                 </button>
             </div>
         </div>
@@ -17,21 +17,23 @@
             <table class="table table-bordered table-responsive">
                 <thead>
                     <tr class="bg-secondary">
-                        <th class="text-white" style="font-size: 20px">Letter</th>
-                        <th class="text-white" style="font-size: 20px">Object</th>
-                        <th class="text-white" style="font-size: 20px">Image Path</th>
-                        <th class="text-white" style="font-size: 20px">Video Path</th>
-                        <th class="text-white" style="font-size: 20px">Action</th>
+                        <th class="text-white">Name</th>
+                        <th class="text-white">Value</th>
+                        <th class="text-white">Object</th>
+                        <th class="text-white">Image Path</th>
+                        <th class="text-white">Video Path</th>
+                        <th class="text-white">Action</th>
                     </tr>
                 </thead>
-                <tbody v-if="alphabetWords.length == 0">
+                <tbody v-if="numbers.length == 0">
                     <tr>
                         <td colspan="5" class="text-center fw-bold">No data found</td>
                     </tr>
                 </tbody>
                 <tbody v-else>
                     <tr v-for="item in data" :key="item.id">
-                        <td class="fw-bold">{{ item.letter.toString().toUpperCase() }}</td>
+                        <td class="fw-bold">{{ item.name.toString().toUpperCase() }}</td>
+                        <td class="fw-bold">{{ item.value }}</td>
                         <td class="fw-bold">{{ item.object }}</td>
                         <td>
                             <div class="row">
@@ -72,11 +74,11 @@
                 </tbody>
             </table>
         </div>
-        <div v-if="alphabetWords.length !== 0" class="d-flex justify-content-around">
+        <div v-if="numbers.length !== 0" class="d-flex justify-content-around">
             <button :disabled="flag == 0" @click="prev()" class="btn btn-secondary rounded-0">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <button :disabled="flag == (alphabetWords.length - 1)" @click="next()" class="btn btn-secondary rounded-0">
+            <button :disabled="flag == (numbers.length - 1)" @click="next()" class="btn btn-secondary rounded-0">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -103,28 +105,28 @@
             </div>
         </div>
         <!-- Add Alphabet Modal -->
-        <div class="modal fade" id="addAlphabetModal" data-bs-backdrop="static" tabindex="-1"
-            aria-labelledby="addAlphabetModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addNumberModal" data-bs-backdrop="static" tabindex="-1"
+            aria-labelledby="addNumberModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%" class="logo" alt="Hopeminded Logo">
-                        <h5 class="modal-title" id="addAlphabetModalLabel">Add Alphabet</h5>
+                        <h5 class="modal-title" id="addNumberModalLabel">Add Number</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form>
                             <div class="mb-3">
-                                <label for="letter" class="form-label fw-bold">Alphabet</label>
-                                <input v-model="alphabetContent.letter" maxlength="1" type="text" class="form-control" id="letter"
-                                    aria-describedby="letter">
-                                <small class="text-danger" v-if="errors && errors.letter">{{ errors.letter[0] }}</small>
+                                <label for="value" class="form-label fw-bold">Number Value</label>
+                                <input v-model="numberContent.value" maxlength="2" type="text" class="form-control" id="value"
+                                    aria-describedby="value">
+                                <small class="text-danger" v-if="errors && errors.value">{{ errors.value[0] }}</small>
                             </div>
                             <div class="mb-3">
-                                <label for="objectName" class="form-label fw-bold">Object Name</label>
-                                <input v-model="alphabetContent.objectName" type="text" class="form-control" id="objectName"
-                                    aria-describedby="objectName">
-                                <small class="text-danger" v-if="errors && errors.objectName">{{ errors.objectName[0]
+                                <label for="_n" class="form-label fw-bold">Object Name</label>
+                                <input v-model="numberContent.object_name" type="text" class="form-control" id="_n"
+                                    aria-describedby="_n">
+                                <small class="text-danger" v-if="errors && errors.object_name">{{ errors.object_name[0]
                                 }}</small>
                             </div>
                             <div class="mb-3">
@@ -140,7 +142,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button :disabled="isProcessing" @click.prevent="submitAlphabet" type="button" class="btn-primary rounded-0 btn">
+                        <button :disabled="isProcessing" @click.prevent="submitNumber" type="button" class="btn-primary rounded-0 btn">
                             Submit
                         </button>
                     </div>
@@ -174,107 +176,59 @@ export default {
     props: ['chapter'],
     data() {
         return {
-            alphabetWords: [],
-            fields: [0],
-            nextId: 1,
+            isProcessing: false,
+            numbers: [],
             data: [],
             flag: 0,
-            count: 1,
             media: null,
             image: null,
             video: null,
-            error: null,
-            popover: null,
             textbookId: null,
-            alphabetContent: {
+            numberContent: {
                 flag: null,
-                letter: null,
-                objectName: null,
+                value: null,
+                object_name: null,
                 image: null,
                 video: null
             },
             errors: []
         }
     },
-    created() {
-        this.alphabetContent.flag = this.$route.params.textbookFlag
-        this.getTextbooks()
-        // axios.get(`/api/alphabets-words/get?user=${'teacher'}`)
-    },
-    beforeUnmount() {
-        $('#addAlphabetModal').modal('hide')
-    },
     computed: {
-        errorsLength() {
-            return Object.keys(this.errors).length
-        },
-        isModalOpen() {
-            if ($('#addAlphabetModal').hasClass('show')) return true;
-            else return false;
-        },
-        disabledButton() {
-            const objectName = this.alphabetContent.objectName.filter(data =>  {
-                return data == null
-            })
-
-            const image = this.alphabetContent.image.filter(data =>  {
-                return data == null
-            })
-
-            const video = this.alphabetContent.video.filter(data =>  {
-                return data == null
-            })
-
-            const letterNotMatch = this.alphabetContent.objectName.filter(data => {
-                return data.charAt(0) != this.alphabetContent.letter
-            })
-
-            if(this.alphabetContent.letter == null || objectName.length > 0 || image.length > 0 || video.length > 0 || letterNotMatch.length > 0) {
-                return true
-            }
-
-            return false
-        },
         selectedChapter() {
             return this.chapter
         }
     },
     watch: {
-        selectedChapter(newValue, oldValue) {
+        selectedChapter() {
             this.getTextbooks()
         }
     },
+    created() {
+        this.numberContent.flag = this.$route.params.textbookFlag
+        this.getTextbooks()
+    },
     methods: {
         async getTextbooks() {
-            const alphabetWords = await axios.get(`/api/alphabets-words/get?user=${'teacher'}&chapter=${this.selectedChapter}`)
-            this.alphabetWords = _.chunk(alphabetWords.data, 5)
-            this.data = this.alphabetWords[this.flag]
-        },
-        manageFields(flag) {
-            if (flag == 'plus' && this.fields.length != 5) {
-                this.fields.push(0)
-                this.alphabetContent.objectName.push('')
-                this.alphabetContent.image.push(null)
-                this.alphabetContent.video.push(null)
-            } else {
-                if (this.fields.length != 1) {
-                    this.fields.pop();
-                    this.alphabetContent.objectName.pop()
-                    this.alphabetContent.image.pop()
-                    this.alphabetContent.video.pop()
+            const { data } = await axios.get('/api/textbook/numbers', {
+                params: {
+                    user: 'teacher',
+                    chapter: this.selectedChapter
                 }
-            }
+            })
+            this.numbers = _.chunk(data, 5)
+            this.data = this.numbers[this.flag]
         },
         prev() {
             if (this.flag != 0) {
                 this.flag--
-                this.data = this.alphabetWords[this.flag]
+                this.data = this.numbers[this.flag]
             }
         },
         next() {
-            if (this.flag != (this.alphabetWords.length - 1)) {
+            if (this.flag != (this.numbers.length - 1)) {
                 this.flag++
-                this.data = this.alphabetWords[this.flag]
+                this.data = this.numbers[this.flag]
             }
         },
         viewMedia(flag, media) {
@@ -294,41 +248,45 @@ export default {
             this.$router.push('/textbook-management')
         },
         changeImageFile(event) {
-            this.alphabetContent.image = event.target.files[0]
+            this.numberContent.image = event.target.files[0]
         },
         changeVideoFile(event) {
-            this.alphabetContent.video = event.target.files[0]
+            this.numberContent.video = event.target.files[0]
         },
-        async submitAlphabet() {
+        async submitNumber() {
             this.errors = []
             const data = new FormData()
-            data.append('flag', this.alphabetContent.flag)
-            if (this.alphabetContent.letter != null)
-                data.append('letter', this.alphabetContent.letter)
-            if (this.alphabetContent.objectName != null)
-                data.append('objectName', this.alphabetContent.objectName)
-            if (this.alphabetContent.image != null)
-                data.append('image', this.alphabetContent.image)
-            if (this.alphabetContent.video != null)
-                data.append('video', this.alphabetContent.video)
+            data.append('flag', this.numberContent.flag)
+            if(this.numberContent.value != null)
+                data.append('value', this.numberContent.value)
+            if(this.numberContent.object_name != null)
+                data.append('object_name', this.numberContent.object_name)
+            if(this.numberContent.image != null)
+                data.append('image', this.numberContent.image)
+            if(this.numberContent.video != null)
+                data.append('video', this.numberContent.video)
             try {
                 this.isProcessing = true
-                const response = await axios.post(`/api/textbook/add?chapter=${this.selectedChapter}`, data, {
-                    headers: { 'content-type': 'multipart/form-data' }
+                const response = await axios.post('/api/textbook/number', data, {
+                    params: {
+                        chapter: this.selectedChapter
+                    },
+                    headers: {
+                        'content-type': 'multipart/form-data'
+                    }
                 })
                 if (response.status === 200) {
-                    this.alphabetContent.letter = null
-                    this.alphabetContent.objectName = null
-                    this.alphabetContent.image = null
-                    this.alphabetContent.video = null
+                    this.numberContent.value = null
+                    this.numberContent.object_name = null
+                    this.numberContent.image = null
+                    this.numberContent.video = null
                     this.$refs.imageFileInput.value = '';
                     this.$refs.videoFileInput.value = '';
                     swal.fire('Success', response.data.message, 'success')
                     this.getTextbooks()
-                    $('#addAlphabetModal').modal('hide');
+                    $('#addNumberModal').modal('hide');
                 }
             } catch (error) {
-                console.log(error)
                 this.errors = error.response.data.errors
             } finally {
                 this.isProcessing = false
@@ -341,7 +299,7 @@ export default {
         async deleteTextbook() {
             try {
                 this.isProcessing = true
-                const response = await axios.delete(`/api/textbook/delete/${this.textbookId}`)
+                const response = await axios.delete(`/api/textbook/number/${this.textbookId}`)
                 if(response.status == 200) {
                     $('#deleteTextbook').modal('hide');
                     swal.fire('Success', response.data.message, 'success')
@@ -368,9 +326,5 @@ export default {
     margin: 0;
     height: 100vh;
     overflow-x: hidden;
-}
-
-.dropdown-toggle::after {
-    display: none !important;
 }
 </style>

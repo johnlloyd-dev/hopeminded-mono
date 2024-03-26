@@ -25,9 +25,18 @@
                             </div>
                         </div>
                     </div>
-                    <alphabet-letters-component :chapter="selectedChapter" v-if="textbookFlag == 'alphabet-letters'"></alphabet-letters-component>
-                    <alphabet-words-component :chapter="selectedChapter" v-if="textbookFlag == 'alphabet-words'"></alphabet-words-component>
-                    <vowel-consonants-component :chapter="selectedChapter" v-if="textbookFlag == 'vowel-consonants'"></vowel-consonants-component>
+                    <AlphabetsLetters
+                        :chapter="selectedChapter"
+                        v-if="textbookFlag == 'alphabet-letters'"/>
+                    <AlphabetsWords
+                        :chapter="selectedChapter"
+                        v-if="textbookFlag == 'alphabet-words'"/>
+                    <VowelsConsonants
+                        :chapter="selectedChapter"
+                        v-if="textbookFlag == 'vowel-consonants'"/>
+                    <Numbers
+                        :chapter="selectedChapter"
+                        v-if="textbookFlag == 'numbers'"/>
                 </div>
             </div>
         </div>
@@ -35,7 +44,17 @@
 </template>
 
 <script>
+import AlphabetsLetters from './textbook-management/AlphabetsLetters.vue'
+import AlphabetsWords from './textbook-management/AlphabetsWords.vue'
+import VowelsConsonants from './textbook-management/VowelsConsonants.vue'
+import Numbers from './textbook-management/Numbers.vue'
 export default {
+    components: {
+        AlphabetsLetters,
+        AlphabetsWords,
+        VowelsConsonants,
+        Numbers
+    },
     data() {
         return {
             selectedChapter: 1,

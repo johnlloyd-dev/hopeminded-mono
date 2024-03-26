@@ -16,17 +16,14 @@ use App\Http\Controllers\QuizReportController;
 use App\Http\Controllers\SkillTestController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\TextbookController;
-use App\Http\Controllers\TextbookFlagController;
 use App\Http\Controllers\UserController;
-use App\Models\Teacher;
-use App\Models\Textbook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ExcelCSVController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\TextbookAlphabetController;
+use App\Http\Controllers\TextbookNumberController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,16 +64,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/certificate/delete', [CertificateController::class, 'deleteCertificate']);
     Route::get('/student-certificates/all', [CertificateController::class, 'getStudentCertificates']);
 
-    Route::post('/textbook/add', [TextbookController::class, 'addTextbook']);
-    Route::post('/textbook/alphabets-words/add', [TextbookController::class, 'addTextbookAlphabetWords']);
-    Route::delete('textbook/delete/{textbookId}', [TextbookController::class, 'deleteTextbook']);
+    Route::post('/textbook/add', [TextbookAlphabetController::class, 'addTextbook']);
+    Route::post('/textbook/alphabets-words/add', [TextbookAlphabetController::class, 'addTextbookAlphabetWords']);
+    Route::delete('textbook/delete/{textbookId}', [TextbookAlphabetController::class, 'deleteTextbook']);
 
     Route::get('quiz-report/student/{studentId}', [QuizReportController::class, 'getStudentQuizReport']);
     Route::get('/skill-test/fetch/{flag}', [SkillTestController::class, 'getSkillTest']);
 
-    Route::get('alphabets-letters/get', [TextbookController::class, 'getAlphabetsLetters']);
-    Route::get('vowels-consonants/get', [TextbookController::class, 'getVowelsConsonants']);
-    Route::get('alphabets-words/get', [TextbookController::class, 'getAlphabetsWords']);
+    Route::get('alphabets-letters/get', [TextbookAlphabetController::class, 'getAlphabetsLetters']);
+    Route::get('vowels-consonants/get', [TextbookAlphabetController::class, 'getVowelsConsonants']);
+    Route::get('alphabets-words/get', [TextbookAlphabetController::class, 'getAlphabetsWords']);
+
+    Route::prefix('/textbook')->group(function () {
+        Route::get('/numbers', [TextbookNumberController::class, 'index']);
+        Route::post('/number', [TextbookNumberController::class, 'addTextbookItem']);
+        Route::delete('/number/{id}', [TextbookNumberController::class, 'deleteTextbookItem']);
+    });
 
     Route::get('students-of-teacher/{teacherId}', [TeacherController::class, 'getStudents']);
 
@@ -95,7 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [LogoutController::class, 'logout']);
 
-    Route::post('seed', [TextbookController::class, 'seedTextbook']);
+    Route::post('seed', [TextbookAlphabetController::class, 'seedTextbook']);
 
     Route::post('/skill-test/upload', [SkillTestController::class, 'addSkillTest']);
     Route::put('/skill-test/update/{skillTestId}', [SkillTestController::class, 'updateSkillTest']);

@@ -31,7 +31,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-3">
                                         <div :class="{ 'opacity-75 pe-none': isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/alphabets.png" class="card-img-top" alt="...">
                                             <div class="card-body">
@@ -44,7 +44,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-3">
                                         <div :class="{ 'opacity-75 pe-none': skillTestAL.data_items && skillTestAL.data_items.length < quantityRequirement?.value || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/vc.png" class="card-img-top" alt="...">
                                             <div class="card-body">
@@ -57,11 +57,24 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-3">
                                         <div :class="{ 'opacity-75 pe-none': (skillTestAL.data_items && skillTestVC.data_items.length < quantityRequirement?.value) || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/words.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Alphabets/Words</h5>
+                                                <router-link v-if="selectedChapter == 1" to="/alphabet-by-words"
+                                                    class="btn btn-primary">Start the
+                                                    lesson</router-link>
+                                                <router-link v-else to="/coming-soon" class="btn btn-primary">Start the
+                                                    lesson</router-link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div :class="{ 'opacity-75 pe-none': (skillTestAL.data_items && skillTestVC.data_items.length < quantityRequirement?.value) || isProcessing }" class="card" style="width: 18rem;">
+                                            <img src="/images/numbers.png" class="card-img-top" alt="...">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Numbers</h5>
                                                 <router-link v-if="selectedChapter == 1" to="/alphabet-by-words"
                                                     class="btn btn-primary">Start the
                                                     lesson</router-link>

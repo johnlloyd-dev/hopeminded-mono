@@ -22,14 +22,14 @@ app.component('admin-sidebar-component', AdminSidebar);
 import Loading from './components/Loading.vue';
 app.component('loading-component', Loading);
 
-import AlphabetLetters from './components/teacher/layouts/AlphabetLetters.vue';
-app.component('alphabet-letters-component', AlphabetLetters);
+// import AlphabetLetters from './components/teacher/layouts/AlphabetLetters.vue';
+// app.component('alphabet-letters-component', AlphabetLetters);
 
-import AlphabetWords from './components/teacher/layouts/AlphabetWords.vue';
-app.component('alphabet-words-component', AlphabetWords);
+// import AlphabetWords from './components/teacher/layouts/AlphabetWords.vue';
+// app.component('alphabet-words-component', AlphabetWords);
 
-import VowelConsonants from './components/teacher/layouts/VowelConsonants.vue';
-app.component('vowel-consonants-component', VowelConsonants);
+// import VowelConsonants from './components/teacher/layouts/VowelConsonants.vue';
+// app.component('vowel-consonants-component', VowelConsonants);
 
 import HandSign from './components/teacher/layouts/HandSign.vue';
 app.component('hand-sign-component', HandSign);

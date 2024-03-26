@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('textbook_alphabets', function (Blueprint $table) {
+        Schema::create('textbook_numbers', function (Blueprint $table) {
             $table->id();
-            $table->string('flag');
             $table->foreignId('teacher_id')->constrained('teachers');
-            $table->string('letter');
+            $table->string('name');
+            $table->integer('value');
             $table->string('object')->nullable();
             $table->jsonb('image')->nullable();
             $table->jsonb('video')->nullable();
+            $table->integer('chapter')->nullable()->default(1);
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('textbook_alphabets');
+        Schema::dropIfExists('textbook_numbers');
     }
 };

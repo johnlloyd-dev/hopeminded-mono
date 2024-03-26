@@ -1,26 +1,11 @@
 <template>
     <div>
-        <div class="row d-flex align-items-center mt-5">
-            <div class="col-4">
-                <h3 class="fw-bold">Vowels/Consonants</h3>
+        <div class="row d-flex align-items-center mb-3 mt-5">
+            <div class="col-2">
+                <h3 class="fw-bold">Alphabet/Letters</h3>
             </div>
-            <div class="col-4">
+            <div class="col-2">
                 <h3 class="fw-bold">Chapter {{ selectedChapter }}</h3>
-            </div>
-        </div>
-        <div class="row d-flex align-items-center mb-3 mt-3">
-            <div class="col-4">
-                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                    <input type="radio" class="btn-check" v-model="alphabetFlag" :value="0" id="btnradio1"
-                        autocomplete="off" :checked="alphabetFlag == 0">
-                    <label class="btn btn-outline-dark fw-bold rounded-0"
-                        :class="alphabetFlag == 0 ? 'text-white' : 'text-black'" for="btnradio1">Vowels</label>
-
-                    <input type="radio" class="btn-check" v-model="alphabetFlag" :value="1" id="btnradio2"
-                        autocomplete="off" :checked="alphabetFlag == 1">
-                    <label class="btn btn-outline-dark fw-bold rounded-0"
-                        :class="alphabetFlag == 1 ? 'text-white' : 'text-black'" for="btnradio2">Consonants</label>
-                </div>
             </div>
             <div class="col-8">
                 <button data-bs-toggle="modal" data-bs-target="#addAlphabetModal" class="btn btn-success rounded-0 fw-bold">
@@ -28,19 +13,18 @@
                 </button>
             </div>
         </div>
-
-        <div class="d-flex justify-content-center mt-3">
+        <div class="d-flex justify-content-center">
             <table class="table table-bordered table-responsive">
                 <thead>
                     <tr class="bg-secondary">
-                        <th class="text-white" style="font-size: 20px" scope="col">Letter</th>
-                        <th class="text-white" style="font-size: 20px">Object</th>
-                        <th class="text-white" style="font-size: 20px">Image Path</th>
-                        <th class="text-white" style="font-size: 20px">Video Path</th>
-                        <th class="text-white" style="font-size: 20px">Action</th>
+                        <th class="text-white">Letter</th>
+                        <th class="text-white">Object</th>
+                        <th class="text-white">Image Path</th>
+                        <th class="text-white">Video Path</th>
+                        <th class="text-white">Action</th>
                     </tr>
                 </thead>
-                <tbody v-if="vowelConsonants.length == 0">
+                <tbody v-if="alphabetLetters.length == 0">
                     <tr>
                         <td colspan="5" class="text-center fw-bold">No data found</td>
                     </tr>
@@ -88,11 +72,11 @@
                 </tbody>
             </table>
         </div>
-        <div v-if="vowelConsonants.length !== 0 && alphabetFlag == 1" class="d-flex justify-content-around">
-            <button @click="prev()" class="btn btn-secondary rounded-0">
+        <div v-if="alphabetLetters.length !== 0" class="d-flex justify-content-around">
+            <button :disabled="flag == 0" @click="prev()" class="btn btn-secondary rounded-0">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <button @click="next()" class="btn btn-secondary rounded-0">
+            <button :disabled="flag == (alphabetLetters.length - 1)" @click="next()" class="btn btn-secondary rounded-0">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -132,8 +116,8 @@
                         <form>
                             <div class="mb-3">
                                 <label for="letter" class="form-label fw-bold">Alphabet</label>
-                                <input v-model="alphabetContent.letter" maxlength="1" type="text" class="form-control"
-                                    id="letter" aria-describedby="letter">
+                                <input v-model="alphabetContent.letter" maxlength="1" type="text" class="form-control" id="letter"
+                                    aria-describedby="letter">
                                 <small class="text-danger" v-if="errors && errors.letter">{{ errors.letter[0] }}</small>
                             </div>
                             <div class="mb-3">
@@ -145,14 +129,12 @@
                             </div>
                             <div class="mb-3">
                                 <label for="image" class="form-label fw-bold">Image File</label>
-                                <input ref="imageFileInput" accept="image/*" @change="changeImageFile" type="file"
-                                    class="form-control" id="image">
+                                <input ref="imageFileInput" accept="image/*" @change="changeImageFile" type="file" class="form-control" id="image">
                                 <small class="text-danger" v-if="errors && errors.image">{{ errors.image[0] }}</small>
                             </div>
                             <div class="mb-3">
                                 <label for="video" class="form-label fw-bold">Video File</label>
-                                <input ref="videoFileInput" @change="changeVideoFile" accept="video/*" type="file"
-                                    class="form-control" id="video">
+                                <input ref="videoFileInput" @change="changeVideoFile"  accept="video/*" type="file" class="form-control" id="video">
                                 <small class="text-danger" v-if="errors && errors.video">{{ errors.video[0] }}</small>
                             </div>
                         </form>
@@ -192,10 +174,9 @@ export default {
     props: ['chapter'],
     data() {
         return {
-            vowelConsonants: [],
-            alphabetFlag: 0,
+            isProcessing: false,
+            alphabetLetters: [],
             data: [],
-            newData: [],
             flag: 0,
             media: null,
             image: null,
@@ -211,51 +192,37 @@ export default {
             errors: []
         }
     },
-    created() {
-        this.alphabetContent.flag = this.$route.params.textbookFlag
-        this.getTextbooks()
-    },
-    watch: {
-        alphabetFlag(newValue, oldValue) {
-            this.resetContent(newValue, oldValue)
-        },
-        selectedChapter(newValue, oldValue) {
-            this.getTextbooks()
-        }
-    },
     computed: {
         selectedChapter() {
             return this.chapter
         }
     },
+    watch: {
+        selectedChapter(newValue, oldValue) {
+            this.getTextbooks()
+        }
+    },
+    created() {
+        console.log(this.$route.params.textbookFlag)
+        this.alphabetContent.flag = this.$route.params.textbookFlag
+        this.getTextbooks()
+    },
     methods: {
         async getTextbooks() {
-            const vowelConsonants = await axios.get(`/api/vowels-consonants/get?user=${'teacher'}&chapter=${this.selectedChapter}`)
-            this.vowelConsonants = vowelConsonants.data
-            this.newData = this.vowelConsonants[this.alphabetFlag]
-            this.data = this.newData
+            const alphabetLetters = await axios.get(`/api/alphabets-letters/get?user=${'teacher'}&chapter=${this.selectedChapter}`)
+            this.alphabetLetters = _.chunk(alphabetLetters.data, 5)
+            this.data = this.alphabetLetters[this.flag]
         },
         prev() {
             if (this.flag != 0) {
                 this.flag--
-                this.data = this.newData[this.flag]
+                this.data = this.alphabetLetters[this.flag]
             }
         },
         next() {
-            if (this.flag != (this.vowelConsonants[this.alphabetFlag].length - 1)) {
+            if (this.flag != (this.alphabetLetters.length - 1)) {
                 this.flag++
-                this.data = this.newData[this.flag]
-            }
-        },
-        resetContent(newValue, oldValue) {
-            if (newValue == 1) {
-                this.data = []
-                this.newData = _.chunk(this.vowelConsonants[newValue], 5)
-                this.data = this.newData[this.flag]
-            } else {
-                this.data = []
-                this.newData = this.vowelConsonants[newValue]
-                this.data = this.newData
+                this.data = this.alphabetLetters[this.flag]
             }
         },
         viewMedia(flag, media) {
@@ -284,13 +251,13 @@ export default {
             this.errors = []
             const data = new FormData()
             data.append('flag', this.alphabetContent.flag)
-            if (this.alphabetContent.letter != null)
+            if(this.alphabetContent.letter != null)
                 data.append('letter', this.alphabetContent.letter)
-            if (this.alphabetContent.objectName != null)
+            if(this.alphabetContent.objectName != null)
                 data.append('objectName', this.alphabetContent.objectName)
-            if (this.alphabetContent.image != null)
+            if(this.alphabetContent.image != null)
                 data.append('image', this.alphabetContent.image)
-            if (this.alphabetContent.video != null)
+            if(this.alphabetContent.video != null)
                 data.append('video', this.alphabetContent.video)
             try {
                 this.isProcessing = true
@@ -309,7 +276,6 @@ export default {
                     $('#addAlphabetModal').modal('hide');
                 }
             } catch (error) {
-                console.log(error)
                 this.errors = error.response.data.errors
             } finally {
                 this.isProcessing = false

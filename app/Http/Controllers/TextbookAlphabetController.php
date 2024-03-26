@@ -7,6 +7,7 @@ use App\Http\Requests\TextbookRequest;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Textbook;
+use App\Models\TextbookAlphabet;
 use App\Rules\UniqueDependingOnFlag;
 use Closure;
 use DateTime;
@@ -18,7 +19,7 @@ use Illuminate\Validation\Rule;
 use Laravel\Ui\Presets\React;
 use stdClass;
 
-class TextbookController extends Controller
+class TextbookAlphabetController extends Controller
 {
     public function getVowelsConsonants(Request $request)
     {
@@ -27,7 +28,7 @@ class TextbookController extends Controller
         } else {
             $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         }
-        $textbooks = Textbook::where('teacher_id', $teacherId)
+        $textbooks = TextbookAlphabet::where('teacher_id', $teacherId)
             ->where('flag', 'vowel-consonants')
             ->where('chapter', $request->get('chapter'))
             ->orderBy('letter', 'ASC')
@@ -58,7 +59,7 @@ class TextbookController extends Controller
         } else {
             $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         }
-        return Textbook::where('teacher_id', $teacherId)
+        return TextbookAlphabet::where('teacher_id', $teacherId)
             ->where('flag', 'alphabet-letters')
             ->where('chapter', $request->get('chapter'))
             ->orderBy('letter', 'ASC')
@@ -77,7 +78,7 @@ class TextbookController extends Controller
         } else {
             $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         }
-        return Textbook::where('teacher_id', $teacherId)
+        return TextbookAlphabet::where('teacher_id', $teacherId)
             ->where('flag', 'alphabet-words')
             ->where('chapter', $request->get('chapter'))
             ->orderBy('letter', 'ASC')
@@ -162,7 +163,7 @@ class TextbookController extends Controller
             $alphabetType = in_array($request->letter, ['a', 'e', 'i', 'o', 'u']) ? 'vowel' : 'consonant';
 
             $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
-            Textbook::create([
+            TextbookAlphabet::create([
                 'flag' => $request->flag,
                 'letter' => strtolower($request->letter),
                 'object' => $request->objectName,
@@ -233,7 +234,7 @@ class TextbookController extends Controller
         $alphabetType = in_array($request->letter, ['a', 'e', 'i', 'o', 'u']) ? 'vowel' : 'consonant';
 
         $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
-        Textbook::create([
+        TextbookAlphabet::create([
             'flag' => $request->flag,
             'letter' => strtolower($request->letter),
             'object' => $request->objectName,
@@ -249,14 +250,14 @@ class TextbookController extends Controller
 
     public function deleteTextbook($textbookId)
     {
-        Textbook::find($textbookId)->delete();
+        TextbookAlphabet::find($textbookId)->delete();
         return response()->json(['message' => 'An alphabet is deleted successfully.']);
     }
 
     public function isLetterExist()
     {
         $teacher = Teacher::where('user_id', Auth::user()->id)->first();
-        $count = Textbook::where('flag', request()->flag)
+        $count = TextbookAlphabet::where('flag', request()->flag)
             ->where('teacher_id', $teacher->id)
             ->where('chapter', request()->get('chapter'))
             ->where('letter', request()->letter)
@@ -275,7 +276,7 @@ class TextbookController extends Controller
     public function seedTextbook()
     {
         $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
-        Textbook::where('teacher_id', $teacherId)->delete();
+        TextbookAlphabet::where('teacher_id', $teacherId)->delete();
         $jsonFile = public_path('json/alphabets-with-letters.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 
@@ -285,7 +286,7 @@ class TextbookController extends Controller
             else
                 $type = 'consonant';
 
-            Textbook::updateOrCreate([
+            TextbookAlphabet::updateOrCreate([
                 'flag' => 'alphabet-letters',
                 'type' => $type,
                 'teacher_id' => $teacherId,
@@ -307,7 +308,7 @@ class TextbookController extends Controller
                 else
                     $type = 'consonant';
 
-                Textbook::updateOrCreate([
+                TextbookAlphabet::updateOrCreate([
                     'flag' => 'vowel-consonants',
                     'type' => $type,
                     'teacher_id' => $teacherId,
@@ -329,7 +330,7 @@ class TextbookController extends Controller
             else
                 $type = 'consonant';
 
-            Textbook::updateOrCreate([
+            TextbookAlphabet::updateOrCreate([
                 'flag' => 'alphabet-words',
                 'type' => $type,
                 'teacher_id' => $teacherId,

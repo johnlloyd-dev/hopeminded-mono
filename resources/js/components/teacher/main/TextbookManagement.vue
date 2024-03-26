@@ -10,29 +10,38 @@
                         </div>
                         <div class="main-content mt-3">
                             <div class="row">
-                                <div class="col-4">
-                                    <div class="card">
-                                        <div class="card-body d-flex justify-content-center">
-                                            <button @click="navigate('alphabet-letters')" class="btn btn-primary">
+                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                    <div style="height: 300px" class="card textbook-al">
+                                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                            <button @click="navigate('alphabet-letters')" class="btn btn-lg btn-primary w-75 position-relative rounded-0 btn-shadow fw-bold">
                                                 Alphabets/Letters
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-4">
-                                    <div class="card">
-                                        <div class="card-body d-flex justify-content-center">
-                                            <button @click="navigate('vowel-consonants')" class="btn btn-success">
+                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                    <div style="height: 300px" class="card textbook-vc">
+                                        <div class="card-body flex-column d-flex align-items-center justify-content-center">
+                                            <button @click="navigate('vowel-consonants')" class="btn btn-lg btn-success w-75 position-relative rounded-0 btn-shadow fw-bold">
                                                 Vowel/Consonants
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-4">
-                                    <div class="card">
-                                        <div class="card-body d-flex justify-content-center">
-                                            <button @click="navigate('alphabet-words')" class="btn btn-secondary">
+                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                    <div style="height: 300px" class="card textbook-aw">
+                                        <div class="card-body flex-column d-flex align-items-center justify-content-center">
+                                            <button @click="navigate('alphabet-words')" class="btn btn-lg btn-danger w-75 position-relative rounded-0 btn-shadow fw-bold">
                                                 Alphabets/Words
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                    <div style="height: 300px" class="card textbook-n">
+                                        <div class="card-body flex-column d-flex align-items-center justify-content-center">
+                                            <button @click="navigate('numbers')" class="btn btn-lg btn-warning w-75 position-relative rounded-0 btn-shadow fw-bold">
+                                                Numbers
                                             </button>
                                         </div>
                                     </div>
@@ -172,6 +181,43 @@ export default {
     background-color: #1D3461;
     color: #fff;
 
+}
+
+.textbook-al, .textbook-vc, .textbook-aw, .textbook-n {
+    position: relative;
+}
+
+.textbook-al::before, .textbook-vc::before, .textbook-aw::before, .textbook-n::before {
+    content: "";
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    opacity: 0.75
+}
+
+.textbook-al::before{
+    background-image: url("/images/textbook-AL.jpg");
+}
+
+.textbook-vc::before {
+    background-image: url("/images/textbook-VC.jpg");
+}
+
+.textbook-aw::before {
+    background-image: url("/images/textbook-AW.jpg");
+}
+
+.textbook-n::before {
+    background-image: url("/images/textbook-N.jpg");
+}
+
+.btn-shadow {
+    box-shadow: 3px 3px 3px rgb(255, 255, 255);
 }
 
 @keyframes pulse {
