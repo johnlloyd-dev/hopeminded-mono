@@ -8,6 +8,7 @@ export const store = new createStore({
         alphabetLetters: {},
         vowelConsonants: {},
         alphabetWords: {},
+        numbers: [],
         quizInfo: {},
         selectedChapter: null,
         isLoading: false,
@@ -43,6 +44,9 @@ export const store = new createStore({
         },
         quantityRequirement(state) {
             return state.quantityRequirement
+        },
+        numbers(state) {
+            return state.numbers
         }
     },
     mutations: {
@@ -62,7 +66,10 @@ export const store = new createStore({
             state.vowelConsonants = data;
         },
         SET_ALPHABET_WORDS_DATA(state, data) {
-            state.alphabetWords = data;
+            state.alphabetLetters = data;
+        },
+        SET_NUMBERS_DATA(state, data) {
+            state.numbers = data;
         },
         SET_QUIZ_INFO(state, data) {
             state.quizInfo = data;
@@ -94,6 +101,22 @@ export const store = new createStore({
                 context.commit("SET_ISLOADING", true);
                 const alphabets = await axios.get(`/api/alphabets-letters/get?user=${'student'}&chapter=1`);
                 context.commit("SET_ALPHABET_LETTERS_DATA", alphabets.data);
+            } catch (error) {
+                console.log(error)
+            } finally {
+                context.commit("SET_ISLOADING", false);
+            }
+        },
+        async setNumbers(context, flag) {
+            try {
+                context.commit("SET_ISLOADING", true);
+                const numbers = await axios.get('/api/textbook/numbers', {
+                    params: {
+                        chapter: 1,
+                        user: 'student'
+                    }
+                });
+                context.commit("SET_NUMBERS_DATA", numbers.data);
             } catch (error) {
                 console.log(error)
             } finally {

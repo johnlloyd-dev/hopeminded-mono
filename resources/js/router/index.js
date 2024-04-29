@@ -28,9 +28,12 @@ const quizTypingBalloon = () => import("../components/student/game/quiz/Balloon.
 const memoryGame = () => import("../components/student/game/Memory.vue");
 const quizMemoryGame = () => import("../components/student/game/quiz/Memory.vue");
 
+const matchingCards = () => import("../components/student/game/Match.vue");
+
 const alphabetByLetters = () => import("../components/student/textbook/AlphabetLetters.vue");
 const alphabetByWords = () => import("../components/student/textbook/AlphabetWords.vue");
 const vowelConsonants = () => import("../components/student/textbook/VowelConsonants.vue");
+const numbers = () => import("../components/student/textbook/Numbers.vue");
 
 const studentManagement = () => import("../components/teacher/main/StudentManagement.vue");
 const sectionManagement = () => import("../components/teacher/main/SectionManagement.vue");
@@ -207,6 +210,14 @@ const routes = [
         },
     },
     {
+        name: "matching-cards",
+        path: "/matching-cards",
+        component: matchingCards,
+        meta: {
+            title: `Matching Cards`,
+        },
+    },
+    {
         name: "alphabet-by-letters",
         path: "/alphabet-by-letters",
         component: alphabetByLetters,
@@ -228,6 +239,14 @@ const routes = [
         component: vowelConsonants,
         meta: {
             title: `Vowel and Consonants`,
+        },
+    },
+    {
+        name: "numbers",
+        path: "/numbers",
+        component: numbers,
+        meta: {
+            title: `Numbers`,
         },
     },
     {

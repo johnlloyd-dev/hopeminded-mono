@@ -98,7 +98,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [LogoutController::class, 'logout']);
 
-    Route::post('seed', [TextbookAlphabetController::class, 'seedTextbook']);
+    Route::post('textbook-alphabets/seed', [TextbookAlphabetController::class, 'seedTextbook']);
+    Route::post('textbook-numbers/seed', [TextbookNumberController::class, 'seedTextbook']);
 
     Route::post('/skill-test/upload', [SkillTestController::class, 'addSkillTest']);
     Route::put('/skill-test/update/{skillTestId}', [SkillTestController::class, 'updateSkillTest']);

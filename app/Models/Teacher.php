@@ -14,7 +14,6 @@ class Teacher extends Model
         'last_name',
         'email',
         'user_id',
-        'unhashed',
         'access_id'
     ];
 

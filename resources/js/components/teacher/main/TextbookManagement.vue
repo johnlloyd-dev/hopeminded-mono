@@ -10,7 +10,7 @@
                         </div>
                         <div class="main-content mt-3">
                             <div class="row">
-                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="col-lg-4 col-md-6 col-sm-12 col-xl-3 mb-3">
                                     <div style="height: 300px" class="card textbook-al">
                                         <div class="card-body d-flex flex-column align-items-center justify-content-center">
                                             <button @click="navigate('alphabet-letters')" class="btn btn-lg btn-primary w-75 position-relative rounded-0 btn-shadow fw-bold">
@@ -19,7 +19,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="col-lg-4 col-md-6 col-sm-12 col-xl-3 mb-3">
                                     <div style="height: 300px" class="card textbook-vc">
                                         <div class="card-body flex-column d-flex align-items-center justify-content-center">
                                             <button @click="navigate('vowel-consonants')" class="btn btn-lg btn-success w-75 position-relative rounded-0 btn-shadow fw-bold">
@@ -28,7 +28,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="col-lg-4 col-md-6 col-sm-12 col-xl-3 mb-3">
                                     <div style="height: 300px" class="card textbook-aw">
                                         <div class="card-body flex-column d-flex align-items-center justify-content-center">
                                             <button @click="navigate('alphabet-words')" class="btn btn-lg btn-danger w-75 position-relative rounded-0 btn-shadow fw-bold">
@@ -37,7 +37,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="col-lg-4 col-md-6 col-sm-12 col-xl-3 mb-3">
                                     <div style="height: 300px" class="card textbook-n">
                                         <div class="card-body flex-column d-flex align-items-center justify-content-center">
                                             <button @click="navigate('numbers')" class="btn btn-lg btn-warning w-75 position-relative rounded-0 btn-shadow fw-bold">
@@ -79,9 +79,12 @@ export default {
         },
         async seed() {
             try {
-                const response = await axios.post('/api/seed')
-                if (response.status === 200) {
-                    swal.fire('Success', response.data.message, 'success')
+                const { status } = await axios.post('/api/textbook-alphabets/seed')
+                if (status === 200) {
+                    const { data, status } = await axios.post('/api/textbook-numbers/seed')
+                    if (status === 200) {
+                        swal.fire('Success', data.message, 'success')
+                    }
                 }
             } catch (error) {
                 console.log(error)

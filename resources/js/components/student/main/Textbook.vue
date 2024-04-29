@@ -71,11 +71,12 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
-                                        <div :class="{ 'opacity-75 pe-none': (skillTestAL.data_items && skillTestVC.data_items.length < quantityRequirement?.value) || isProcessing }" class="card" style="width: 18rem;">
+                                        <!-- <div :class="{ 'opacity-75 pe-none': (skillTestAL.data_items && skillTestVC.data_items.length < quantityRequirement?.value) || isProcessing }" class="card" style="width: 18rem;"> -->
+                                        <div class="card" style="width: 18rem;">
                                             <img src="/images/numbers.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Numbers</h5>
-                                                <router-link v-if="selectedChapter == 1" to="/alphabet-by-words"
+                                                <router-link v-if="selectedChapter == 1" to="/numbers"
                                                     class="btn btn-primary">Start the
                                                     lesson</router-link>
                                                 <router-link v-else to="/coming-soon" class="btn btn-primary">Start the

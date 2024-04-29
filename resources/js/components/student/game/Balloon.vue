@@ -75,7 +75,8 @@ export default {
             typingBalloon: {
                 highestLevel: 1,
                 score: 0
-            }
+            },
+            loaded: false
         };
     },
     computed: {
@@ -127,6 +128,7 @@ export default {
                 }).then((result) => {
                     if (result.value) {
                         this.disabledGame = false
+                        this.loaded = true
                         this.storeQuizInfo()
                         this.fetchThemes()
                         window.addEventListener("keyup", this.handleKeyUp, true);
@@ -151,6 +153,7 @@ export default {
                     this.ctx = this.c.getContext("2d");
                     this.c.height = window.innerHeight * 0.98;
                     this.c.width = window.innerWidth * 0.996;
+
                     this.initBalloons();
                     this.animate();
                 })

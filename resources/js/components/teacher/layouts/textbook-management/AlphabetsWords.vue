@@ -19,8 +19,8 @@
                     <tr class="bg-secondary">
                         <th class="text-white">Letter</th>
                         <th class="text-white">Object</th>
-                        <th class="text-white">Image Path</th>
-                        <th class="text-white">Video Path</th>
+                        <th class="text-white">Image Preview</th>
+                        <th class="text-white">Video Preview</th>
                         <th class="text-white">Action</th>
                     </tr>
                 </thead>
@@ -33,35 +33,24 @@
                     <tr v-for="item in data" :key="item.id">
                         <td class="fw-bold">{{ item.letter.toString().toUpperCase() }}</td>
                         <td class="fw-bold">{{ item.object }}</td>
-                        <td>
-                            <div class="row">
-                                <div class="col-10">
-                                    <p style="width: 350px;" class="fw-bold text-truncate">
-                                        {{ item.image_url }}
-                                    </p>
-                                </div>
-                                <div class="col-2">
-                                    <button @click="viewMedia('image', item.image_url)"
-                                        class="btn btn-sm btn-primary rounded-0">
-                                        <i class="fas fa-external-link-alt"></i>
-                                    </button>
-                                </div>
+                        <td class="text-center">
+                            <div v-if="item.image_url">
+                                <button @click="viewMedia('image', item.image_url)"
+                                    class="btn btn-sm btn-primary rounded-0">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
+                            </div>
+                            <div v-else>
+                                <p class="fw-bold">
+                                    N/A
+                                </p>
                             </div>
                         </td>
-                        <td class="fw-bold">
-                            <div class="row">
-                                <div class="col-10">
-                                    <p style="width: 350px;" class="fw-bold text-truncate">
-                                        {{ item.video_url }}
-                                    </p>
-                                </div>
-                                <div class="col-2">
-                                    <button @click="viewMedia('video', item.video_url)"
-                                        class="btn btn-sm btn-primary rounded-0">
-                                        <i class="fas fa-external-link-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
+                        <td class="fw-bold text-center">
+                            <button @click="viewMedia('video', item.video_url)"
+                                class="btn btn-sm btn-primary rounded-0">
+                                <i class="fas fa-external-link-alt"></i>
+                            </button>
                         </td>
                         <td class="d-flex justify-content-center">
                             <button @click="deleteConfirmation(item.id)" class="btn-danger btn rounded-0 btn-sm">

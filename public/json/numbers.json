@@ -1,0 +1,62 @@
+[
+    {
+        "value": 1,
+        "name": "one",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Fone-combo.png?alt=media&token=9eaa18ec-c607-47eb-975b-f241aa2afc67",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    },
+    {
+        "value": 2,
+        "name": "two",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Ftwo-combo.png?alt=media&token=6296114e-63eb-4137-8b3d-db54b546f689",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    },
+    {
+        "value": 3,
+        "name": "three",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Fthree-combo.png?alt=media&token=a278da4d-ceba-4f0c-9b5c-548a50cb70e1",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    },
+    {
+        "value": 4,
+        "name": "four",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Ffour-combo.png?alt=media&token=f13acddc-1306-499b-a6f6-25165f0b57b8",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    },
+    {
+        "value": 5,
+        "name": "five",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Ffive-combo.png?alt=media&token=db11b44b-fcd7-4041-b13a-cce44affdc00",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    },
+    {
+        "value": 6,
+        "name": "six",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Fsix-combo.png?alt=media&token=d757b310-696d-48b3-9d50-480d42f70b63",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    },
+    {
+        "value": 7,
+        "name": "seven",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Fseven-combo.png?alt=media&token=a2eead9d-961f-47c9-9170-769b1f6f67e8",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    },
+    {
+        "value": 8,
+        "name": "eight",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Feight-combo.png?alt=media&token=28757ec1-3e7c-4040-99ab-63a71077578a",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    },
+    {
+        "value": 9,
+        "name": "nine",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Fnine-combo.png?alt=media&token=d82c5000-e0fc-4a11-8fa0-fd9e1076520d",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    },
+    {
+        "value": 0,
+        "name": "zero",
+        "image": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fimages%2Fzero-combo.png?alt=media&token=abf8d66b-40b8-4278-9331-47f6be7db655",
+        "video": "https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/numbers%2Fvideos%2F981078.mp4?alt=media&token=a5e6efff-be10-4378-ac6f-ada749f2f65b"
+    }
+]

@@ -24,7 +24,7 @@ class TextbookNumberController extends Controller
 
         return TextbookNumber::where('teacher_id', $teacherId)
             ->where('chapter', $request->get('chapter'))
-            ->orderBy('name', 'ASC')
+            ->orderBy('value', 'ASC')
             ->get()
             ->map(function ($textbooks) {
                 $textbooks->image_url = json_decode($textbooks->image);
@@ -110,5 +110,30 @@ class TextbookNumberController extends Controller
         ];
 
         return $word_value[$number];
+    }
+
+    public function seedTextbook()
+    {
+        $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        TextbookNumber::where('teacher_id', $teacherId)->delete();
+
+        $jsonFile = public_path('json/numbers.json');
+        $jsonData = json_decode(file_get_contents($jsonFile), true);
+
+        foreach ($jsonData as $data) {
+            TextbookNumber::updateOrCreate([
+                'teacher_id' => $teacherId,
+                'name' => $data["name"],
+                'value' => $data["value"],
+                // 'object' => $data["object"],
+                'image' => json_encode($data["image"]),
+                'video' => json_encode($data["video"]),
+                'chapter' => 1
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Textbooks are successfully inserted.'
+        ]);
     }
 }

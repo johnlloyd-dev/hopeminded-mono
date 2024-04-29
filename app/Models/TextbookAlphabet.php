@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class TextbookAlphabet extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'flag',
+        'type',
+        'teacher_id',
+        'letter',
+        'object',
+        'image',
+        'video',
+        'chapter'
+    ];
 }

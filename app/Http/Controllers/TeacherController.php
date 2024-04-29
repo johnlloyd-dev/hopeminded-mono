@@ -43,7 +43,7 @@ class TeacherController extends Controller
             'last_name' => $request->lastName,
             'email' => $request->email,
             'user_id' => $user->id,
-            'unhashed' => $request->password
+            // 'unhashed' => $request->password
         ]);
 
         $defaultPercentage = [

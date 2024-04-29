@@ -12,7 +12,7 @@
 
                         <div class="card-body">
                             <div class="row d-flex justify-content-between mb-5">
-                                <div class="col-lg-4 col-md-12 col-sm-12 p-0">
+                                <div class="col-lg-3 col-md-12 col-sm-12 p-0">
                                     <div class="card-sl">
                                         <div class="card-image">
                                             <img src="/images/memory.png" />
@@ -23,7 +23,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4 col-md-12 col-sm-12 p-0">
+                                <div class="col-lg-3 col-md-12 col-sm-12 p-0">
                                     <div class="card-sl">
                                         <div class="card-image">
                                             <img src="/images/balloon.png" />
@@ -34,7 +34,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4 col-md-12 col-sm-12 p-0">
+                                <div class="col-lg-3 col-md-12 col-sm-12 p-0">
                                     <div class="card-sl">
                                         <div class="card-image">
                                             <img src="/images/hangman.png" />
@@ -42,6 +42,17 @@
                                         <router-link to="/hangman-game" class="card-action"><i class="fa fa-play"></i></router-link>
                                         <div class="card-heading">
                                             Hangman
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-12 col-sm-12 p-0">
+                                    <div class="card-sl">
+                                        <div class="card-image">
+                                            <img src="/images/matching-game.jpg" />
+                                        </div>
+                                        <router-link to="/matching-cards" class="card-action"><i class="fa fa-play"></i></router-link>
+                                        <div class="card-heading">
+                                            Matching Cards
                                         </div>
                                     </div>
                                 </div>

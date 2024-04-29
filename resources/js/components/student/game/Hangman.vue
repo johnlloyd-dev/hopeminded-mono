@@ -1,6 +1,8 @@
 <template>
     <div v-if="!gameLoading">
-        <div id="overlay"></div>
+        <video autoplay muted loop id="myVideo">
+            <source src="https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/game-background%2Fgame2.mp4?alt=media&token=ec586edc-4e7d-4784-8c49-76e60bcd581a" type="video/mp4">
+        </video>
         <div class="mt-3" style="z-index: 9999">
             <div v-if="!disabledGame" id="app" @keyup="handleKeyPress">
                 <div class="row w-100">
@@ -148,6 +150,9 @@ export default {
         },
         gameLoading: false
     }),
+    async created() {
+        await axios.get("https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/game-background%2Fgame2.mp4?alt=media&token=ec586edc-4e7d-4784-8c49-76e60bcd581a")
+    },
     mounted() {
         this.initQuizInfo()
     },
@@ -745,5 +750,14 @@ button {
             }
         }
     }
+}
+
+#myVideo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
 }
 </style>
