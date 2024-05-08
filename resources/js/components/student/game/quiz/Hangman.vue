@@ -261,7 +261,7 @@ export default {
             axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=1`, this.hangmanGame)
         },
         fetchWords() {
-            axios.get('json/hangman-game.json')
+            axios.get('json/games/hangman-game.json')
                 .then((response) => {
                     this.words = response.data.filter(item => {
                         return item.word.length != 3
@@ -470,7 +470,7 @@ export default {
             }
         },
         setLetters() {
-            axios.get('json/balloon-game.json')
+            axios.get('json/alphabets-hand-signs.json')
                 .then((response) => {
                     this.letters = response.data.map(item => {
                         return {

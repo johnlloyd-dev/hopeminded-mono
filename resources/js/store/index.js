@@ -66,7 +66,7 @@ export const store = new createStore({
             state.vowelConsonants = data;
         },
         SET_ALPHABET_WORDS_DATA(state, data) {
-            state.alphabetLetters = data;
+            state.alphabetWords = data;
         },
         SET_NUMBERS_DATA(state, data) {
             state.numbers = data;

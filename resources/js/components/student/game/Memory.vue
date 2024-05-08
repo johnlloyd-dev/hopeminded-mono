@@ -151,7 +151,7 @@ export default {
             getQuizInfo: 'getQuizInfo'
         }),
         fetchData() {
-            axios.get('json/memory-game.json')
+            axios.get('json/games/memory-game.json')
                 .then(response => {
                     this.icons = response.data
                     this.cardsShuffle()
@@ -161,7 +161,7 @@ export default {
                 })
         },
         fetchAlphabets() {
-            axios.get('json/balloon-game.json')
+            axios.get('json/alphabets-hand-signs.json')
                 .then(response => {
                     this.alphabets = response.data
                 })

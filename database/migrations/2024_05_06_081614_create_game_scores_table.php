@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('games', function (Blueprint $table) {
+        Schema::create('game_scores', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('flag');
+            $table->foreignId('game_id')->constrained('games');
+            $table->integer('perfect_score');
+            $table->integer('passing_score');
+            $table->enum('type', ['tutorial', 'quiz'])->default('tutorial');
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('games');
+        Schema::dropIfExists('game_scores');
     }
 };

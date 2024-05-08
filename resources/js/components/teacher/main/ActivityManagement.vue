@@ -52,13 +52,13 @@
                                         autocomplete="off" :checked="keyFlag == 0">
                                     <label class="btn btn-outline-dark fw-bold rounded-0"
                                         :class="keyFlag == 0 ? 'text-white' : 'text-black'"
-                                        for="btnradio1">Hand Signs</label>
+                                        for="btnradio1">Alphabets Hand Signs</label>
 
                                     <input type="radio" class="btn-check" v-model="keyFlag" :value="1" id="btnradio2"
                                         autocomplete="off" :checked="keyFlag == 1">
                                     <label class="btn btn-outline-dark fw-bold rounded-0"
                                         :class="keyFlag == 1 ? 'text-white' : 'text-black'"
-                                        for="btnradio2">Objects</label>
+                                        for="btnradio2">Numbers Hand Signs</label>
                                 </div>
                             </div>
                             <a class="btn btn-secondary rounded-0 d-flex fw-bold justify-content-between align-items-center w-50" data-bs-toggle="collapse" href="#answerKeyCollapse" role="button" aria-expanded="false" aria-controls="answerKeyCollapse">
@@ -67,8 +67,8 @@
                             </a>
                             <div class="collapse mt-3" id="answerKeyCollapse">
                                 <div class="card card-body">
-                                    <hand-sign-component v-if="keyFlag == 0"></hand-sign-component>
-                                    <object-component v-if="keyFlag == 1"></object-component>
+                                    <AlphabetsHandSigns v-if="keyFlag == 0"/>
+                                    <NumbersHandSigns v-if="keyFlag == 1"/>
                                 </div>
                             </div>
                         </div>
@@ -83,11 +83,15 @@
 import Statistics from '../layouts/Statistics.vue'
 import StudentPerformance from '../layouts/StudentPerformance.vue'
 import BarChart from '../layouts/BarChart.vue'
+import AlphabetsHandSigns from '../layouts/AlphabetsHandSigns.vue';
+import NumbersHandSigns from '../layouts/NumbersHandSigns.vue';
 export default {
     components: {
         Statistics,
         BarChart,
-        StudentPerformance
+        StudentPerformance,
+        AlphabetsHandSigns,
+        NumbersHandSigns
     },
     data() {
         return {

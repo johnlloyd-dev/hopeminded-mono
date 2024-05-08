@@ -106,7 +106,7 @@ class TextbookNumberController extends Controller
             7 => 'seven',
             8 => 'eight',
             9 => 'nine',
-            10 => 'ten'
+            0 => 'zero'
         ];
 
         return $word_value[$number];
@@ -117,7 +117,7 @@ class TextbookNumberController extends Controller
         $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         TextbookNumber::where('teacher_id', $teacherId)->delete();
 
-        $jsonFile = public_path('json/numbers.json');
+        $jsonFile = public_path('json/textbooks/numbers.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 
         foreach ($jsonData as $data) {

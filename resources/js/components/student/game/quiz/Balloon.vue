@@ -223,7 +223,7 @@ export default {
             axios.post(`/api/quiz/info/update/${this.quizInfo.id}?gameId=2`, this.typingBalloon)
         },
         fetchThemes() {
-            axios.get('json/balloon-game.json')
+            axios.get('json/games/balloon-game.json')
                 .then(response => {
                     this.theme = response.data
                     this.allThemes = response.data

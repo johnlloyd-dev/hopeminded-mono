@@ -706,7 +706,7 @@
                                         aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                                         <div class="accordion-body">
                                             <template v-if="Object.keys(weaknessesData).length">
-                                                <template v-if="flag === 'alphabet-letters'">
+                                                <template v-if="flag === 'alphabet-words'">
                                                     <table class="table table-bordered table-responsive">
                                                         <thead>
                                                             <tr>

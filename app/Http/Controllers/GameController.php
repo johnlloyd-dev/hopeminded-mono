@@ -82,12 +82,15 @@ class GameController extends Controller
         ]);
 
         $textbookName = null;
-        if ($gameInfo->textbook_flag === 'hangman-game')
+        if ($gameInfo->textbook_flag === 'hangman-game') {
             $textbookName = 'Alphabets/Words';
-        else if ($gameInfo->textbook_flag === 'typing-balloon')
+        } else if ($gameInfo->textbook_flag === 'typing-balloon') {
             $textbookName = 'Vowels/Consonants';
-        else
+        } else if ($gameInfo->textbook_flag === 'memory-game') {
             $textbookName = 'Alphabets/Letters';
+        } else {
+            $textbookName = 'Numbers';
+        }
 
         if (!$request->get('flag')) {
             if (count($quizReport) > 0) {
@@ -129,36 +132,25 @@ class GameController extends Controller
 
     public function updateGameInfo(Request $request, $id)
     {
+        $gameId = $request->query('gameId');
         $quiz = QuizReport::findOrFail($id);
+        $game = Game::find($gameId);
+
         $mark = null;
+        $passingScore = null;
 
-        $hangmanPassingScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 6 : 10;
-        $balloonPassingScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 20 : 38;
-        $memoryPassingScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 9 : 44;
-
-        $hangmanPerfectScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 8 : 18;
-        $balloonPerfectScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 26 : 51;
-        $memoryPerfectScore = $request->get('flag') && $request->get('flag') == 'tutorial' ? 12 : 59;
-
-        if ($request->get('gameId') == 1) {
-            if ($request->score < $hangmanPassingScore) {
-                $mark = 'failed';
-            } else {
-                $mark = 'passed';
-            }
-        } else if ($request->get('gameId') == 2) {
-            if ($request->score < $balloonPassingScore) {
-                $mark = 'failed';
-            } else {
-                $mark = 'passed';
-            }
+        if ($request->has('flag') && $request->query('flag') == 'tutorial') {
+            $passingScore = $game->tutorialScore->first()->passing_score;
         } else {
-            if ($request->score < $memoryPassingScore) {
-                $mark = 'failed';
-            } else {
-                $mark = 'passed';
-            }
+            $passingScore = $game->quizScore->first()->passing_score;
         }
+
+        if ($request->input('score') < $passingScore) {
+            $mark = 'failed';
+        } else {
+            $mark = 'passed';
+        }
+
         $quiz->update([
             'highest_level' => $request->highestLevel,
             'total_score' => $request->score,
@@ -192,6 +184,11 @@ class GameController extends Controller
             ->where('game_id', 1)
             ->select('total_score')
             ->max('total_score');
+        $quizReports->highest_scores['matching_game'] = QuizReport::where('student_id', $student->id)
+            ->where('flag', 'quiz')
+            ->where('game_id', 4)
+            ->select('total_score')
+            ->max('total_score');
 
         return $quizReports;
     }
@@ -220,12 +217,16 @@ class GameController extends Controller
                 return $data;
             });
         if (count($quizReport['data'])) {
-            if ($quizReport['data'][0]->game_flag === 'hangman-game' || $quizReport['data'][0]->game_flag === 'typing-balloon') {
-                $jsonFile = public_path('json/balloon-game.json');
+            if (in_array($quizReport['data'][0]->game_flag, ['memory-game', 'typing-balloon'])) {
+                $jsonFile = public_path('json/games/balloon-game.json');
+                $jsonData = json_decode(file_get_contents($jsonFile), true);
+                $quizReport['answer_key'] = $jsonData;
+            } else if ($quizReport['data'][0]->game_flag === 'matching-game') {
+                $jsonFile = public_path('json/games/numbers.json');
                 $jsonData = json_decode(file_get_contents($jsonFile), true);
                 $quizReport['answer_key'] = $jsonData;
             } else {
-                $jsonFile = public_path('json/hangman-game.json');
+                $jsonFile = public_path('json/games/hangman-game.json');
                 $jsonData = json_decode(file_get_contents($jsonFile), true);
                 $quizReport['answer_key'] = $jsonData;
             }
@@ -254,6 +255,9 @@ class GameController extends Controller
             case 'vowel_consonants':
                 $url = '/vowel-consonants';
                 break;
+            default:
+                $url = 'numbers';
+                break;
         }
 
         $textbookName = null;
@@ -261,8 +265,10 @@ class GameController extends Controller
             $textbookName = 'Alphabets/Words';
         else if ($retake->textbook_flag === 'typing-balloon')
             $textbookName = 'Vowels/Consonants';
-        else
+        else if ($retake->textbook_flag === 'memory-game')
             $textbookName = 'Alphabets/Letters';
+        else
+            $textbookName = 'Numbers';
 
         Notification::create([
             'student_id' => $retake->student_id,

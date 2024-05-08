@@ -277,7 +277,7 @@ class TextbookAlphabetController extends Controller
     {
         $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         TextbookAlphabet::where('teacher_id', $teacherId)->delete();
-        $jsonFile = public_path('json/alphabets-with-letters.json');
+        $jsonFile = public_path('json/textbooks/alphabets-letters.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 
         foreach ($jsonData as $data) {
@@ -298,7 +298,7 @@ class TextbookAlphabetController extends Controller
             ]);
         }
 
-        $jsonFile = public_path('json/vowel-consonants.json');
+        $jsonFile = public_path('json/textbooks/vowels-consonants.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 
         foreach ($jsonData as $json) {
@@ -321,7 +321,7 @@ class TextbookAlphabetController extends Controller
             }
         }
 
-        $jsonFile = public_path('json/alphabets-with-words.json');
+        $jsonFile = public_path('json/textbooks/alphabets-words.json');
         $jsonData = json_decode(file_get_contents($jsonFile), true);
 
         foreach ($jsonData as $data) {

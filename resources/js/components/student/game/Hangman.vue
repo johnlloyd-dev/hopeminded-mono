@@ -208,7 +208,7 @@ export default {
         },
         fetchWords() {
             this.gameLoading = true
-            axios.get('json/hangman-game.json')
+            axios.get('json/games/hangman-game.json')
                 .then((response) => {
                     this.words = response.data.filter(item => {
                         return item.word.length != 3
@@ -322,7 +322,7 @@ export default {
         },
         setLetters() {
             this.gameLoading = true
-            axios.get('json/balloon-game.json')
+            axios.get('json/alphabets-hand-signs.json')
                 .then((response) => {
                     this.letters = response.data.map(item => {
                         return {

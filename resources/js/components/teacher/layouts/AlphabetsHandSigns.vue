@@ -39,8 +39,8 @@ export default {
     },
     methods: {
         async getHandSigns() {
-            const alphabetLetters = await axios.get('json/balloon-game.json')
-            this.data = alphabetLetters.data
+            const { data } = await axios.get('json/alphabets-hand-signs.json')
+            this.data = data
         },
     },
 }

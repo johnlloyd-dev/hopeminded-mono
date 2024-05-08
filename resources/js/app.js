@@ -31,14 +31,8 @@ app.component('loading-component', Loading);
 // import VowelConsonants from './components/teacher/layouts/VowelConsonants.vue';
 // app.component('vowel-consonants-component', VowelConsonants);
 
-import HandSign from './components/teacher/layouts/HandSign.vue';
-app.component('hand-sign-component', HandSign);
-
 import PasswordResetForm from './components/PasswordResetForm.vue';
 app.component('password-reset-component', PasswordResetForm);
-
-import Object from './components/teacher/layouts/Objects.vue';
-app.component('object-component', Object);
 
 import VueSidebarMenu from 'vue-sidebar-menu'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
