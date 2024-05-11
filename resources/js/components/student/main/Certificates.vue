@@ -24,7 +24,7 @@
                                                         class="accordion-button collapsed bg-secondary text-white fw-bold" type="button"
                                                         data-bs-toggle="collapse" data-bs-target="#collapseOne"
                                                         aria-expanded="false" aria-controls="collapseOne">
-                                                        Alphabet-Letters/Memory Game
+                                                        Alphabets-Letters/Memory Game
                                                     </button>
                                                 </h2>
                                                 <div id="collapseOne" class="accordion-collapse collapse rounded-0"
@@ -70,7 +70,7 @@
                                                         class="accordion-button collapsed bg-secondary text-white fw-bold" type="button"
                                                         data-bs-toggle="collapse" data-bs-target="#collapseThree"
                                                         aria-expanded="false" aria-controls="collapseThree">
-                                                        Alphabet-Words/Hangman Game
+                                                        Alphabets-Words/Hangman Game
                                                     </button>
                                                 </h2>
                                                 <div id="collapseThree" class="accordion-collapse collapse rounded-0"
@@ -79,6 +79,36 @@
                                                         <span v-if="certificates.hangman.length === 0">No
                                                             certificates yet</span>
                                                         <ul v-else v-for="item in certificates.hangman" :key="item.id"
+                                                            class="list-group rounded-0">
+                                                            <li class="list-group-item">
+                                                                <a style="margin-right: 30px;" :href="item.file_url"
+                                                                    download>{{ item.file_name }}</a>
+                                                                <button type="button" @click="viewFile(item.file_url)"
+                                                                    class="btn btn-primary rounded-0 btn-sm">
+                                                                    View Certificate
+                                                                    <i class="fas fa-external-link-alt"></i>
+                                                                </button>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="accordion-item rounded-0 mb-3">
+                                                <h2 class="accordion-header" id="headingThree">
+                                                    <button
+                                                        style="border-radius: 0"
+                                                        class="accordion-button collapsed bg-secondary text-white fw-bold" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseFour"
+                                                        aria-expanded="false" aria-controls="collapseFour">
+                                                        Numbers/Matching Game
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseFour" class="accordion-collapse collapse rounded-0"
+                                                    aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                                                    <div class="accordion-body">
+                                                        <span v-if="certificates.matching.length === 0">No
+                                                            certificates yet</span>
+                                                        <ul v-else v-for="item in certificates.matching" :key="item.id"
                                                             class="list-group rounded-0">
                                                             <li class="list-group-item">
                                                                 <a style="margin-right: 30px;" :href="item.file_url"
@@ -145,7 +175,8 @@ export default {
             certificates: {
                 hangman: [],
                 memory: [],
-                typing: []
+                typing: [],
+                matching: []
             }
         }
     },
@@ -164,11 +195,17 @@ export default {
                 this.certificates.hangman = response.data.filter(data => {
                     return data.game_flag == 'hangman-game'
                 })
+
                 this.certificates.memory = response.data.filter(data => {
                     return data.game_flag == 'memory-game'
                 })
+
                 this.certificates.typing = response.data.filter(data => {
                     return data.game_flag == 'typing-balloon'
+                })
+
+                this.certificates.typing = response.data.filter(data => {
+                    return data.game_flag == 'matching-game'
                 })
             } catch (error) {
                 console.log(error)

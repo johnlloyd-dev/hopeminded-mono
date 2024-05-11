@@ -28,7 +28,8 @@ const quizTypingBalloon = () => import("../components/student/game/quiz/Balloon.
 const memoryGame = () => import("../components/student/game/Memory.vue");
 const quizMemoryGame = () => import("../components/student/game/quiz/Memory.vue");
 
-const matchingCards = () => import("../components/student/game/Match.vue");
+const matchingGame = () => import("../components/student/game/Match.vue");
+const quizMatchingGame = () => import("../components/student/game/quiz/Match.vue");
 
 const alphabetByLetters = () => import("../components/student/textbook/AlphabetLetters.vue");
 const alphabetByWords = () => import("../components/student/textbook/AlphabetWords.vue");
@@ -212,7 +213,15 @@ const routes = [
     {
         name: "matching-cards",
         path: "/matching-cards",
-        component: matchingCards,
+        component: matchingGame,
+        meta: {
+            title: `Matching Cards`,
+        },
+    },
+    {
+        name: "quiz-matching-game",
+        path: "/quiz-matching-game",
+        component: quizMatchingGame,
         meta: {
             title: `Matching Cards`,
         },

@@ -164,7 +164,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="memory-game">
+                                    <div class="memory-game mb-3">
                                         <button
                                             class="btn btn-secondary d-block fw-bold rounded-0 w-100 d-flex justify-content-between align-items-center mb-1 fs-6 p-3"
                                             type="button" data-bs-toggle="collapse" data-bs-target="#hangmanGame"
@@ -239,11 +239,86 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="matching-game">
+                                        <button
+                                            class="btn btn-secondary d-block fw-bold rounded-0 w-100 d-flex justify-content-between align-items-center mb-1 fs-6 p-3"
+                                            type="button" data-bs-toggle="collapse" data-bs-target="#matchingGame"
+                                            aria-expanded="false" aria-controls="matchingGame">
+                                            <span>Matching Game</span>
+                                            <i class="fas fa-chevron-circle-down"></i>
+                                        </button>
+                                        <div class="collapse rounded-0" id="matchingGame">
+                                            <div class="card card-body rounded-0">
+                                                <template v-if="isLoading">
+                                                    <ul class="o-vertical-spacing o-vertical-spacing--l">
+                                                        <li class="blog-post o-media">
+                                                            <div class="o-media__figure">
+                                                                <span class="skeleton-box"
+                                                                    style="width:100px;height:80px;"></span>
+                                                            </div>
+                                                            <div class="o-media__body">
+                                                                <div class="o-vertical-spacing">
+                                                                    <h3 class="blog-post__headline">
+                                                                        <span class="skeleton-box"
+                                                                            style="width:55%;"></span>
+                                                                    </h3>
+                                                                    <p>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:80%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:90%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:83%;"></span>
+                                                                        <span class="skeleton-box"
+                                                                            style="width:80%;"></span>
+                                                                    </p>
+                                                                    <div class="blog-post__meta">
+                                                                        <span class="skeleton-box"
+                                                                            style="width:70px;"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </template>
+                                                <template v-else>
+                                                    <h6 class="fw-bold">Perfect Score: <span class="text-danger">{{ perfectScore.matching_game }}</span></h6>
+                                                    <table class="table table-bordered table-responsive">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Attempt Number</th>
+                                                                <th scope="col">Date/Time</th>
+                                                                <th scope="col">Score</th>
+                                                                <th scope="col">Percentage</th>
+                                                                <th scope="col">Mark</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody v-if="matchingGame.length === 0">
+                                                            <tr>
+                                                                <td colspan="5" class="text-center fw-bold">No data found
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tbody v-else>
+                                                            <tr v-for="item in matchingGame" :key="item.id">
+                                                                <td>{{ item.attempt_number }}</td>
+                                                                <td>{{ new Date(item.created_at).toLocaleString() }}</td>
+                                                                <td>{{ `${item.total_score} / ${perfectScore.matching_game}` }}</td>
+                                                                <td>{{ percentage(item.total_score, 'mc') }}%</td>
+                                                                <td>{{ item.mark.toUpperCase() }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                    <h6 class="fw-bold">Highest Score: <span class="fw-bold text-danger">{{ highestScores['matching_game'] ?? 0 }}/{{ perfectScore.matching_game }}</span></h6>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <hr class="my-4">
                                     <h3 class="fw-bold mb-3">Skill Test Report</h3>
                                     <p v-if="Object.keys(passingPercentages).length" class="alert alert-warning fw-bold" role="alert">Note: The percentage set by your teacher for the skill test passing score is <span class="fw-bold">{{ passingPercentages['skill_test'][0].percentage }}%.</span></p>
                                     <div class="row">
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-3">
                                             <div class="card" style="width: 18rem;">
                                                 <div class="card-body">
                                                     <h5 class="card-title fw-bold">Alphabets-Words</h5>
@@ -255,7 +330,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-3">
                                             <div class="card" style="width: 18rem;">
                                                 <div class="card-body">
                                                     <h5 class="card-title fw-bold">Vowels-Consonants</h5>
@@ -263,11 +338,11 @@
                                                     <p class="card-text">Submitted: <span class="fw-bold">{{ skillTestReports['vowel-consonants'].submitted }}/26</span></p>
                                                     <p class="card-text">Average Score: <span class="fw-bold">{{ skillTestReports['vowel-consonants'].average }}/10</span></p>
                                                     <p class="card-text">Percentage: <span class="fw-bold">{{ skillTestReports['vowel-consonants'].percentage ?? '[No records found]'  }}</span></p>
-                                                    <p class="card-text">Mark: <span class="fw-bold" :class="skillTestReports['vowel-consonants'].mark ? 'text-danger' : 'text-success'">{{ skillTestReports['alphabet-words'].mark }}</span></p>
+                                                    <p class="card-text">Mark: <span class="fw-bold" :class="skillTestReports['vowel-consonants'].mark ? 'text-danger' : 'text-success'">{{ skillTestReports['vowel-consonants'].mark }}</span></p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-3">
                                             <div class="card" style="width: 18rem;">
                                                 <div class="card-body">
                                                     <h5 class="card-title fw-bold">Alphabets-Letters</h5>
@@ -275,7 +350,19 @@
                                                     <p class="card-text">Submitted: <span class="fw-bold">{{ skillTestReports['alphabet-letters'].submitted }}/26</span></p>
                                                     <p class="card-text">Average Score: <span class="fw-bold">{{ skillTestReports['alphabet-letters'].average }}/10</span></p>
                                                     <p class="card-text">Percentage: <span class="fw-bold">{{ skillTestReports['alphabet-letters'].percentage ?? '[No records found]'  }}</span></p>
-                                                    <p class="card-text">Mark: <span class="fw-bold" :class="skillTestReports['alphabet-letters'].mark ? 'text-danger' : 'text-success'">{{ skillTestReports['alphabet-words'].mark }}</span></p>
+                                                    <p class="card-text">Mark: <span class="fw-bold" :class="skillTestReports['alphabet-letters'].mark ? 'text-danger' : 'text-success'">{{ skillTestReports['alphabet-letters'].mark }}</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="card" style="width: 18rem;">
+                                                <div class="card-body">
+                                                    <h5 class="card-title fw-bold">Numbers</h5>
+                                                    <hr>
+                                                    <p class="card-text">Submitted: <span class="fw-bold">{{ skillTestReports['numbers'].submitted }}/10</span></p>
+                                                    <p class="card-text">Average Score: <span class="fw-bold">{{ skillTestReports['numbers'].average }}/10</span></p>
+                                                    <p class="card-text">Percentage: <span class="fw-bold">{{ skillTestReports['numbers'].percentage ?? '[No records found]'  }}</span></p>
+                                                    <p class="card-text">Mark: <span class="fw-bold" :class="skillTestReports['numbers'].mark ? 'text-danger' : 'text-success'">{{ skillTestReports['numbers'].mark }}</span></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -325,7 +412,8 @@ export default {
             return {
                 memory_game: 59,
                 hangman_game: 18,
-                typing_balloon: 51
+                typing_balloon: 51,
+                matching_game: 24
             }
         },
         hangmanGame() {
@@ -352,12 +440,20 @@ export default {
             }
             return this.data
         },
+        matchingGame() {
+            if (this.data && this.data.length) {
+                return this.data.filter((data) => {
+                    return data.game_id === 4
+                })
+            }
+            return this.data
+        },
         skillTestReports() {
             let data = {};
-            const flags = ['alphabet-words', 'alphabet-letters', 'vowel-consonants'];
+            const flags = ['alphabet-words', 'alphabet-letters', 'vowel-consonants', 'numbers'];
 
             flags.forEach(element => {
-                if (this.skillTestsData.hasOwnProperty(element)) {
+                if (this.skillTestsData && this.skillTestsData.hasOwnProperty(element)) {
                     data[element] = {
                         submitted: this.skillTestsData[element].submitted,
                         average: this.skillTestsData[element].average,
@@ -389,6 +485,8 @@ export default {
                 return Math.round((score / this.perfectScore.hangman_game) * 100);
             else if (flag === 'tp')
                 return Math.round((score / this.perfectScore.typing_balloon) * 100);
+            else if (flag === 'mc')
+                return Math.round((score / this.perfectScore.matching_game) * 100);
             else
                 return Math.round((score / this.perfectScore.memory_game) * 100);
         },
