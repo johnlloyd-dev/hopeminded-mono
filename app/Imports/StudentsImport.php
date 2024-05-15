@@ -19,14 +19,14 @@ class StudentsImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-        $email_exist = Student::where('email', $row['email'])->first();
-
-        if ($email_exist) {
-            return null;
-        }
-
         $auth = Auth::user();
         $teacher = Teacher::where('user_id', $auth->id)->first();
+
+        $student = Student::where('email', $row['email'])->first();
+
+        if ($student) {
+            return null;
+        }
 
         $defaultUsername = "";
         if (isset($row['last_name'])) {

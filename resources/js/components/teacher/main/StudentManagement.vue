@@ -127,6 +127,23 @@
                                                 </div>
                                         </div>
                                     </div>
+                                    <div>
+                                        <button class="btn rounded-0 btn-secondary btn-sm mt-2 fw-bold w-100" type="button"
+                                            data-bs-toggle="collapse" :data-bs-target="`#numbers${index}`"
+                                            aria-expanded="false" aria-controls="numbers">
+                                            Numbers
+                                        </button>
+                                        <div class="collapse fw-bold text-center bg-danger bg-gradient text-white" :id="`numbers${index}`">
+                                            <span class="mb-0 me-2">Submitted: <span class="fw-bold rounded-5 p-1">{{
+                                                getProgressPercentage(student, 'numbers') }}/10</span></span>
+                                            <span class="vr"></span>
+                                            <span class="mb-0 ms-2">Lacking: <span class="fw-bold rounded-5 p-1">{{ 10 -
+                                                (getProgressPercentage(student, 'numbers'))}}</span></span>
+                                                <div class="progress rounded-0 bg-white">
+                                                    <div style="min-width: 20px;" :class="getProgressPercentage(student, 'numbers') !== 0 ? 'progress-bar-striped progress-bar-animated' : 'bg-white text-dark'" class="progress-bar" role="progressbar" :style="`width: ${Math.round(((getProgressPercentage(student, 'alphabet-words'))/26) * 100)}%;`" :aria-valuenow="Math.round(((getProgressPercentage(student, 'alphabet-words'))/26) * 100)" aria-valuemin="0" aria-valuemax="100">{{ Math.round(((getProgressPercentage(student, 'alphabet-words'))/26) * 100) }}%</div>
+                                                </div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="w-25">
                                     <div>
@@ -157,9 +174,20 @@
                                             aria-expanded="false" aria-controls="hangmanGameCollapse">
                                             Hangman Game
                                         </button>
-                                        <div class="collapse fw-bold text-center bg-white"
+                                        <div class="collapse fw-bold text-center bg-success"
                                             :id="`hangmanGameCollapse${index}`">
-                                            <span>Highest Score: {{ student.hangman_game }}</span>
+                                            <span class="text-white">Highest Score: {{ student.hangman_game }}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn rounded-0 btn-secondary btn-sm mt-2 fw-bold w-100" type="button"
+                                            data-bs-toggle="collapse" :data-bs-target="`#matchingGame${index}`"
+                                            aria-expanded="false" aria-controls="matchingGame">
+                                            Matching Game
+                                        </button>
+                                        <div class="collapse fw-bold text-center bg-danger"
+                                            :id="`matchingGame${index}`">
+                                            <span class="text-white">Highest Score: {{ student.matching_game }}</span>
                                         </div>
                                     </div>
                                 </td>

@@ -28,9 +28,20 @@
                             :checked="gameId == 3">
                         <label class="btn btn-outline-dark fw-bold rounded-0"
                             :class="gameId == 3 ? 'text-white' : 'text-black'" for="btnradio3">Memory Game</label>
+
+                        <input type="radio" class="btn-check" v-model="gameId" :value="4" id="btnradio4" autocomplete="off"
+                            :checked="gameId == 4">
+                        <label class="btn btn-outline-dark fw-bold rounded-0"
+                            :class="gameId == 4 ? 'text-white' : 'text-black'" for="btnradio4">Matching Game</label>
                     </div>
                 </div>
-                <AlphabetReports ref="AlphabetReports" :reports="reports" :student-id="studentId" :flag="flag" :game-name="gameName" :quiz-report-highest-score="quizReportHighestScore" :quiz-report-retake="quizReportRetake" />
+                <AlphabetReports ref="AlphabetReports"
+                    :reports="reports"
+                    :student-id="studentId"
+                    :flag="flag"
+                    :game-name="gameName"
+                    :quiz-report-highest-score="quizReportHighestScore"
+                    :quiz-report-retake="quizReportRetake" />
             </div>
         </div>
     </div>
@@ -99,8 +110,11 @@ export default {
                 this.flag = 'alphabet-words'
             else if (value === 2)
                 this.flag = 'vowel-consonants'
-            else
+            else if (value === 3)
                 this.flag = 'alphabet-letters'
+            else
+                this.flag = 'numbers'
+
             this.certificates = []
             this.isLoading = true
             this.filterReports()
@@ -118,8 +132,10 @@ export default {
                 return 'Hangman Game/Alphabets-Words'
             } else if (this.gameId == 2) {
                 return 'Typing Balloon/Vowels-Consonants'
-            } else {
+            } else if (this.gameId == 3) {
                 return 'Memory Game/Alphabets-Letters'
+            } else {
+                return 'Matching Game/Numbers'
             }
         },
         selectedSkillTest() {
@@ -207,6 +223,8 @@ export default {
                 return Math.round((score / 51) * 100);
             } else if (this.gameId == 3) {
                 return Math.round((score / 59) * 100);
+            } else {
+                return Math.round((score / 24) * 100);
             }
         },
         filterReports() {

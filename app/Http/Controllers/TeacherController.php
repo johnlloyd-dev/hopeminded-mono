@@ -62,9 +62,14 @@ class TeacherController extends Controller
         $defaultSkillTestSubmission = [
             [
                 'teacher_id' => $teacher->id,
-                'flag' => 'skill_test',
+                'flag' => 'alphabet',
                 'value' => 26
-            ]
+            ],
+            [
+                'teacher_id' => $teacher->id,
+                'flag' => 'number',
+                'value' => 10
+            ],
         ];
 
         $mailData = [

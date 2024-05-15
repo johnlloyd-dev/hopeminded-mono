@@ -23,7 +23,7 @@ class QuizReportController extends Controller
             ->orderByRaw('-total_score ASC')
             ->get()
             ->map(function ($report) {
-                $perfect_score = Game::find($report->game_id)->perfect_score;
+                $perfect_score = Game::find($report->game_id)->quizScore->first()->perfect_score;
                 $percentage = ((int)$report->total_score / $perfect_score) * 100;
 
                 $report->perfect_score = $perfect_score;

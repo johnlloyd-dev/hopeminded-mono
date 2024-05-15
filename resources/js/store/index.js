@@ -162,11 +162,7 @@ export const store = new createStore({
         },
         async getQuantityRequiement(context, flag) {
             try {
-                const response = await axios.get(`/api/quantity-requirements/get`, {
-                    params: {
-                        flag: flag
-                    }
-                })
+                const response = await axios.get(`/api/quantity-requirements/get`)
 
                 if (response.status == 200) {
                     context.commit("SET_QUANTITY_REQUIREMENT", response.data);

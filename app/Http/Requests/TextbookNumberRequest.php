@@ -22,8 +22,7 @@ class TextbookNumberRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'value' => 'required|numeric|between:1,10|unique:textbook_numbers,value',
-            'object_name' => 'required',
+            'value' => 'required|numeric|between:0,9',
             'image' => 'required|mimes:jpeg,png,jpg,gif',
             'video' => 'required|mimetypes:video/avi,video/mpeg,video/quicktime,video/mp4'
         ];

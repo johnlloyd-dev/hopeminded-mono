@@ -222,7 +222,7 @@ class GameController extends Controller
                 $jsonData = json_decode(file_get_contents($jsonFile), true);
                 $quizReport['answer_key'] = $jsonData;
             } else if ($quizReport['data'][0]->game_flag === 'matching-game') {
-                $jsonFile = public_path('json/games/numbers.json');
+                $jsonFile = public_path('json/games/matching-game.json');
                 $jsonData = json_decode(file_get_contents($jsonFile), true);
                 $quizReport['answer_key'] = $jsonData;
             } else {

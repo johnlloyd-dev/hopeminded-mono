@@ -49,8 +49,8 @@
                                     <div class="card rounded-0 border-bottom-0 p-2">
                                         <div class="row p-1">
                                             <div class="col-2 d-flex align-items-center">
-                                                <h5 class="mb-0">Alphabet: <span class="fw-bold text-danger">{{
-                                                    item.toUpperCase() }}</span></h5>
+                                                <h5 class="mb-0">{{ typeof item == 'string' ? 'Alphabet' : 'Number' }}: <span class="fw-bold text-danger">{{
+                                                    typeof item == 'string' ?  item.toUpperCase() : item }}</span></h5>
                                             </div>
                                             <div v-if="skillTest.hasOwnProperty(item)"
                                                 class="col-2 d-flex align-items-center">
@@ -853,7 +853,11 @@ export default {
     },
     computed: {
         allAphabets() {
-            return Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i));
+            if (this.gameId != 4) {
+                return Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i));
+            } else {
+                return Array.from({length: 10}, (_, index) => index).sort((a, b) => a - b);
+            }
         },
         isReportsLoading() {
             return this.$parent.isLoading
@@ -1055,6 +1059,9 @@ export default {
                         break;
                     case 'vowel-consonants':
                         gameFlag = 'typing-balloon'
+                        break;
+                    case 'numbers':
+                        gameFlag = 'matching-game'
                         break;
                 }
 

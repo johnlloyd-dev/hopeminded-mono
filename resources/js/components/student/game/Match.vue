@@ -365,7 +365,7 @@ export default {
                     this.cancelButtonText = 'Exit'
                 } else {
                     this.mistakes++
-                    $('#exampleModal').modal('show')
+                    // $('#exampleModal').modal('show')
                 }
             }
         },

@@ -20,7 +20,7 @@ class QuantityRequirementController extends Controller
             $student = Student::where('user_id', Auth::user()->id)->first();
             $teacherId = $student->teacher_id;
         }
-        return QuantityRequirement::where('teacher_id', $teacherId)->where('flag', $request->query('flag'))->first();
+        return QuantityRequirement::where('teacher_id', $teacherId)->get();
     }
 
     public function updateQuantityRequirement(Request $request, $id)

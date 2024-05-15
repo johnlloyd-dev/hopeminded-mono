@@ -111,13 +111,13 @@
                                     aria-describedby="value">
                                 <small class="text-danger" v-if="errors && errors.value">{{ errors.value[0] }}</small>
                             </div>
-                            <div class="mb-3">
+                            <!-- <div class="mb-3">
                                 <label for="_n" class="form-label fw-bold">Object Name</label>
                                 <input v-model="numberContent.object_name" type="text" class="form-control" id="_n"
                                     aria-describedby="_n">
                                 <small class="text-danger" v-if="errors && errors.object_name">{{ errors.object_name[0]
                                 }}</small>
-                            </div>
+                            </div> -->
                             <div class="mb-3">
                                 <label for="image" class="form-label fw-bold">Image File</label>
                                 <input ref="imageFileInput" accept="image/*" @change="changeImageFile" type="file" class="form-control" id="image">

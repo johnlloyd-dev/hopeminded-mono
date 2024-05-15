@@ -71,20 +71,39 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-lg-6">
-                                            <div v-if="!isEdit" class="d-flex align-items-center">
+                                            <div v-if="!isEditAlphabet && !isEditNumber">
                                                 <p class="mb-0">
                                                     Required Number of Skill Test Submissions:
-                                                    <span class="fw-bold text-danger me-2">{{ quantityRequirement?.value ?? 0 }}</span>
-                                                    <i @click="isEdit = !isEdit" style="cursor: pointer" class="fas fa-edit"></i>
                                                 </p>
+                                                <ul>
+                                                    <li>
+                                                        <span class="fw-bold">Alphabets: </span>
+                                                        <span class="fw-bold text-danger me-2">{{ alphabetValue || 0 }}</span>
+                                                        <i @click="isEditAlphabet = !isEditAlphabet" style="cursor: pointer" class="fas fa-edit"></i>
+                                                    </li>
+                                                    <li>
+                                                        <span class="fw-bold">Numbers: </span>
+                                                        <span class="fw-bold text-danger me-2">{{ numberValue || 0 }}</span>
+                                                        <i @click="isEditNumber = !isEditNumber" style="cursor: pointer" class="fas fa-edit"></i>
+                                                    </li>
+                                                </ul>
                                             </div>
-                                            <div v-else>
+                                            <div v-else-if="isEditAlphabet">
                                                 <label for="exampleFormControlInput1" class="form-label">Please enter a
                                                     number:</label>
-                                                <input v-model="value" type="text" class="form-control">
+                                                <input v-model="alphabetValue" type="text" class="form-control">
                                                 <div class="action-buttons mt-3">
                                                     <button type="button" @click="updateQuantityRequirement()" class="btn btn-primary btn-sm me-3">Save <i class="fas fa-save"></i></button>
-                                                    <button type="button" @click="isEdit = !isEdit" class="btn btn-secondary btn-sm">Cancel <i class="fas fa-times-circle"></i></button>
+                                                    <button type="button" @click="isEditAlphabet = !isEditAlphabet" class="btn btn-secondary btn-sm">Cancel <i class="fas fa-times-circle"></i></button>
+                                                </div>
+                                            </div>
+                                            <div v-else-if="isEditNumber">
+                                                <label for="exampleFormControlInput1" class="form-label">Please enter a
+                                                    number:</label>
+                                                <input v-model="numberValue" type="text" class="form-control">
+                                                <div class="action-buttons mt-3">
+                                                    <button type="button" @click="updateQuantityRequirement()" class="btn btn-primary btn-sm me-3">Save <i class="fas fa-save"></i></button>
+                                                    <button type="button" @click="isEditNumber = !isEditNumber" class="btn btn-secondary btn-sm">Cancel <i class="fas fa-times-circle"></i></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -109,9 +128,10 @@ export default {
     data() {
         return {
             collapsed: false,
-            quantityRequirementFlag: 'skill_test',
+            quantityRequirementFlag: 'alphabet',
             passingPercentage: [],
-            value: 0,
+            alphabetValue: 0,
+            numberValue: 0,
             selectedPercentage: {
                 skill_test: null,
                 quiz: null
@@ -122,7 +142,8 @@ export default {
                 { name: '75%', value: 75 },
                 { name: '80%', value: 80 }
             ],
-            isEdit: false
+            isEditAlphabet: false,
+            isEditNumber: false
         }
     },
     computed: {
@@ -133,7 +154,8 @@ export default {
     created() {
         this.getPassingPercentage()
         this.getQuantityRequirement(this.quantityRequirementFlag).then(() => {
-            this.value = this.quantityRequirement.value
+            this.alphabetValue = this.quantityRequirement.find(data=>data.flag=='alphabet').value;
+            this.numberValue = this.quantityRequirement.find(data=>data.flag=='number').value;
         })
     },
     methods: {
@@ -172,14 +194,22 @@ export default {
             }, 500)
         },
         async updateQuantityRequirement() {
+            const requirementId = this.isEditAlphabet ? this.quantityRequirement.find(data=>data.flag=='alphabet').id : this.quantityRequirement.find(data=>data.flag=='number').id;
+            const value = this.isEditAlphabet ? this.alphabetValue : this.numberValue;
+
             setTimeout(async () => {
                 try {
-                    const response = await axios.put(`/api/quantity-requirement/update/${this.quantityRequirement.id}`, { value: this.value })
+                    const response = await axios.put(`/api/quantity-requirement/update/${requirementId}`, { value: value })
 
                     if (response.status == 200 || response.status == 201) {
                         swal.fire('Success', response.data, 'success')
-                        this.isEdit = !this.isEdit
-                        this.getQuantityRequirement(this.quantityRequirementFlag)
+                        if (this.isEditAlphabet) {
+                            this.isEditAlphabet = !this.isEditAlphabet
+                        } else {
+                            this.isEditNumber = !this.isEditNumber
+                        }
+
+                        this.getQuantityRequirement()
                     }
                 } catch (error) {
                     console.log(error)
