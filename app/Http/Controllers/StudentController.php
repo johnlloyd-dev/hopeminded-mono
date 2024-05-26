@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Game;
 use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
@@ -57,46 +59,97 @@ class StudentController extends Controller
         ]);
     }
 
-    public function getTop10Students()
+    public function getTopStudents()
     {
-        return $quizReport = Student::join('quiz_reports', 'students.id', '=', 'quiz_reports.student_id')
-            ->where('flag', 'quiz')
-            ->orderByRaw('-total_score ASC')
+        $teacher_id = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        $games = Game::with('quizScore')->get();
+
+        return Student::select(
+            DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'),
+            'students.id'
+        )
+            ->with(['quiz', 'skill_test'])
+            ->where('teacher_id', $teacher_id)
+            ->orderByRaw('id')
             ->get()
-            ->map(function ($report) {
-                $perfect_score = Game::find($report->game_id)->perfect_score;
-                $percentage = ((int)$report->total_score / $perfect_score) * 100;
+            ->filter(function ($report) {
+                $quiz = $report->quiz->first();
+                $skillTest = $report->skill_test->first();
 
-                $report->perfect_score = $perfect_score;
-                $report->percentage = round($percentage);
-                return $report;
-            });
+                $quizCount = $report->quiz->count();
+                $skillTestTextbookCount = $report->skill_test->groupBy('flag')->count();
+                $skillTestComplete = $report->skill_test->groupBy('flag')->some(function ($data, $key) {
+                    if ($key == 'numbers') {
+                        return $data->count() >= 10;
+                    } else {
+                        return $data->count() >= 26;
+                    }
+                });
 
-        if ($quizReport->count()) {
-            $groupedObjects = [];
-
-            foreach ($quizReport['data'] as $object) {
-                $gameId = $object['game_id'];
-
-                if (!isset($groupedObjects[$gameId])) {
-                    $groupedObjects[$gameId] = [];
+                if ($quiz && $skillTest) {
+                    // if ($quizCount >= 4) {
+                    if ($quizCount >= 4 && ($skillTestTextbookCount >= 4 && $skillTestComplete)) {
+                        return TRUE;
+                    }
                 }
 
-                $groupedObjects[$gameId][] = $object;
-            }
-            $itemKeys = $groupedObjects;
-            $highest_scores = [];
+                return FALSE;
+            })
+            ->map(function ($data) use ($games) {
+                // Quiz
+                $data->quiz->transform(function ($data) use ($games) {
+                    $game = $games->firstWhere('id', $data->game_id);
+                    $perfectScore = $game->quizScore->first()->perfect_score;
 
+                    $data->perfect_score = $perfectScore;
+                    $data->percentage = round(($data->highest_score / $perfectScore) * 100);
 
-            foreach ($itemKeys as $key => $group) {
-                $totalScores = array_column($group, 'total_score');
-                $totalScores = array_map('intval', $totalScores);
+                    return $data;
+                });
+                // End of Quiz
 
-                $highest_score = max($totalScores);
-                $highest_scores[$key] = $highest_score;
-            }
+                // Skill Test
+                $skillTest = $data->skill_test->groupBy('flag')
+                    ->values()
+                    ->map(function ($data) {
+                        $item = $data->first();
+                        $perfectScore = 0;
 
-            $quizReport['highest_score'] = $highest_scores;
-        }
+                        if ($item->flag != 'numbers') {
+                            $perfectScore = 260;
+                        } else {
+                            $perfectScore = 100;
+                        }
+
+                        $totalScore = $data->sum('highest_score');
+
+                        $percentage = round(($totalScore / $perfectScore) * 100);
+
+                        return [
+                            'total' => $totalScore,
+                            'perfect_score' => $perfectScore,
+                            'percentage' => $percentage,
+                            'flag' => $item['flag'],
+                            'student_id' => $item['student_id']
+                        ];
+                    });
+                // End of Skill Test
+
+                $data->quiz_percentage = round($data->quiz->sum('percentage') / $data->quiz->count());
+                $data->quiz_mark = $data->quiz_percentage < 75 ? 'failed' : 'passed';
+
+                $data->skill_test_percentage = round($skillTest->sum('percentage') / $skillTest->count());
+                $data->skill_test_mark = $data->skill_test_percentage < 75 ? 'failed' : 'passed';
+
+                $data->overall_percentage = ($data->skill_test_percentage + $data->quiz_percentage) / 2;
+                $data->overall_mark = $data->overall_percentage < 75 ? 'failed' : 'passed';
+
+                unset($data->quiz);
+                unset($data->skill_test);
+
+                return $data;
+            })
+            ->take(10)
+            ->sortBy('overall_percentage');
     }
 }

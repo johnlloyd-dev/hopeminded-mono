@@ -18,7 +18,13 @@ export default {
         return {
             chartOptions: {
                 responsive: true,
-                indexAxis: 'y'
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        min: 0,
+                        max: 100,
+                    }
+                }
             }
         }
     },

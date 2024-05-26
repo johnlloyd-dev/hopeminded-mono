@@ -135,24 +135,55 @@ class QuizReportController extends Controller
         // Initialize an empty result array to store the grouped data
         $result = [];
 
-        foreach ($quizMistakes as $item) {
-            $gameFlag = $item->game_flag;
-            $alphabet = $gameFlag == 'memory-game' ? $item->attributes->alphabet : strtoupper($item->attributes->answer);
-            $mark = $item->attributes->mark;
+        if ($request->query('game_flag') != 'matching-game') {
+            foreach ($quizMistakes as $item) {
+                $gameFlag = $item->game_flag;
+                $mark = $item->attributes->mark;
 
-            // Check if the alphabet exists in the result array
-            if (!isset($result[$alphabet])) {
-                $result[$alphabet] = [
-                    'correct' => 0,
-                    'wrong' => 0,
-                ];
+
+                $alphabet = $gameFlag == 'memory-game' ? $item->attributes->alphabet : strtoupper($item->attributes->answer);
+
+                // Check if the alphabet exists in the result array
+                if (!isset($result[$alphabet])) {
+                    $result[$alphabet] = [
+                        'correct' => 0,
+                        'wrong' => 0,
+                    ];
+                }
+
+                // Update the counts based on the mark
+                if ($mark == 'correct') {
+                    $result[$alphabet]['correct']++;
+                } elseif ($mark == 'wrong') {
+                    $result[$alphabet]['wrong']++;
+                }
             }
+        } else {
+            foreach ($quizMistakes as $item) {
+                $gameFlag = $item->game_flag;
+                $match_a = $item->attributes->match_a;
+                $match_b = $item->attributes->match_b;
 
-            // Update the counts based on the mark
-            if ($mark == 'correct') {
-                $result[$alphabet]['correct']++;
-            } elseif ($mark == 'wrong') {
-                $result[$alphabet]['wrong']++;
+                foreach ($match_a as $key => $a) {
+                    if ($a == $match_b[$key]) {
+                        $mark = 'correct';
+                    } else {
+                        $mark = 'wrong';
+                    }
+
+                    if (!isset($result[$a])) {
+                        $result[$a] = [
+                            'correct' => 0,
+                            'wrong' => 0,
+                        ];
+                    }
+
+                    if ($mark == 'correct') {
+                        $result[$a]['correct']++;
+                    } elseif ($mark == 'wrong') {
+                        $result[$a]['wrong']++;
+                    }
+                }
             }
         }
 
@@ -193,15 +224,19 @@ class QuizReportController extends Controller
     public function getStatisticsSummary(Request $request)
     {
         if ($request->query('category') == 'quiz') {
-            return QuizMistake::select('quiz_mistakes.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
+            $quizMistake = QuizMistake::select('quiz_mistakes.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
                 ->join('students', function ($query) {
                     $query->on('students.id', '=', 'quiz_mistakes.student_id')
                         ->where('students.teacher_id', Teacher::where('user_id', Auth::user()->id)->first()->id);
                 })
                 ->where('game_flag', $request->query('game_flag'))
-                ->whereRaw("JSON_EXTRACT(attributes, '$.mark') = ?", [$request->query('flag')])
-                ->get()
-                ->map(function ($data) use ($request) {
+                ->when($request->query('game_flag') != 'matching-game', function ($query) use ($request) {
+                    $query->whereRaw("JSON_EXTRACT(attributes, '$.mark') = ?", [$request->query('flag')]);
+                })
+                ->get();
+
+            if ($request->query('game_flag') != 'matching-game') {
+                $quizMistake = $quizMistake->map(function ($data) use ($request) {
                     $data->attributes = json_decode($data->attributes);
 
                     if ($request->query('game_flag') != 'memory-game') {
@@ -212,19 +247,65 @@ class QuizReportController extends Controller
 
                     return $data;
                 })
-                ->groupBy(function ($item) {
-                    return $item->attributes->alphabet;
-                })
-                ->map(function ($group) {
-                    return $group->groupBy('full_name')
-                        ->map(function ($student) {
-                            return [
-                                'student_id' => $student->pluck('student_id')->unique()->first(),
-                                'full_name' => $student->pluck('full_name')->unique()->first(),
-                                'count' => $student->count()
-                            ];
-                        })->values();
-                });
+                    ->groupBy(function ($item) {
+                        return $item->attributes->alphabet;
+                    });
+            } else {
+                $itemData = $quizMistake->map(function ($data) use ($request) {
+                    $data->attributes = json_decode($data->attributes);
+                    $match_a = $data->attributes->match_a;
+                    $match_b = $data->attributes->match_b;
+                    $output = [];
+
+                    if ($request->flag == 'correct') {
+                        foreach ($match_a as $key => $a) {
+                            if ($a == $match_b[$key]) {
+                                array_push($output, $a);
+                            }
+                        }
+                    } else {
+                        foreach ($match_a as $key => $a) {
+                            if ($a != $match_b[$key]) {
+                                array_push($output, $a);
+                            }
+                        }
+                    }
+
+                    $data->result = $output;
+
+                    return $data;
+                })->toArray();
+
+                $result = [];
+
+                foreach ($itemData as $data) {
+                    foreach ($data['result'] as $number) {
+                        $result[$data['id']][] = [
+                            'number' => $number,
+                            'student_id' => $data['student_id'],
+                            'full_name' => $data['full_name']
+                        ];
+                    }
+                }
+
+                return $quizMistake = collect($result)
+                    ->values()
+                    ->flatten(1)
+                    ->groupBy(function ($item) {
+                        return $item['number'];
+                    });
+            }
+
+            return $quizMistake->map(function ($group) {
+                return $group->groupBy('full_name')
+                    ->map(function ($student) {
+                        return [
+                            'student_id' => $student->pluck('student_id')->unique()->first(),
+                            'full_name' => $student->pluck('full_name')->unique()->first(),
+                            'count' => $student->count()
+                        ];
+                    })->values();
+            });
         } else {
             return SkillTest::select('skill_tests.*', 'students.id as student_id', DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'))
                 ->join('students', function ($query) {

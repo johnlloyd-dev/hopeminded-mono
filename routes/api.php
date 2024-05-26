@@ -136,7 +136,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('/students/section/update/{student}',  [StudentController::class, 'updateStudentSection']);
 
-    Route::put('/students/rank/top-ten',  [StudentController::class, 'getTop10Students']);
+    Route::get('/students/rank/top-ten',  [StudentController::class, 'getTopStudents']);
     Route::get('/section/students',  [SectionController::class, 'getStudentsOfSection']);
     Route::get('/section/students/not-in-section',  [SectionController::class, 'getStudentsNotInSection']);
     Route::post('/section/students',  [SectionController::class, 'addStudentsToSection']);

@@ -55,7 +55,7 @@
                                             <div v-if="skillTest.hasOwnProperty(item)"
                                                 class="col-2 d-flex align-items-center">
                                                 <h5 class="mb-0">Object: <span class="fw-bold text-danger">{{
-                                                    skillTest[item][0].object }}</span></h5>
+                                                    skillTest[item][0].object.toUpperCase() }}</span></h5>
                                             </div>
                                             <div v-if="skillTestRetake.hasOwnProperty(item)"
                                                 class="col-2 d-flex align-items-center">
@@ -200,18 +200,18 @@
                     <div class="w-50 me-5">
                         <h6 class="fw-bold">Skill Test Score Summary</h6>
                         <p class="d-flex">Submitted:
-                            <span class="fw-bold ms-1">{{ Object.keys(skillTest).length }}/26</span>
+                            <span class="fw-bold ms-1">{{ Object.keys(skillTest).length }}/{{ completeSubmission }}</span>
                             <span class="fw-bold ms-1 text-danger"
-                                v-if="Object.keys(skillTest).length !== 26">(INCOMPLETE)</span>
+                                v-if="Object.keys(skillTest).length !== completeSubmission">(INCOMPLETE)</span>
                         </p>
                         <div class="d-flex flex-column">
                             <p class="mb-0">Passing Percentage: <span class="fw-bold">{{ selectedPercentage.skill_test }}%</span></p>
                             <small class="text-danger">This percentage is set in the <a href="javascript:;" @click="$router.push({ path: '/configuration' })" class="text-danger">Configure Settings</a> page.</small>
                         </div>
                         <hr>
-                        <p :class="{ 'mb-0': Object.keys(skillTest).length !== 26 }">{{ Object.keys(skillTest).length !== 26
+                        <p :class="{ 'mb-0': Object.keys(skillTest).length !== completeSubmission }">{{ Object.keys(skillTest).length !== completeSubmission
                             ? 'Partial Average' : 'Average' }}: <span class="fw-bold">{{ skillTestAverageScore.display }}</span></p>
-                        <p v-if="Object.keys(skillTest).length !== 26">
+                        <p v-if="Object.keys(skillTest).length !== completeSubmission">
                             <small class="text-danger">This average is partial due to the student's incomplete skill test submissions.</small>
                         </p>
                         <h6>Score Percentage: <span class="fw-bold">{{ calculatePercentage(skillTestAverageScore.score)
@@ -264,7 +264,7 @@
                                                 <input :disabled="!skillTestRetake.hasOwnProperty(item)" v-model="allowedskillTestRetake" class="form-check-input" type="checkbox" :value="item"
                                                     id="flexCheckDefault">
                                                 <label class="form-check-label fw-bold" for="flexCheckDefault">
-                                                    {{ item.toUpperCase() }} <span class="text-danger">( {{ skillTestRetake.hasOwnProperty(item) ? skillTestRetake[item].allowed_retake : 0 }} )</span>
+                                                    {{ typeof item == 'string' ? item.toUpperCase() : item }} <span class="text-danger">( {{ skillTestRetake.hasOwnProperty(item) ? skillTestRetake[item].allowed_retake : 0 }} )</span>
                                                 </label>
                                             </div>
                                         </div>
@@ -869,11 +869,11 @@ export default {
             if (Object.keys(this.highestScore).length) {
                 const scores = Object.values(this.highestScore);
                 const totalScore = scores.reduce(function (a, b) { return a + b; }, 0);
-                const count = scores.length
+                const totalCount = this.gameId != 4 ? 26 : 10;
 
                 return {
-                    score: totalScore / count,
-                    display: `${totalScore / count} / ${this.$parent.perfect_score.score}`
+                    score: totalScore / totalCount,
+                    display: `${totalScore / totalCount} / ${this.$parent.perfect_score.score}`
                 };
             }
             return {
@@ -903,6 +903,13 @@ export default {
                 return "The Typing Balloon game is played by pressing the corresponding alphabet key on the keyboard for each letter shown in the balloon."
             } else {
                 return "The Hangman game involves selecting the correct alphabet symbol based on the object image and accompanying text. If the chosen alphabet does not match the object's name, it will be considered incorrect."
+            }
+        },
+        completeSubmission() {
+            if (this.gameId != 4) {
+                return 26;
+            } else {
+                return 10;
             }
         }
     },

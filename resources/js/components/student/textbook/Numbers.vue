@@ -152,7 +152,7 @@
                                             <div v-if="skillTest && Object.keys(skillTest).length" class="row">
                                                 <button style="width: 100px" type="button"
                                                     class="btn rounded-0 fw-bold me-3 btn-warning">
-                                                    {{ indexes.skillTest.toUpperCase() }}
+                                                    {{ indexes.skillTest }}
                                                 </button>
                                             </div>
                                             <div v-else>
@@ -175,7 +175,7 @@
                                                     <div v-for="(item, index) in selectedSkillTest" :key="index"
                                                         class="col-lg-4 col-md-6 text-center mb-4">
                                                         <div class="position-relative badge-overlay">
-                                                            <h5 class="text-center fw-bold">{{ item.object + (index > 0 ? ' (Retake)' : '') }}</h5>
+                                                            <h5 class="text-center fw-bold">{{ item.object.toUpperCase() + (index > 0 ? ' (Retake)' : '') }}</h5>
                                                             <video class="st-width" ref="previewElement"
                                                                 :src="item.file_url" controls></video>
                                                         </div>
@@ -297,7 +297,7 @@ export default {
             availableQuizRetakes: {},
             indexes: {
                 number: 0,
-                skillTest: 1
+                skillTest: 0
             },
             selected: {
                 object: null,
@@ -386,8 +386,8 @@ export default {
             video.setAttribute("src", this.video); // set the new video src
             video.load(); // load the new video
             video.play(); // play the new video
-            this.selected.letter = this.selectedNumber.letter;
-            this.selected.object = this.selectedNumber.object;
+            this.selected.letter = this.selectedNumber.value;
+            this.selected.object = this.selectedNumber.name;
         },
         recordSkillTest() {
             this.active = true

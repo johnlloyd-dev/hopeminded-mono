@@ -281,6 +281,9 @@ class SkillTestController extends Controller
             case 'vowel-consonants':
                 $url = '/vowel-consonants';
                 break;
+            default:
+                $url = 'numbers';
+                break;
         }
 
         Notification::create([

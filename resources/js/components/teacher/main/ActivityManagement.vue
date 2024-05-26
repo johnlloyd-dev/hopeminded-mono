@@ -33,6 +33,14 @@
                                     <h5 class="fw-bold">Alphabets/Letters</h5>
                                     <h6 class="text-start">Memory Game</h6>
                                 </label>
+
+                                <input type="radio" class="btn-check" v-model="gameFlag" value="matching-game" id="matchingGame" autocomplete="off"
+                                    :checked="gameFlag == 'matching-game'">
+                                <label class="btn btn-outline-dark fw-bold rounded-0"
+                                    :class="gameFlag == 'matching-game' ? 'text-white' : 'text-black'" for="matchingGame">
+                                    <h5 class="fw-bold">Numbers</h5>
+                                    <h6 class="text-start">Matching Game</h6>
+                                </label>
                             </div>
                         </div>
                         <Statistics :game-flag="gameFlag"></Statistics>

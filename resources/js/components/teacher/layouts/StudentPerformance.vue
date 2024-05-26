@@ -28,19 +28,55 @@ export default {
 
     },
     mounted() {
-        this.chartData = {
-                labels: ['Student 1', 'Student 2', 'Student 3', 'Student 4', 'Student 5', 'Student 6', 'Student 7', 'Student 8', 'Student 9', 'Student 10'],
-                datasets: [
-                    {
-                        data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                        label: 'Quiz',
-                        backgroundColor: ['#198754', '#6c757d'],
-                    }
-                ]
-            }
+        this.getTopStudents();
     },
     methods: {
+        async getTopStudents() {
+            try {
+                const { data } = await axios.get('api/students/rank/top-ten');
 
+                const labels = [];
+                const scores = [];
+
+                for (let index = 0; index < 10; index++) {
+                    if (data[index]) {
+                        labels.push(data[index]['full_name']);
+                        scores.push(data[index]['overall_percentage']);
+                    } else {
+                        labels.push(this.ordinalSuffixOf(index+1) + ' (To Be Determined)');
+                        scores.push(0);
+                    }
+                }
+
+                this.chartData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            data: scores,
+                            label: 'Grade Percentage',
+                            backgroundColor: ['#198754'],
+                        }
+                    ]
+                }
+
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        ordinalSuffixOf(i) {
+            let j = i % 10,
+                k = i % 100;
+            if (j === 1 && k !== 11) {
+                return i + "st";
+            }
+            if (j === 2 && k !== 12) {
+                return i + "nd";
+            }
+            if (j === 3 && k !== 13) {
+                return i + "rd";
+            }
+            return i + "th";
+        }
     },
 }
 </script>

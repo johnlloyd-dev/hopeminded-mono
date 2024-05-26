@@ -51,7 +51,7 @@
                             <template v-for="(alphabet, index) of alphabets" :key="index">
                                 <div class="card rounded-0 mb-3">
                                     <div class="card-header">
-                                        <h5 class="mb-0 fw-bold">{{ alphabet.toUpperCase() }}</h5>
+                                        <h5 class="mb-0 fw-bold">{{ typeof alphabet == 'string' ? alphabet.toUpperCase() : alphabet }}</h5>
                                     </div>
                                     <div class="card-body">
                                         <table v-if="statisticsSummary.hasOwnProperty(alphabet)"
@@ -161,6 +161,8 @@ export default {
                 this.textbookFlag = 'vowel-consonants'
             } else if (newGameFlag === 'memory-game') {
                 this.textbookFlag = 'alphabet-letters'
+            } else {
+                this.textbookFlag = 'numbers'
             }
 
             this.getStatistics()
@@ -168,7 +170,11 @@ export default {
     },
     computed: {
         alphabets() {
-            return Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i));
+            if (this.textbookFlag == 'numbers') {
+                return Array.from({length: 10}, (_, index) => index).sort((a, b) => a - b);
+            } else {
+                return Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i));
+            }
         }
     },
     mounted() {

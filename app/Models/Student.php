@@ -25,4 +25,23 @@ class Student extends Model
     {
         return $this->belongsTo(Teacher::class);
     }
+
+    public function quiz()
+    {
+        return $this->hasMany(QuizReport::class, 'student_id', 'id')
+            ->selectRaw('MAX(total_score) as highest_score, game_id, student_id')
+            ->where('flag', 'quiz')
+            ->where('mark', 'passed')
+            ->groupBy('game_id', 'student_id')
+            ->orderBy('game_id', 'ASC');
+    }
+
+    public function skill_test()
+    {
+        return $this->hasMany(SkillTest::class, 'student_id', 'id')
+            ->selectRaw('MAX(score) as highest_score, letter, student_id, flag')
+            ->where('status', 'correct')
+            ->groupBy('flag', 'letter', 'student_id')
+            ->orderBy('letter', 'ASC');
+    }
 }
