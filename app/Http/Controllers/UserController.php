@@ -113,13 +113,8 @@ class UserController extends Controller
     {
         $auth = Auth::user();
         $teacher = Teacher::where('user_id', $auth->id)->first();
-        $defaultUsername = "";
 
-        if (isset($request->lastName)) {
-            $defaultUsername .= strtolower($request->lastName) . "_";
-        }
-
-        $defaultUsername .= rand(100000, 999999);
+        $defaultUsername = rand(1000000, 9999999);
         $defaultPassword = "password";
 
 

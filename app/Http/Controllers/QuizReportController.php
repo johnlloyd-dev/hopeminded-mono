@@ -288,7 +288,7 @@ class QuizReportController extends Controller
                     }
                 }
 
-                return $quizMistake = collect($result)
+                $quizMistake = collect($result)
                     ->values()
                     ->flatten(1)
                     ->groupBy(function ($item) {

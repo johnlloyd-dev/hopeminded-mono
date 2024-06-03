@@ -28,12 +28,7 @@ class StudentsImport implements ToModel, WithHeadingRow
             return null;
         }
 
-        $defaultUsername = "";
-        if (isset($row['last_name'])) {
-            $defaultUsername .= strtolower($row['last_name']) . "_";
-        }
-
-        $defaultUsername .= rand(100000, 999999);
+        $defaultUsername = rand(1000000, 9999999);
         $defaultPassword = "password";
 
         $user = User::create([

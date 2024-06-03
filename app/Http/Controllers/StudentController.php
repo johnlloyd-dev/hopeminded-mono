@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Game;
+use App\Models\PassingPercentage;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
@@ -63,6 +64,8 @@ class StudentController extends Controller
     {
         $teacher_id = Teacher::where('user_id', Auth::user()->id)->first()->id;
         $games = Game::with('quizScore')->get();
+
+        $passing_percentages = PassingPercentage::where('teacher_id', $teacher_id)->get();
 
         return Student::select(
             DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name) as full_name'),

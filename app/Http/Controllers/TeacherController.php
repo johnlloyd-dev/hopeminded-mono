@@ -50,12 +50,12 @@ class TeacherController extends Controller
             [
                 'teacher_id' => $teacher->id,
                 'flag' => 'skill_test',
-                'percentage' => 50
+                'percentage' => 75
             ],
             [
                 'teacher_id' => $teacher->id,
                 'flag' => 'quiz',
-                'percentage' => 50
+                'percentage' => 75
             ],
         ];
 

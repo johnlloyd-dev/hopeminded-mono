@@ -45,7 +45,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
-                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.data_items && skillTestAL.data_items.length < quantityRequirement?.value || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.data_items && quantityRequirement && skillTestAL.data_items.length < quantityRequirement[0]?.value || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/vc.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Vowels/Consonants</h5>
@@ -58,7 +58,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
-                                        <div :class="{ 'opacity-75 pe-none': (skillTestAL.data_items && skillTestVC.data_items.length < quantityRequirement?.value) || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': (skillTestVC.data_items && quantityRequirement && skillTestVC.data_items.length < quantityRequirement[0]?.value) || isProcessing }" class="card" style="width: 18rem;">
                                             <img src="/images/words.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Alphabets/Words</h5>
@@ -71,8 +71,8 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
-                                        <!-- <div :class="{ 'opacity-75 pe-none': (skillTestAL.data_items && skillTestVC.data_items.length < quantityRequirement?.value) || isProcessing }" class="card" style="width: 18rem;"> -->
-                                        <div class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': (skillTestAW.data_items && quantityRequirement && skillTestAW.data_items.length < quantityRequirement[0]?.value) || isProcessing }" class="card" style="width: 18rem;">
+                                        <!-- <div class="card" style="width: 18rem;"> -->
                                             <img src="/images/numbers.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Numbers</h5>
@@ -131,6 +131,9 @@ export default {
             skillTestVC: {
                 data: []
             },
+            skillTestN: {
+                data: []
+            },
         };
     },
     mounted() {
@@ -181,11 +184,13 @@ export default {
                 const data1 = await axios.get(`/api/skill-test/fetch/alphabet-letters`)
                 const data2 = await axios.get(`/api/skill-test/fetch/vowel-consonants`)
                 const data3 = await axios.get(`/api/skill-test/fetch/alphabet-words`)
+                const data4 = await axios.get(`/api/skill-test/fetch/numbers`)
 
                 if(data1.status === 200 && data2.status === 200 && data3.status === 200) {
                     this.skillTestAL = data1.data
                     this.skillTestVC = data2.data
                     this.skillTestAW = data3.data
+                    this.skillTestN = data4.data
                 }
 
             } catch (error) {

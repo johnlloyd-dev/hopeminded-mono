@@ -514,7 +514,7 @@
             <!-- Modal -->
             <div class="modal fade rounded-0" id="weaknessModal" tabindex="-1" aria-labelledby="weaknessModalLabel"
                 aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen">
+                <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Weaknesses</h5>
@@ -647,7 +647,7 @@
                                                                 </tbody>
                                                             </table>
                                                         </template>
-                                                        <template v-else>
+                                                        <template v-else-if="flag === 'vowel-consonants'">
                                                             <table class="table table-bordered table-responsive">
                                                                 <thead>
                                                                     <tr>
@@ -680,6 +680,38 @@
                                                                         <td>
                                                                             <img style="width: 50px"
                                                                                 :src="item2.attributes.answer_image">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </template>
+                                                        <template v-else>
+                                                            <table class="table table-bordered table-responsive">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="text-center" style="width: 20%">To Match Numbers</th>
+                                                                        <th class="text-center" style="width: 20%">Answer Combination</th>
+                                                                        <th class="text-center" style="width: 20%">Mark</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody v-if="!item.length">
+                                                                    <tr>
+                                                                        <td colspan="4" class="text-center fw-bold">No data
+                                                                            found</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tbody v-else>
+                                                                    <tr :class="item2.attributes.mark === 'wrong' ? 'table-danger' : 'table-success'"
+                                                                        class="fw-bold" v-for="item2 in item"
+                                                                        :key="item2.id">
+                                                                        <td class="text-center">
+                                                                            <span v-for="item3 in item2.attributes.match_a">{{ item3 }}</span>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <span v-for="item3 in item2.attributes.match_b">{{ item3 }}</span>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            {{ item2.attributes.mark }}
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -732,7 +764,7 @@
                                                         </tbody>
                                                     </table>
                                                 </template>
-                                                <template v-else>
+                                                <template v-else-if="flag === 'alphabet-letters' || flag === 'vowel-consonants'">
                                                     <table class="table table-bordered table-responsive">
                                                         <thead>
                                                             <tr>
@@ -751,6 +783,32 @@
                                                                 v-for="(item, index) in weaknessesData.answer_key"
                                                                 :key="index">
                                                                 <td>{{ item.letter.toUpperCase() }}</td>
+                                                                <td>
+                                                                    <img width="100" :src="item.image">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+                                                <template v-else>
+                                                    <table class="table table-bordered table-responsive">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20%">Alphabet</th>
+                                                                <th style="width: 20%">Image</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody v-if="!weaknessesData.answer_key.matchB.length">
+                                                            <tr>
+                                                                <td colspan="2" class="text-center fw-bold">No data found
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tbody v-else>
+                                                            <tr class="fw-bold"
+                                                                v-for="(item, index) in weaknessesData.answer_key.matchB"
+                                                                :key="index">
+                                                                <td>{{ item.number }}</td>
                                                                 <td>
                                                                     <img width="100" :src="item.image">
                                                                 </td>
