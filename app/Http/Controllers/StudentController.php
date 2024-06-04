@@ -98,6 +98,7 @@ class StudentController extends Controller
 
                 return FALSE;
             })
+            ->values()
             ->map(function ($data) use ($games) {
                 // Quiz
                 $data->quiz->transform(function ($data) use ($games) {
@@ -153,6 +154,7 @@ class StudentController extends Controller
                 return $data;
             })
             ->take(10)
-            ->sortBy('overall_percentage');
+            ->sortByDesc('overall_percentage')
+            ->values();
     }
 }
