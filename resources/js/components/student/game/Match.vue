@@ -1,6 +1,6 @@
 <template>
     <video autoplay muted loop id="myVideo">
-        <source src="https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/game-background%2Fgame3.mp4?alt=media&token=6e283f50-555e-4559-ad39-14989f62bc4e" type="video/mp4">
+        <source src="https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/game-background%2Fgame5.mp4?alt=media&token=6e45b6bd-83f3-4061-9a5b-95ba9d802ea5" type="video/mp4">
     </video>
     <div v-if="isLoading">Loading...</div>
     <div v-else class="mx-5">

@@ -3,11 +3,18 @@
         <div class="d-flex">
             <teacher-sidebar-component @collapse="onCollapse" />
             <div :class="collapsed ? 'collapsed-menu' : 'not-collapsed-menu'" class="main-content mx-5 w-100 h-100 mt-5">
-                <button class="btn btn-secondary mb-3 rounded-0 me-3" data-bs-toggle="modal"
-                    data-bs-target="#addStudentModal">Add
-                    Student</button>
-                <button class="btn btn-success mb-3 rounded-0" data-bs-toggle="modal"
-                    data-bs-target="#importStudentModal">Import CSV</button>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <button class="btn btn-secondary mb-3 rounded-0 me-3" data-bs-toggle="modal"
+                        data-bs-target="#addStudentModal">Add
+                        Student</button>
+                    <button class="btn btn-success mb-3 rounded-0" data-bs-toggle="modal"
+                        data-bs-target="#importStudentModal">Import CSV</button>
+                </div>
+                <div class="form-group">
+                    <input type="text" v-model="searchQuery" class="form-control" @input="searchStudent()" placeholder="Search student...">
+                </div>
+            </div>
                 <div class="d-flex justify-content-center">
                     <table class="table table-striped table-bordered">
                         <thead>
@@ -367,7 +374,8 @@ export default {
             },
             statusPrompt: {},
             csvFile: null,
-            importing: false
+            importing: false,
+            searchQuery: null
         }
     },
     components: {
@@ -388,6 +396,13 @@ export default {
                 this.collapsed = false
             }
         },
+        searchStudent: _.debounce(async function () {
+            try {
+                await this.getStudents();
+            } catch (error) {
+                console.log(error)
+            }
+        }, 1000),
         async getStudents(next = null, remainToCurrentPage = true) {
             try {
                 this.isLoading = true
@@ -410,7 +425,10 @@ export default {
                     }
 
                     response = await axios.get('/api/users/students/get', {
-                        params: { page: page }
+                        params: {
+                            page: page,
+                            searchQuery: this.searchQuery
+                        }
                     })
                 }
 

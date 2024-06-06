@@ -19,7 +19,7 @@
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4">
                                             <h6 class="fw-bold">Skill Test</h6>
                                             <div class="d-flex flex-column">
                                                 <div v-for="(percentage, index) in percentages" :key="index"
@@ -37,7 +37,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4">
                                             <h6 class="fw-bold">Quiz</h6>
                                             <div class="d-flex flex-column">
                                                 <div v-for="(percentage, index) in percentages" :key="index"
@@ -51,6 +51,24 @@
                                                         {{ percentage.name }}
                                                     </label>
                                                     <i v-if="percentage.value == selectedPercentage.quiz"
+                                                        class="fas fa-check fa-lg ms-1"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <h6 class="fw-bold">Overall</h6>
+                                            <div class="d-flex flex-column">
+                                                <div v-for="(percentage, index) in percentages" :key="index"
+                                                    class="form-check">
+                                                    <input @click="updatePassingPercentage('overall')"
+                                                        v-model="selectedPercentage.overall" :value="percentage.value"
+                                                        class="form-check-input" type="radio"
+                                                        :id="`percentageOptions${index}`">
+                                                    <label class="form-check-label fw-bold"
+                                                        :for="`percentageOptions${index}`">
+                                                        {{ percentage.name }}
+                                                    </label>
+                                                    <i v-if="percentage.value == selectedPercentage.overall"
                                                         class="fas fa-check fa-lg ms-1"></i>
                                                 </div>
                                             </div>
@@ -91,7 +109,7 @@
                                             <div v-else-if="isEditAlphabet">
                                                 <label for="exampleFormControlInput1" class="form-label">Please enter a
                                                     number:</label>
-                                                <input v-model="alphabetValue" type="text" class="form-control">
+                                                <input v-model="alphabetValue" type="number" max="26" min="1" class="form-control" required>
                                                 <div class="action-buttons mt-3">
                                                     <button type="button" @click="updateQuantityRequirement()" class="btn btn-primary btn-sm me-3">Save <i class="fas fa-save"></i></button>
                                                     <button type="button" @click="isEditAlphabet = !isEditAlphabet" class="btn btn-secondary btn-sm">Cancel <i class="fas fa-times-circle"></i></button>
@@ -100,7 +118,7 @@
                                             <div v-else-if="isEditNumber">
                                                 <label for="exampleFormControlInput1" class="form-label">Please enter a
                                                     number:</label>
-                                                <input v-model="numberValue" type="text" class="form-control">
+                                                <input v-model="numberValue" type="number" max="10" min="1" class="form-control" required>
                                                 <div class="action-buttons mt-3">
                                                     <button type="button" @click="updateQuantityRequirement()" class="btn btn-primary btn-sm me-3">Save <i class="fas fa-save"></i></button>
                                                     <button type="button" @click="isEditNumber = !isEditNumber" class="btn btn-secondary btn-sm">Cancel <i class="fas fa-times-circle"></i></button>
@@ -134,7 +152,8 @@ export default {
             numberValue: 0,
             selectedPercentage: {
                 skill_test: null,
-                quiz: null
+                quiz: null,
+                overall: null
             },
             percentages: [
                 { name: '50%', value: 50 },
@@ -175,6 +194,7 @@ export default {
                 this.passingPercentage = response.data
                 this.selectedPercentage.skill_test = response.data['skill_test'].percentage
                 this.selectedPercentage.quiz = response.data['quiz'].percentage
+                this.selectedPercentage.overall = response.data['overall'].percentage
             } catch (error) {
                 console.log(error)
             }

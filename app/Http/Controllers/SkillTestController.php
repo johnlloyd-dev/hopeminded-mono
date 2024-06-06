@@ -115,14 +115,18 @@ class SkillTestController extends Controller
             $studentId = $request->get('student_id');
         }
 
+        $teacher_id = Student::find($studentId)->teacher_id;
+        $passing_percentages = PassingPercentage::where('teacher_id', $teacher_id)->get();
+        $passing_percentage = (int)$passing_percentages->firstWhere('flag', 'skill_test')->percentage / 100;
+
         $skillTests = SkillTest::where('student_id', $studentId)
             ->where('flag', $flag)
             ->get()
-            ->map(function ($skill_test) use ($studentId) {
-                $perfect_score = PerfectScore::where('student_id', $studentId)->first()->score ?? 10;
+            ->map(function ($skill_test) use ($passing_percentage) {
+                $perfect_score = 10;
                 $score = (int)$skill_test->score;
                 $percentage = ((int)$skill_test->score / $perfect_score) * 100;
-                $passing_score = $perfect_score * .75;
+                $passing_score = $perfect_score * (float)$passing_percentage;
 
                 $skill_test->perfect_score = $perfect_score;
                 $skill_test->percentage = $percentage;

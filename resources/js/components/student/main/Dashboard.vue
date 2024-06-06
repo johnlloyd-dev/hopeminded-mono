@@ -13,44 +13,44 @@
                         <div class="card-body">
                             <div class="row d-flex justify-content-between mb-5">
                                 <div class="col-lg-3 col-md-12 col-sm-12 p-0">
-                                    <div class="card-sl">
-                                        <div class="card-image">
+                                    <div id="memoryGame" class="card-sl card-animate-hover card-animation animate__animated">
+                                        <div class="card-image bg-card">
                                             <img src="/images/memory.png" />
                                         </div>
-                                        <router-link to="/memory-game" class="card-action"><i class="fa fa-play"></i></router-link>
+                                        <button @click="gameNavigate('/memory-game', 'memoryGame')" type="button" class="card-action btn"><i class="fa fa-play"></i></button>
                                         <div class="card-heading">
                                             Memory Game
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-12 col-sm-12 p-0">
-                                    <div class="card-sl">
-                                        <div class="card-image">
+                                    <div id="typingBalloon" class="card-sl card-animate-hover card-animation animate__animated">
+                                        <div class="card-image bg-card">
                                             <img src="/images/balloon.png" />
                                         </div>
-                                        <router-link to="/typing-balloon" class="card-action"><i class="fa fa-play"></i></router-link>
+                                        <button @click="gameNavigate('/typing-balloon', 'typingBalloon')" type="button" class="card-action btn"><i class="fa fa-play"></i></button>
                                         <div class="card-heading">
                                             Typing Balloon
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-12 col-sm-12 p-0">
-                                    <div class="card-sl">
-                                        <div class="card-image">
+                                    <div id="hangmanGame" class="card-sl card-animate-hover card-animation animate__animated">
+                                        <div class="card-image bg-card">
                                             <img src="/images/hangman.png" />
                                         </div>
-                                        <router-link to="/hangman-game" class="card-action"><i class="fa fa-play"></i></router-link>
+                                        <button @click="gameNavigate('/hangman-game', 'hangmanGame')" type="button" class="card-action btn"><i class="fa fa-play"></i></button>
                                         <div class="card-heading">
                                             Hangman
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-12 col-sm-12 p-0">
-                                    <div class="card-sl">
-                                        <div class="card-image">
+                                    <div id="matchingCards" class="card-sl card-animate-hover card-animation animate__animated">
+                                        <div class="card-image bg-card">
                                             <img src="/images/matching-game.jpg" />
                                         </div>
-                                        <router-link to="/matching-cards" class="card-action"><i class="fa fa-play"></i></router-link>
+                                        <button @click="gameNavigate('/matching-cards', 'matchingCards')" type="button" class="card-action btn"><i class="fa fa-play"></i></button>
                                         <div class="card-heading">
                                             Matching Cards
                                         </div>
@@ -80,6 +80,16 @@ export default {
                 this.collapsed = false
             }
         },
+        gameNavigate(page, cardId) {
+            var element = document.getElementById(cardId);
+            element.classList.remove("card-animation");
+            element.classList.remove("card-animate-hover");
+            element.classList.add("animate__zoomOutUp");
+
+            setTimeout(() => {
+                this.$router.push(page)
+            }, 1000)
+        }
     },
 }
 </script>
@@ -107,21 +117,39 @@ export default {
 }
 
 .card-sl {
-    border-radius: 8px;
+    border-radius: 8px !important;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     width: 250px;
     height: 270px;
+    position: relative;
+    z-index: 999
+}
+
+.card-animate-hover:hover {
+    animation: scaleUpDown 1s ease-in-out infinite;
+}
+
+@keyframes scaleUpDown {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.03);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 .card-image {
     display: flex;
     justify-content: center;
+    border-radius: 8px 8px 0px 0;
 }
 
 .card-image img {
     width: 230px;
     height: 230px;
-    border-radius: 8px 8px 0px 0;
 }
 
 .card-action {
@@ -150,7 +178,7 @@ export default {
     font-weight: bold;
     background: #fff;
     padding: 10px 15px;
-    border-radius: 8px;
+    border-radius: 0 0 8px 8px;
 }
 
 .card-text {
@@ -225,5 +253,113 @@ export default {
         transform: scale(0.9);
         box-shadow: 0 0 0 0 rgba(90, 153, 212, 0);
     }
+}
+
+.card-animation {
+    transition: 1s box-shadow;
+}
+
+.card-animation:hover {
+    box-shadow: 0 5px 35px 0px rgba(255, 0, 0, 0.1);
+}
+
+.card-animation:hover::before, .card-animation:hover::after {
+  display: block;
+  content: '';
+  position: absolute;
+  width: 250px;
+  height: 270px;
+  background: #FDA8CF;
+  border-radius: 5px;
+  z-index: -1;
+  animation: 1s clockwise infinite;
+}
+
+.card-animation:hover:after {
+  background: #F3CE5E;
+  animation: 2s counterclockwise infinite;
+}
+
+@keyframes clockwise {
+  0% {
+    top: -5px;
+    left: 0;
+  }
+  12% {
+    top: -2px;
+    left: 2px;
+  }
+  25% {
+    top: 0;
+    left: 5px;
+  }
+  37% {
+    top: 2px;
+    left: 2px;
+  }
+  50% {
+    top: 5px;
+    left: 0;
+  }
+  62% {
+    top: 2px;
+    left: -2px;
+  }
+  75% {
+    top: 0;
+    left: -5px;
+  }
+  87% {
+    top: -2px;
+    left: -2px;
+  }
+  100% {
+    top: -5px;
+    left: 0;
+  }
+}
+
+@keyframes counterclockwise {
+  0% {
+    top: -5px;
+    right: 0;
+  }
+  12% {
+    top: -2px;
+    right: 2px;
+  }
+  25% {
+    top: 0;
+    right: 5px;
+  }
+  37% {
+    top: 2px;
+    right: 2px;
+  }
+  50% {
+    top: 5px;
+    right: 0;
+  }
+  62% {
+    top: 2px;
+    right: -2px;
+  }
+  75% {
+    top: 0;
+    right: -5px;
+  }
+  87% {
+    top: -2px;
+    right: -2px;
+  }
+  100% {
+    top: -5px;
+    right: 0;
+  }
+}
+
+.bg-card {
+    background: #aed7fd;
+    /* background: radial-gradient(circle, rgba(174,209,238,1) 0%, rgba(148,233,226,1) 100%); */
 }
 </style>

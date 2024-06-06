@@ -4,6 +4,7 @@ import { createApp } from 'vue';
 import { store } from './store';
 
 import router from './router'
+import 'animate.css';
 
 const app = createApp({});
 

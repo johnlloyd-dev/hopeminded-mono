@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\Notification;
+use App\Models\PassingPercentage;
 use App\Models\QuizMistake;
 use App\Models\QuizReport;
 use App\Models\Retake;
@@ -135,14 +136,18 @@ class GameController extends Controller
         $gameId = $request->query('gameId');
         $quiz = QuizReport::findOrFail($id);
         $game = Game::find($gameId);
+        $teacher_id = Student::where('user_id', Auth::user()->id)->first()->teacher_id;
+        $passing_percentages = PassingPercentage::where('teacher_id', $teacher_id)->get();
 
         $mark = null;
         $passingScore = null;
 
+        $percentage = (int)$passing_percentages->firstWhere('flag', 'quiz')->percentage / 100;
+
         if ($request->has('flag') && $request->query('flag') == 'tutorial') {
-            $passingScore = $game->tutorialScore->first()->passing_score;
+            $passingScore = round((int)$game->tutorialScore->first()->perfect_score * (float)$percentage);
         } else {
-            $passingScore = $game->quizScore->first()->passing_score;
+            $passingScore = round((int)$game->quizScore->first()->perfect_score * (float)$percentage);
         }
 
         if ($request->input('score') < $passingScore) {

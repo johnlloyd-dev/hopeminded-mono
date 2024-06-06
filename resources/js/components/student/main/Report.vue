@@ -456,9 +456,9 @@ export default {
                 if (this.skillTestsData && this.skillTestsData.hasOwnProperty(element)) {
                     data[element] = {
                         submitted: this.skillTestsData[element].submitted,
-                        average: this.skillTestsData[element].average,
+                        average: Math.round(this.skillTestsData[element].average),
                         mark: this.skillTestsData[element].mark,
-                        percentage: this.skillTestsData[element].percentage + '%'
+                        percentage: Math.round(this.skillTestsData[element].percentage) + '%'
                     }
                 } else {
                     data[element] = {

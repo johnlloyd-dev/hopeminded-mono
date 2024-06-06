@@ -81,7 +81,7 @@ class StudentController extends Controller
 
                 $quizCount = $report->quiz->count();
                 $skillTestTextbookCount = $report->skill_test->groupBy('flag')->count();
-                $skillTestComplete = $report->skill_test->groupBy('flag')->some(function ($data, $key) {
+                $skillTestComplete = $report->skill_test->groupBy('flag')->every(function ($data, $key) {
                     if ($key == 'numbers') {
                         return $data->count() >= 10;
                     } else {
@@ -99,7 +99,7 @@ class StudentController extends Controller
                 return FALSE;
             })
             ->values()
-            ->map(function ($data) use ($games) {
+            ->map(function ($data) use ($games, $passing_percentages) {
                 // Quiz
                 $data->quiz->transform(function ($data) use ($games) {
                     $game = $games->firstWhere('id', $data->game_id);
@@ -140,13 +140,13 @@ class StudentController extends Controller
                 // End of Skill Test
 
                 $data->quiz_percentage = round($data->quiz->sum('percentage') / $data->quiz->count());
-                $data->quiz_mark = $data->quiz_percentage < 75 ? 'failed' : 'passed';
+                $data->quiz_mark = $data->quiz_percentage < $passing_percentages->firstWhere('flag', 'quiz')->percentage ? 'failed' : 'passed';
 
                 $data->skill_test_percentage = round($skillTest->sum('percentage') / $skillTest->count());
-                $data->skill_test_mark = $data->skill_test_percentage < 75 ? 'failed' : 'passed';
+                $data->skill_test_mark = $data->skill_test_percentage < $passing_percentages->firstWhere('flag', 'skill_test')->percentage ? 'failed' : 'passed';
 
                 $data->overall_percentage = ($data->skill_test_percentage + $data->quiz_percentage) / 2;
-                $data->overall_mark = $data->overall_percentage < 75 ? 'failed' : 'passed';
+                $data->overall_mark = $data->overall_percentage < $passing_percentages->firstWhere('flag', 'overall')->percentage ? 'failed' : 'passed';
 
                 unset($data->quiz);
                 unset($data->skill_test);

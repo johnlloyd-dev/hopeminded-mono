@@ -22,7 +22,7 @@ class UserController extends Controller
         return Auth::user();
     }
 
-    public function getStudents()
+    public function getStudents(Request $request)
     {
         $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
 
@@ -55,6 +55,13 @@ class UserController extends Controller
         })
             ->select('users.*', 'students.*')
             ->where('students.teacher_id', $teacherId)
+            ->when($request->get('searchQuery'), function ($query) use ($request) {
+                $query->where(function ($query) use ($request) {
+                    $query->where('students.first_name', 'LIKE', '%'. $request->get('searchQuery') .'%')
+                        ->orWhere('students.middle_name', 'LIKE', '%'. $request->get('searchQuery') .'%')
+                        ->orWhere('students.last_name', 'LIKE', '%'. $request->get('searchQuery') .'%');
+                });
+            })
             ->paginate(5);
 
         $transformedData = $paginationData->getCollection()->map(function ($student) use ($memory_game_perfect_score, $hangman_game_perfect_score, $typing_balloon_perfect_score, $matching_game_perfect_score) {

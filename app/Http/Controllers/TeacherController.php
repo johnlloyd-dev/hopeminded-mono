@@ -57,6 +57,11 @@ class TeacherController extends Controller
                 'flag' => 'quiz',
                 'percentage' => 75
             ],
+            [
+                'teacher_id' => $teacher->id,
+                'flag' => 'overall',
+                'percentage' => 75
+            ],
         ];
 
         $defaultSkillTestSubmission = [
