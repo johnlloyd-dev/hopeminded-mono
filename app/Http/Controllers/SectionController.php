@@ -58,12 +58,15 @@ class SectionController extends Controller
     {
         $teacherId = Teacher::where('user_id', Auth::user()->id)->first()->id;
         return Student::select(
-            'id',
-            'first_name',
-            'middle_name',
-            'last_name',
-            'email'
+            'students.id',
+            'students.first_name',
+            'students.middle_name',
+            'students.last_name',
+            'students.email',
+            'students.user_id',
+            'users.status'
         )
+            ->join('users', 'users.id', '=', 'students.user_id')
             ->where('teacher_id', $teacherId)
             ->where('section_id', $request->query('sectionId'))
             ->get();

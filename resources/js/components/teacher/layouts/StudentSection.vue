@@ -37,6 +37,12 @@
                                 <button @click="removeStudent(student.id)" type="button" class="btn btn-danger btn-sm rounded-0 me-3">
                                     Remove
                                 </button>
+                                <button @click="viewReport(student.id)" type="button" class="btn btn-secondary btn-sm rounded-0 me-3">
+                                    Reports
+                                </button>
+                                <button @click="toggleConfirmationModal(student)" type="button" :class="student.status == 'active' ? 'btn-danger' : 'btn-success'" class="btn btn-sm rounded-0 me-3">
+                                    <span>{{ student.status == 'active' ? "Deactivate " : "Activate " }} </span>
+                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -51,36 +57,63 @@
 
         <!-- Modal -->
         <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addStudentModalLabel">Add Students To This Section</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <template v-if="!studentsNotInSectionLoading">
-                        <template v-if="studentsNotInSection.length">
-                            <div v-for="student in studentsNotInSection" :key="student.id" class="form-check">
-                                <input v-model="selectedStudentsIds" class="form-check-input" type="checkbox" :value="student.id" id="flexCheckDefault">
-                                <label class="form-check-label fw-bold" for="flexCheckDefault">
-                                    {{ combineName(student) }}
-                                </label>
-                            </div>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addStudentModalLabel">Add Students To This Section</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <template v-if="!studentsNotInSectionLoading">
+                            <template v-if="studentsNotInSection.length">
+                                <div v-for="student in studentsNotInSection" :key="student.id" class="form-check">
+                                    <input v-model="selectedStudentsIds" class="form-check-input" type="checkbox" :value="student.id" id="flexCheckDefault">
+                                    <label class="form-check-label fw-bold" for="flexCheckDefault">
+                                        {{ combineName(student) }}
+                                    </label>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <p class="text-center fw-bold">No records found</p>
+                            </template>
                         </template>
                         <template v-else>
-                            <p class="text-center fw-bold">No records found</p>
+                            <p class="text-center fw-bold">Loading...</p>
                         </template>
-                    </template>
-                    <template v-else>
-                        <p class="text-center fw-bold">Loading...</p>
-                    </template>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal">Close</button>
-                    <button @click="addStudentsToSection()" :disabled="!selectedStudentsIds.length" type="button" class="btn btn-primary rounded-0">Add Students To Section</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal">Close</button>
+                        <button @click="addStudentsToSection()" :disabled="!selectedStudentsIds.length" type="button" class="btn btn-primary rounded-0">Add Students To Section</button>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Update Student Confirmation Modal -->
+        <div class="modal fade" id="updateStatusConfirmation" data-bs-backdrop="static" tabindex="-1"
+            aria-labelledby="updateStatusConfirmationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <img width="70" src="/images/main-logo.png" style="margin-right: 10px; border-radius: 50%"
+                            class="logo" alt="Hopeminded Logo">
+                        <h5 class="modal-title" id="updateStatusConfirmationModalLabel">Update Status Confirmation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="fw-bold">Do you want to proceed in {{ statusPrompt.status == 'active' ? 'deactivating' : 'activating' }} this student's account?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button v-if="!isLoading" type="button" @click.prevent="updateStudentStatus(statusPrompt.user_id)"
+                            style="font-weight: bold; width: 120px;" class="btn btn-primary">Proceed</button>
+                        <button type="button" v-else disabled style="font-weight: bold; width: 120px;"
+                            class="btn btn-primary pb-0">
+                            <Loading />
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -101,13 +134,19 @@ export default {
             studentsNotInSectionLoading: false,
             studentsOfSection: [],
             studentsNotInSection: [],
-            selectedStudentsIds: []
+            selectedStudentsIds: [],
+            statusPrompt: {},
         }
     },
     created() {
         this.getStudentsOfSection()
     },
     methods: {
+        viewReport(studentId) {
+            this.$router.push({
+                path: `/student-quiz-report/${studentId}`
+            });
+        },
         async getStudentsOfSection() {
             try {
                 this.studentsOfSectionLoading = true
@@ -193,7 +232,28 @@ export default {
         },
         navigate() {
             this.$router.push('/section-management')
-        }
+        },
+        toggleConfirmationModal(student) {
+            this.statusPrompt.status = student.status
+            this.statusPrompt.user_id = student.user_id
+            $('#updateStatusConfirmation').modal('show')
+        },
+        async updateStudentStatus(userId) {
+            try {
+                this.isLoading = true
+                const response = await axios.put(`/api/status/update/user/${userId}`)
+
+                if (response.status == 200 || response.status == 201) {
+                    $('#updateStatusConfirmation').modal('hide')
+                    swal.fire('Success', response.data.message, 'success')
+                    this.getStudentsOfSection()
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.isLoading = false
+            }
+        },
     },
 }
 </script>
