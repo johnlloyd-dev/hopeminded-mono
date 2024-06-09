@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-3">
-                                        <div :class="{ 'opacity-75 pe-none': isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': isProcessing }" class="card animate__animated animate__swing" style="width: 18rem;">
                                             <img src="/images/alphabets.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Alphabets/Letters</h5>
@@ -45,7 +45,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
-                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.data_items && quantityRequirement && skillTestAL.data_items.length < quantityRequirement[0]?.value || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': skillTestAL.data_items && quantityRequirement && skillTestAL.data_items.length < quantityRequirement[0]?.value || isProcessing }" class="card animate__animated animate__swing" style="width: 18rem;">
                                             <img src="/images/vc.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Vowels/Consonants</h5>
@@ -58,7 +58,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
-                                        <div :class="{ 'opacity-75 pe-none': (skillTestVC.data_items && quantityRequirement && skillTestVC.data_items.length < quantityRequirement[0]?.value) || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': (skillTestVC.data_items && quantityRequirement && skillTestVC.data_items.length < quantityRequirement[0]?.value) || isProcessing }" class="card animate__animated animate__swing" style="width: 18rem;">
                                             <img src="/images/words.png" class="card-img-top" alt="...">
                                             <div class="card-body">
                                                 <h5 class="card-title">Alphabets/Words</h5>
@@ -71,7 +71,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
-                                        <div :class="{ 'opacity-75 pe-none': (skillTestAW.data_items && quantityRequirement && skillTestAW.data_items.length < quantityRequirement[0]?.value) || isProcessing }" class="card" style="width: 18rem;">
+                                        <div :class="{ 'opacity-75 pe-none': (skillTestAW.data_items && quantityRequirement && skillTestAW.data_items.length < quantityRequirement[0]?.value) || isProcessing }" class="card animate__animated animate__swing" style="width: 18rem;">
                                         <!-- <div class="card" style="width: 18rem;"> -->
                                             <img src="/images/numbers.png" class="card-img-top" alt="...">
                                             <div class="card-body">

@@ -1,6 +1,9 @@
 
 <template>
     <body v-if="!disabledGame">
+        <video autoplay="autoplay" muted loop id="myVideo">
+            <source src="https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/game-background%2Fgame7.mp4?alt=media&token=d9c5e13c-1c24-4a43-8032-467fd861647c" type="video/mp4">
+        </video>
         <canvas id="canvas" ref="canvas"></canvas>
     </body>
     <div v-else class="bg-white position-relative" style="height: 100vh">
@@ -153,6 +156,18 @@ export default {
                     this.ctx = this.c.getContext("2d");
                     this.c.height = window.innerHeight * 0.98;
                     this.c.width = window.innerWidth * 0.996;
+
+                    const video = document.querySelector('#myVideo');
+
+                    video.addEventListener('play', () => {
+                        function drawFrame() {
+                            if (!video.paused && !video.ended) {
+                                ctx.drawImage(video, 0, 0, this.c.width, this.c.height);
+                                requestAnimationFrame(drawFrame); // Use requestAnimationFrame for smoother animation
+                            }
+                        }
+                        drawFrame();
+                    });
 
                     this.initBalloons();
                     this.animate();
@@ -336,7 +351,8 @@ body {
     height: 100%;
     border: 1px solid black;
     background-size: cover;
-    background-image: url("/images/background.jpg");
+    z-index: 999;
+    // background-image: url("/images/background.jpg");
 }
 
 #container {
@@ -351,6 +367,7 @@ body {
     align-items: center;
     justify-content: center;
     background-size: calc(10 * 2px) calc(10 * 2px);
+    z-index: 999;
 }
 
 .container-inner {
@@ -421,5 +438,15 @@ body {
             }
         }
     }
+}
+
+video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1; /* Place it behind other content */
 }
 </style>

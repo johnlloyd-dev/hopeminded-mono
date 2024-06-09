@@ -1,5 +1,7 @@
 <template>
-    <div id="overlay"></div>
+    <video autoplay muted loop id="myVideo">
+        <source src="https://firebasestorage.googleapis.com/v0/b/hopeminded-d6a43.appspot.com/o/game-background%2Fgame4.mp4?alt=media&token=bdc4ca16-1fe8-4c26-ad45-00e3b09eadf1" type="video/mp4">
+    </video>
     <div style="z-index: 9999">
         <div v-if="!disabledGame" class="body">
             <!-- <h3 style="font-weight: bold;">Chances:
@@ -839,5 +841,14 @@ img {
         width: 100%;
         margin: 0;
     }
+}
+
+#myVideo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
 }
 </style>

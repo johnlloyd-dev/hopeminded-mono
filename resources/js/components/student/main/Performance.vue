@@ -48,7 +48,7 @@ export default {
                 }
             }
 
-            return 'Ranked Above 10th'
+            return 'Not on the top 10 yet'
         }
     },
     methods: {

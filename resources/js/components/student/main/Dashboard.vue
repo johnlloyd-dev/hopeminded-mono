@@ -13,7 +13,7 @@
                         <div class="card-body">
                             <div class="row d-flex justify-content-between mb-5">
                                 <div class="col-lg-3 col-md-12 col-sm-12 p-0">
-                                    <div id="memoryGame" class="card-sl card-animate-hover card-animation animate__animated">
+                                    <div id="memoryGame" class="card-sl card-animate-hover animate__animated animate__swing">
                                         <div class="card-image bg-card">
                                             <img src="/images/memory.png" />
                                         </div>
@@ -24,7 +24,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-12 col-sm-12 p-0">
-                                    <div id="typingBalloon" class="card-sl card-animate-hover card-animation animate__animated">
+                                    <div id="typingBalloon" class="card-sl card-animate-hover animate__animated animate__swing">
                                         <div class="card-image bg-card">
                                             <img src="/images/balloon.png" />
                                         </div>
@@ -35,7 +35,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-12 col-sm-12 p-0">
-                                    <div id="hangmanGame" class="card-sl card-animate-hover card-animation animate__animated">
+                                    <div id="hangmanGame" class="card-sl card-animate-hover animate__animated animate__swing">
                                         <div class="card-image bg-card">
                                             <img src="/images/hangman.png" />
                                         </div>
@@ -46,7 +46,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-12 col-sm-12 p-0">
-                                    <div id="matchingCards" class="card-sl card-animate-hover card-animation animate__animated">
+                                    <div id="matchingCards" class="card-sl card-animate-hover animate__animated animate__swing">
                                         <div class="card-image bg-card">
                                             <img src="/images/matching-game.jpg" />
                                         </div>
@@ -126,7 +126,7 @@ export default {
 }
 
 .card-animate-hover:hover {
-    animation: scaleUpDown 1s ease-in-out infinite;
+    animation: scaleUpDown 1s ease-in-out;
 }
 
 @keyframes scaleUpDown {
