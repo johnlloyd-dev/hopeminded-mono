@@ -10,6 +10,7 @@ const teacherDashboard = () => import("../components/teacher/main/Dashboard.vue"
 const studentTextbook = () => import("../components/student/main/Textbook.vue");
 const studentReport = () => import("../components/student/main/Report.vue");
 const certificates = () => import("../components/student/main/Certificates.vue");
+const performance = () => import("../components/student/main/Performance.vue");
 const contact = () => import("../components/student/main/Contact.vue");
 const review = () => import("../components/student/main/Review.vue");
 
@@ -362,6 +363,14 @@ const routes = [
             title: `Section`,
         },
     },
+    {
+        name: "performance",
+        path: "/performance",
+        component: performance,
+        meta: {
+            title: `Performance`,
+        }
+    }
 ];
 const router = createRouter({
     history: createWebHistory(),

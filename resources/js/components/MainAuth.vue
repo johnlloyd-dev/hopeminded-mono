@@ -145,7 +145,8 @@ export default {
                 .then(({ data }) => {
                     localStorage.setItem('token', data.data.token)
                     localStorage.setItem('fullname', data.data.fullname)
-                    console.log(data.data.user_flag)
+                    localStorage.setItem('ownerId', data.data.owner_id)
+
                     if (data.data.user_flag == 'student')
                         this.$router.push({ path: '/student-dashboard' })
                     else if (data.data.user_flag == 'teacher')

@@ -60,9 +60,16 @@ class StudentController extends Controller
         ]);
     }
 
-    public function getTopStudents()
+    public function getTopStudents(Request $request)
     {
-        $teacher_id = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        $teacher_id = null;
+
+        if ($request->has('flag')) {
+            $teacher_id = Student::where('user_id', Auth::user()->id)->first()->teacher_id;
+        } else {
+            $teacher_id = Teacher::where('user_id', Auth::user()->id)->first()->id;
+        }
+
         $games = Game::with('quizScore')->get();
 
         $passing_percentages = PassingPercentage::where('teacher_id', $teacher_id)->get();

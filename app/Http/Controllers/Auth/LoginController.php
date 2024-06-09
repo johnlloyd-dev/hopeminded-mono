@@ -38,6 +38,7 @@ class LoginController extends Controller
                         $data['fullname'] = $owner->first_name . " " . $owner->middle_name . " " . $owner->last_name;
                     }
                     $data['user_flag'] = $auth->user_flag;
+                    $data['owner_id'] = $owner->id;
                     $data['token'] = $auth->createToken('LoginToken')->plainTextToken;
                     return response()->json(['data' => $data]);
                 }

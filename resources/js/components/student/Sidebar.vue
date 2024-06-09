@@ -85,6 +85,11 @@ export default {
                     icon: 'fa-solid fa-certificate',
                 },
                 {
+                    href: '/performance',
+                    title: 'Performance',
+                    icon: 'fa-solid fa-star',
+                },
+                {
                     href: '/contact-us',
                     title: 'Contact Us',
                     icon: 'fa-solid fa-address-book',
