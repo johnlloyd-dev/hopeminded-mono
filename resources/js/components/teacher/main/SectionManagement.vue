@@ -221,7 +221,7 @@ export default {
     background-size: cover;
     background-repeat: repeat;
     background-attachment: fixed;
-    color: #333;
+    color: #101c2a;
     padding: 0;
     margin: 0;
     height: 100vh;
@@ -229,7 +229,8 @@ export default {
 }
 
 .card {
-    background-color: rgba(255, 255, 255, 0.5);
+
+    background-color: rgba(232, 223, 223, 0.1);
     border: none;
 }
 </style>

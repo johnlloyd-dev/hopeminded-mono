@@ -26,6 +26,7 @@ class LoginController extends Controller
             } else if (Hash::check($request->password, $user->password)) {
                 if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
                     $auth = $request->user();
+                    $owner = null;
                     if ($auth->user_flag != 'admin') {
                         switch ($auth->user_flag) {
                             case 'student':
@@ -38,7 +39,7 @@ class LoginController extends Controller
                         $data['fullname'] = $owner->first_name . " " . $owner->middle_name . " " . $owner->last_name;
                     }
                     $data['user_flag'] = $auth->user_flag;
-                    $data['owner_id'] = $owner->id;
+                    $data['owner_id'] = isset($owner) ? $owner->id : null;
                     $data['token'] = $auth->createToken('LoginToken')->plainTextToken;
                     return response()->json(['data' => $data]);
                 }
