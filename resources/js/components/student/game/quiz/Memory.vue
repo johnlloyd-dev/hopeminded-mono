@@ -267,7 +267,7 @@ export default {
                 //         this.text = `Sorry. You already used up your play chances.`
                 //         this.cancelButtonText = 'Exit'
                 //     } else {
-                //         // this.startTimer();
+                //         this.startTimer();
                 //         this.disabledGame = false
                 //         this.storeQuizInfo()
                 //         this.fetchAlphabets()
@@ -445,7 +445,7 @@ export default {
                     this.memoryGame.highestLevel = 3
                 }
                 this.time = 60
-                this.startTimer()
+                // this.startTimer()
                 this.updateQuizInfo()
             }
             this.show = false
