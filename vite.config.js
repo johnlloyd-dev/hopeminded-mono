@@ -4,6 +4,14 @@ import vue from '@vitejs/plugin-vue';
 import axios from 'axios';
 
 export default defineConfig({
+    server: {
+        host: '0.0.0.0',
+        port: 3001,
+        strictPort: true, // Ensures it doesn't switch to another port
+        hmr: {
+            host: 'localhost',
+        },
+    },
     plugins: [
         laravel({
             input: [
